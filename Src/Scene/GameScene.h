@@ -13,6 +13,14 @@ class Item;
 class MiniMap;
 class Camera;
 
+//スポーン場所
+struct SpawnArea
+{
+	VECTOR center;     // 中心座標
+	float radius;      // 半径
+	bool triggered;    // もうスポーン済みか（1回きりの場合）
+};
+
 class GameScene : public SceneBase
 {
 public:
@@ -33,11 +41,13 @@ public:
 	void AddItem(std::shared_ptr<Item> item);
 	std::shared_ptr<Item>CreateItem(const VECTOR& spawnPos, float scale,Item::TYPE itemType);
 	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
+
 private:
 	int cnt;
 
-	void EnemyCreate(void);
+	void EnemyCreate(int count);
 
+	std::vector<SpawnArea> spawnAreas_;	// スポーン場所
 	std::unique_ptr<Stage> stage_;		// ステージ
 	std::shared_ptr<Tree>tree_;			// ツリー
 	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
