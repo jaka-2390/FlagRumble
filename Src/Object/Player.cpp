@@ -13,7 +13,6 @@
 #include "Common/AnimationController.h"
 #include "Common/Capsule.h"
 #include "Common/Collider.h"
-#include "Tree.h"
 #include "Player.h"
 
 //íSìñ˚¸ñÏ
@@ -22,7 +21,6 @@ Player::Player(void)
 {
 	animationController_ = nullptr;
 	enemy_ = nullptr;
-	tree_ = nullptr;
 
 	state_ = STATE::NONE;
 
@@ -256,39 +254,6 @@ void Player::Draw(void)
 			DrawTriangle(cx, timerCy, (int)x1, (int)y1, (int)x2, (int)y2, GetColor(0, 0, 0), true);
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
-
-	if (tree_ && tree_->GetLv() >= 50) {
-		const int cx = 450;
-		const int iconCy = Application::SCREEN_SIZE_Y - 115;
-		const int timerCy = iconCy + 2;
-		const float radius = 32.0f;
-		const int segments = 60;
-
-		DrawRotaGraph(cx, iconCy, 1.3, 0, imgRotateAttackIcon_, true);
-
-		if (!IsExAttackReady())
-		{
-			float ratio = static_cast<float>(GetNowCount() - lastExTime_) / exTimer_;
-			int filledSegments = static_cast<int>(segments * ratio);
-
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-
-			for (int i = 0; i < segments - filledSegments; ++i)
-			{
-				float angle1 = -DX_PI_F / 2 - DX_TWO_PI * i / segments;
-				float angle2 = -DX_PI_F / 2 - DX_TWO_PI * (i + 1) / segments;
-
-				float x1 = cx + radius * cosf(angle1);
-				float y1 = timerCy + radius * sinf(angle1);
-				float x2 = cx + radius * cosf(angle2);
-				float y2 = timerCy + radius * sinf(angle2);
-
-				DrawTriangle(cx, timerCy, (int)x1, (int)y1, (int)x2, (int)y2, GetColor(0, 0, 0), true);
-			}
-
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-		}
 	}
 
 #pragma endregion
@@ -1009,33 +974,10 @@ void Player::ProcessAttack(void)
 		else if (!isAttack2_ && !isAttack_ && !exAttack_ && isHit_N)
 		{
 			// TreeÇÃÉåÉxÉãÇ™25à»è„Ç»ÇÁATTACK2Çãñâ¬
-			if (tree_ && tree_->GetLv() >= 25 && !isAttack2_)
-			{
-				animationController_->Play((int)ANIM_TYPE::ATTACK2, false);
-				isAttack2_ = true;
-
-				// è’ìÀ(çUåÇ)
-				CollisionAttack2();
-
-				// çUåÇâπáA
-				SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE2, Sound::TIMES::FORCE_ONCE);
-			}
 		}
 		else if (!exAttack_ && !isAttack_ && !isAttack2_ && isHit_E)
 		{
 			// TreeÇÃÉåÉxÉãÇ™50à»è„Ç≈ÉNÅ[ÉãÉ^ÉCÉÄ10ïbÇ™ÇΩÇ¡ÇƒÇ¢ÇÈÇ»ÇÁEXATTACKÇãñâ¬
-			if (tree_ && tree_->GetLv() >= 50 && !exAttack_ && IsExAttackReady())
-			{
-				animationController_->Play((int)ANIM_TYPE::EXATTACK, false);
-				exAttack_ = true;
-				lastExTime_ = GetNowCount(); // Å© ÉNÅ[ÉãÉ^ÉCÉÄäJén
-
-				// è’ìÀ(çUåÇ)
-				CollisionAttackEx();
-
-				// çUåÇâπáB
-				SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE3, Sound::TIMES::FORCE_ONCE);
-			}
 		}
 	}
 
@@ -1275,11 +1217,6 @@ bool Player::IsMax(void)
 void Player::SetIsMax(void)
 {
 	isMax_ = false;
-}
-
-void Player::SetTree(Tree* tree)
-{
-	tree_ = tree;
 }
 
 void Player::wHit(float scale)

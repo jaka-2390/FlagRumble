@@ -6,11 +6,10 @@
 #include "./Common/Capsule.h"
 #include "ActorBase.h"
 #include "Player.h"
-#include "Tree.h"
 #include "Item.h"
 
-Item::Item(Player& player, const Transform& transform, TYPE itemType, Tree& tree):
-	player_(player), pos_(transform.pos), itemType_(itemType), tree_(tree)
+Item::Item(Player& player, const Transform& transform, TYPE itemType):
+	player_(player), pos_(transform.pos), itemType_(itemType)
 {
 	transform_.dir = {};
 	transform_.modelId = 0;
@@ -209,14 +208,12 @@ void Item::ItemUse(void)
 		player_.Heal();
 		break;
 	case Item::TYPE::MUTEKI:
-		tree_.Muteki();
 		break;
 	case Item::TYPE::ALL:
 		player_.wHit(transform_.scl.x);
 		player_.PowerUp();
 		player_.SpeedUp();
 		player_.Heal();
-		tree_.Muteki();
 		break;
 	
 	default:

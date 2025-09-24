@@ -36,6 +36,9 @@ public:
 	// 複数画像ハンドルを別配列にコピー
 	void CopyHandle(int* imgs);
 
+	// 読み込みが完了したか
+	bool IsLoadComplete() const;
+
 	// リソースタイプ
 	TYPE type_;
 

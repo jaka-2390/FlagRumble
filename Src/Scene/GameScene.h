@@ -7,7 +7,6 @@
 class Stage;
 class EnemyBase;
 class SkyDome;
-class Tree;
 class Player;
 class Item;
 class MiniMap;
@@ -24,8 +23,8 @@ struct SpawnArea
 class GameScene : public SceneBase
 {
 public:
-	static constexpr int ENCOUNT = 300;		//エンカウンタ
-	static constexpr int ENEMY_MAX = 200;	//最大出現数
+	static constexpr int ENCOUNT = 120;		//エンカウンタ
+	static constexpr int ENEMY_MAX = 50;	//最大出現数
 	static constexpr int ENE_ENC = 30;		//最大許容量
 
 	GameScene(void);	// コンストラクタ
@@ -49,7 +48,6 @@ private:
 
 	std::vector<SpawnArea> spawnAreas_;	// スポーン場所
 	std::unique_ptr<Stage> stage_;		// ステージ
-	std::shared_ptr<Tree>tree_;			// ツリー
 	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
 	std::shared_ptr<Player> player_;	// プレイヤー
 	std::vector<std::shared_ptr<Item>> items_;		//アイテム

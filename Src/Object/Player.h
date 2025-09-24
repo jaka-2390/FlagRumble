@@ -8,7 +8,6 @@
 class AnimationController;
 class Collider;
 class Capsule;
-class Tree;
 
 class Player : public ActorBase
 {
@@ -102,7 +101,6 @@ public:
 	void SetEnemy(const std::vector<std::shared_ptr<EnemyBase>>* enemys);//敵の情報を取得
 	VECTOR GetPos() const;
 	void SetPos(const VECTOR& pos);
-	void SetTree(Tree* tree);
 
 	// --- インタラクション（ヒット系） ---
 	void wHit(float scale);	//水を取得
@@ -264,7 +262,6 @@ private:
 	int effectHealPleyId_;
 
 	// --- ポインタ ---
-	Tree* tree_;// 木のポインタ(水やり対象)
 	const std::vector<std::shared_ptr<EnemyBase>>* enemy_;// 敵の一覧への参照(攻撃や当たり判定に使用)
 
 	// --- デバッグ用 ---

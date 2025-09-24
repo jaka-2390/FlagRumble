@@ -21,7 +21,6 @@
 #include "../Object/Enemy/EnemyThorn.h"
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
-#include "../Object/Tree.h"
 #include "../Object/Planet.h"
 #include "../Object/Item.h"
 #include "MiniMap.h"
@@ -32,7 +31,6 @@
 GameScene::GameScene(void)
 {
 	player_ = nullptr;
-	tree_ = nullptr;
 	skyDome_ = nullptr;
 	stage_ = nullptr;
 	imgGameUi1_ = -1;
@@ -52,17 +50,9 @@ void GameScene::Init(void)
 	GravityManager::GetInstance().SetPlayer(player_);
 	player_->Init();
 
-	//木
-	tree_ = std::make_shared<Tree>();
-	tree_->Init();
-	tree_->SetPlayer(player_.get());
-
-	// プレイヤーにTreeを渡す(条件付き攻撃用)
-	player_->SetTree(tree_.get());
-
 	// 敵のモデル
-	//EnemyCreate(10);
-	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), 100.0f, false }); // 例：X=1000, Z=2000 の周囲500の円
+	//EnemyCreate(1);
+	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), 500.0f, false }); // 例：X=1000, Z=2000 の周囲500の円
 	//spawnAreas_.push_back({ VGet(-3000.0f, 0.0f, 500.0f), 400.0f, false });
 
 	player_->SetEnemy(&enemys_);
@@ -189,24 +179,8 @@ void GameScene::Update(void)
 
 	uiDisplayFrame_++;
 
-	if (tree_->GetLv() >= 75 && isB_ == 0)
-	{
-		isB_ = 1;
-		EnemyCreate(1);
-		isB_ = 2;
-	}
-	if (tree_->GetLv() >= 100) 
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-	}
-	if (tree_->GetHp() <= 0) 
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
-	}
-
 	skyDome_->Update();
 	stage_->Update();
-	tree_->Update();
 	player_->Update();
 
 	for (auto& item : items_) 
@@ -225,10 +199,11 @@ void GameScene::Update(void)
 	//	enCounter = 0;
 	//	if (ENEMY_MAX >= enemys_.size()) 
 	//	{
-	//		int spawnCount = 5; // まとめて出したい数
+	//		int spawnCount = 1; // まとめて出したい数
 	//		EnemyCreate(spawnCount);
 	//	}
 	//}
+
 	VECTOR playerPos = player_->GetTransform().pos;
 
 	for (auto& area : spawnAreas_)
@@ -241,16 +216,11 @@ void GameScene::Update(void)
 
 		if (distSq <= area.radius * area.radius) // 距離チェック（2乗比較）
 		{
-			EnemyCreate(5);        // 一斉に5体出現
+			EnemyCreate(50);        // 一斉に50体出現
 			area.triggered = true; // 再出現を防止（1回限り）
 		}
 	}
 
-	//if (!unlockedQ && tree_->GetLv() >= 25) {
-	//	unlockedQ = true;
-	//	showQFlash = true;
-	//	qUnlockTime = GetNowCount();  // 現在時刻（ミリ秒）を記録
-	//}
 }
 
 void GameScene::Draw(void)
@@ -265,7 +235,6 @@ void GameScene::Draw(void)
 	{
 		enemy->Draw();
 	}
-	tree_->Draw();
 	player_->Draw();
 
 	for (auto enemy : enemys_)
@@ -355,29 +324,6 @@ void GameScene::Draw(void)
 #pragma region UI
 	SetFontSize(32);
 	DrawString(10,450,"E:通常攻撃"      ,0xffffff);
-	if (tree_->GetLv()>=25)
-	{
-		DrawString(10, 500, "Q:なぎ払い", 0xffffff);
-
-		if (showQFlash)
-		{
-			int now = GetNowCount();
-			int elapsed = now - qUnlockTime;
-
-			if (elapsed >= 3000)
-			{
-				showQFlash = false;
-			}
-			else
-			{
-				int flashColor = ((elapsed / 400) % 2 == 0) ? 0xff0000 : 0xffffff;
-
-				int x = 10 + GetDrawStringWidth("Q:なぎ払い", strlenDx("Q:なぎ払い"));
-				DrawString(x, 500, " 解放", flashColor);
-			}
-		}
-	}
-	if (tree_->GetLv()>=50)	DrawString(10,550,"R:回転斬り　解放",0xffffff);
 	SetFontSize(16);
 #pragma endregion
 }
@@ -460,8 +406,7 @@ std::shared_ptr<Item> GameScene::CreateItem(const VECTOR& spawnPos, float scale,
 
 	// 再利用できなければ新しく作成
 	OutputDebugStringA("新規アイテムを作成\n");
-	auto newItem = std::make_shared<Item>(*player_, Transform{}, itemType,*
-		tree_);
+	auto newItem = std::make_shared<Item>(*player_, Transform{}, itemType);
 	newItem->Init(); // 初期化（モデル読み込み等）
 	newItem->Respawn(spawnPos);
 	newItem->SetScale(scale);
@@ -478,77 +423,22 @@ void GameScene::EnemyCreate(int count)
 {
 	for (int i = 0; i < count; ++i)
 	{
-		int randDir = GetRand(3);
 		VECTOR randPos = VGet(0.0f, 0.0f, 0.0f);
-		switch (randDir)//位置
-		{
-		case 0://前
-			randPos.x = GetRand(20000) - 10000;
-			randPos.z = 10000;
-			break;
-		case 1://後
-			randPos.x = GetRand(20000) - 10000;
-			randPos.z = -10000;
-			break;
-		case 2://左
-			randPos.x = -10000;
-			randPos.z = GetRand(20000) - 10000;
-			break;
-		case 3://右
-			randPos.x = 10000;
-			randPos.z = GetRand(29000) - 10000;
-			break;
-		default:
-			break;
-		}
 
-		std::shared_ptr<EnemyBase> enemy;
+        // 出現位置をランダムに設定（エリアの周囲に散らばせる）
+        randPos.x = GetRand(2000) - 1000;  // -1000 ～ +1000
+        randPos.z = GetRand(2000) - 1000;  
 
-		//敵のtype
-		if (isB_ == 1)
-		{
-			EnemyBase::TYPE type_ = static_cast<EnemyBase::TYPE>(EnemyBase::TYPE::BOSS);
-			enemy = std::make_shared<EnemyBoss>();
-		}
-		else
-		{
-			EnemyBase::TYPE type_ = static_cast<EnemyBase::TYPE>(GetRand(static_cast<int>(EnemyBase::TYPE::MAX) - 2));
-			switch (type_)
-			{
-			case EnemyBase::TYPE::SABO:
-				enemy = std::make_shared<EnemyCactus>();
-				break;
-			case EnemyBase::TYPE::DOG:
-				enemy = std::make_shared<EnemyDog>();
-				break;
-			case EnemyBase::TYPE::MIMIC:
-				enemy = std::make_shared<EnemyMimic>();
-				break;
-			case EnemyBase::TYPE::MUSH:
-				enemy = std::make_shared<EnemyMushroom>();
-				break;
-			case EnemyBase::TYPE::ONION:
-				enemy = std::make_shared<EnemyOnion>();
-				break;
-			case EnemyBase::TYPE::TOGE:
-				enemy = std::make_shared<EnemyThorn>();
-				break;
-			case EnemyBase::TYPE::VIRUS:
-				enemy = std::make_shared<EnemyVirus>();
-				break;
-			default:
-				enemy = std::make_shared<EnemyCactus>();
-				break;
-			}
-		}
+        // ここを固定 → 例：EnemyDog を 50体生成
+        std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
 
-		// 生成された敵の初期化
-		enemy->SetGameScene(this);
-		enemy->SetPos(randPos);
-		enemy->SetPlayer(player_);
-		enemy->SetTree(tree_);
-		enemy->Init();
+        // 初期化
+        enemy->SetGameScene(this);
+        enemy->SetPos(randPos);
+        enemy->SetPlayer(player_);
+        enemy->Init();
 
-		enemys_.emplace_back(std::move(enemy));
+        // リストに追加
+        enemys_.emplace_back(std::move(enemy));
 	}
 }

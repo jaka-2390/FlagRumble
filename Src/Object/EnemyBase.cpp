@@ -10,7 +10,6 @@
 #include "Common/AnimationController.h"
 #include "ActorBase.h"
 #include "Player.h"
-#include "Tree.h"
 #include "EnemyBase.h"
 
 //担当　田中良明
@@ -112,7 +111,6 @@ void EnemyBase::UpdateAttack(void)
 	{
 		isAttack_ = true;
 		isAttack_T = false;
-		tree_->eHit();
 	}
 
 	 //アニメーション終了で次の状態に遷移
@@ -320,8 +318,6 @@ void EnemyBase::AttackCollisionPos(void)
 
 	//プレイヤーを見る
 	EnemyToPlayer();
-	//treeを見る
-	EnemyToTree();
 }
 
 void EnemyBase::EnemyToPlayer(void)
@@ -340,19 +336,6 @@ void EnemyBase::EnemyToPlayer(void)
 		|| player_->pstate_ == Player::PlayerState::DOWN)
 	{
 		ChangeState(STATE::PLAY);
-	}
-}
-
-void EnemyBase::EnemyToTree(void)
-{
-	//プレイヤーの当たり判定とサイズ
-	treeCenter_ = tree_->GetCollisionPos();
-	treeRadius_ = tree_->GetCollisionRadius();
-
-	if (AsoUtility::IsHitSpheres(attackCollisionPos_, attackCollisionRadius_, treeCenter_,treeRadius_))
-	{
-		isAttack_T = true;
-		ChangeState(STATE::ATTACK);
 	}
 }
 
@@ -423,11 +406,6 @@ void EnemyBase::ChangeStateDeath(void)
 void EnemyBase::SetPlayer(std::shared_ptr<Player> player)
 {
 	player_ = player;
-}
-
-void EnemyBase::SetTree(std::shared_ptr<Tree> tree)
-{
-	tree_ = tree;
 }
 
 void EnemyBase::DrawDebug(void)

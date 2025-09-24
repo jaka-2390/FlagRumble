@@ -11,7 +11,6 @@
 class AnimationController;
 class GameScene;
 class Player;
-class Tree;
 
 class EnemyBase : public ActorBase
 {
@@ -131,11 +130,9 @@ public:
 	void DrawDebugSearchRange(void);
 
 	void SetPlayer(std::shared_ptr<Player> player);
-	void SetTree(std::shared_ptr<Tree> tree);
 protected:
 
 	std::shared_ptr<Player> player_;
-	std::shared_ptr<Tree> tree_;
 	GameScene* scene_;
 
 	// ƒAƒjƒ[ƒVƒ‡ƒ“
@@ -195,7 +192,6 @@ protected:
 	//UŒ‚ŠÖŒW
 	void AttackCollisionPos(void);	//UŒ‚—pŠÖ”
 	void EnemyToPlayer(void);		//“G‚ªƒvƒŒƒCƒ„[UŒ‚
-	void EnemyToTree(void);			//“G‚ª–Ø‚ğUŒ‚
 	void CheckHitAttackHit(void);	//UŒ‚‚ª“–‚½‚Á‚½‚©Šm”F‚·‚é
 
 	// ó‘Ô‘JˆÚ
