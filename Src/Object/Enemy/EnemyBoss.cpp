@@ -52,10 +52,10 @@ void EnemyBoss::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-Item::TYPE EnemyBoss::GetDropItemType() const
-{
-	return Item::TYPE::ALL;
-}
+//Item::TYPE EnemyBoss::GetDropItemType() const
+//{
+//	return Item::TYPE::ALL;
+//}
 
 void EnemyBoss::DrawBossHpBar(void)
 {

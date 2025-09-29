@@ -14,5 +14,5 @@ public:
 	void SetParam(void) override;
 
 	//ドロップアイテム
-	virtual Item::TYPE GetDropItemType() const override;
+	//virtual Item::TYPE GetDropItemType() const override;
 };

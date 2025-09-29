@@ -49,14 +49,14 @@ void EnemyThorn::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-Item::TYPE EnemyThorn::GetDropItemType() const
-{
-	if (GetRand(RANDOM_VALUE))
-	{
-		return Item::TYPE::WATER;
-	}
-	else
-	{
-		return Item::TYPE::MUTEKI;
-	}
-}
+//Item::TYPE EnemyThorn::GetDropItemType() const
+//{
+//	if (GetRand(RANDOM_VALUE))
+//	{
+//		return Item::TYPE::WATER;
+//	}
+//	else
+//	{
+//		return Item::TYPE::MUTEKI;
+//	}
+//}

@@ -20,12 +20,12 @@ void MiniMap::Init(void)
 
 void MiniMap::Draw(const MapVector2& playerPos, float playerAngleRad,
     float cameraAngleRad,
-    const std::vector<std::shared_ptr<EnemyBase>>& enemies,
-    const std::vector<MapVector2>& items)
+    const std::vector<std::shared_ptr<EnemyBase>>& enemies/*,
+    const std::vector<MapVector2>& items*/)
 {
     DrawBackground();
     DrawEnemies(enemies);
-    DrawItems(items);
+    //DrawItems(items);
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, ALPHA_HALF_TRANSPARENT);      //透過ON
     DrawCameraViewCone(playerPos, cameraAngleRad);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, ALPHA_OPAQUE);      //透過OFF
@@ -158,34 +158,34 @@ void MiniMap::DrawEnemies(const std::vector<std::shared_ptr<EnemyBase>>& enemies
     }
 }
 
-void MiniMap::DrawItems(const std::vector<MapVector2>& items)
-{
-    for (const auto& item : items)
-    {
-        MapVector2 mapPos = WorldToMapPos(item);
-        int ix = static_cast<int>(mapPos.x);
-        int iz = static_cast<int>(mapPos.z);
-
-        // === ミニマップ内に収まるように制限===
-        if (!IsInsideCircle(ix, iz)) continue;
-
-        int size = ITEM_SIZE;
-        // 頂点座標
-        int topX = ix;
-        int topY = iz - size;
-        int rightX = ix + size;
-        int rightY = iz;
-        int bottomX = ix;
-        int bottomY = iz + size;
-        int leftX = ix - size;
-        int leftY = iz;
-
-        // 三角形を2つ使って塗りつぶす
-        DrawTriangle(topX, topY, rightX, rightY, bottomX, bottomY, LIGHT_BLUE, TRUE);
-        DrawTriangle(bottomX, bottomY, leftX, leftY, topX, topY, LIGHT_BLUE, TRUE);
-
-    }
-}
+//void MiniMap::DrawItems(const std::vector<MapVector2>& items)
+//{
+//    for (const auto& item : items)
+//    {
+//        MapVector2 mapPos = WorldToMapPos(item);
+//        int ix = static_cast<int>(mapPos.x);
+//        int iz = static_cast<int>(mapPos.z);
+//
+//        // === ミニマップ内に収まるように制限===
+//        if (!IsInsideCircle(ix, iz)) continue;
+//
+//        int size = ITEM_SIZE;
+//        // 頂点座標
+//        int topX = ix;
+//        int topY = iz - size;
+//        int rightX = ix + size;
+//        int rightY = iz;
+//        int bottomX = ix;
+//        int bottomY = iz + size;
+//        int leftX = ix - size;
+//        int leftY = iz;
+//
+//        // 三角形を2つ使って塗りつぶす
+//        DrawTriangle(topX, topY, rightX, rightY, bottomX, bottomY, LIGHT_BLUE, TRUE);
+//        DrawTriangle(bottomX, bottomY, leftX, leftY, topX, topY, LIGHT_BLUE, TRUE);
+//
+//    }
+//}
 
 bool MiniMap::IsInsideCircle(int x, int y) const
 {

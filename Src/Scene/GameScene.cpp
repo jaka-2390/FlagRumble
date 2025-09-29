@@ -22,7 +22,7 @@
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
-#include "../Object/Item.h"
+#include "../Object/Flag.h"
 #include "MiniMap.h"
 #include "GameScene.h"
 
@@ -35,7 +35,6 @@ GameScene::GameScene(void)
 	stage_ = nullptr;
 	imgGameUi1_ = -1;
 	imgOpeGear_ = -1;
-	//item_ = nullptr;
 }
 
 GameScene::~GameScene(void)
@@ -54,6 +53,7 @@ void GameScene::Init(void)
 	//EnemyCreate(1);
 	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), 500.0f, false }); // 例：X=1000, Z=2000 の周囲500の円
 	//spawnAreas_.push_back({ VGet(-3000.0f, 0.0f, 500.0f), 400.0f, false });
+	lastSpawnTime_ = GetNowCount();  // 開始時の時間を記録
 
 	player_->SetEnemy(&enemys_);
 
@@ -70,6 +70,9 @@ void GameScene::Init(void)
 
 	map_ = std::make_unique<MiniMap>(30000.0f, 300);
 	map_->Init();
+
+	flag_ = std::make_shared<Flag>();
+	flag_->Init();
 
 	// 画像
 	imgGameUi1_ = resMng_.Load(ResourceManager::SRC::GAMEUI_1).handleId_;
@@ -183,14 +186,16 @@ void GameScene::Update(void)
 	stage_->Update();
 	player_->Update();
 
-	for (auto& item : items_) 
+	/*for (auto& item : items_) 
 	{
 		item->Update();
-	}
+	}*/
 	for (auto enemy : enemys_) 
 	{
 		enemy->Update();
 	}
+
+	flag_->Update();
 
 	// 敵のエンカウント処理
 	//enCounter++;
@@ -204,7 +209,7 @@ void GameScene::Update(void)
 	//	}
 	//}
 
-	VECTOR playerPos = player_->GetTransform().pos;
+	/*VECTOR playerPos = player_->GetTransform().pos;
 
 	for (auto& area : spawnAreas_)
 	{
@@ -216,21 +221,65 @@ void GameScene::Update(void)
 
 		if (distSq <= area.radius * area.radius) // 距離チェック（2乗比較）
 		{
-			EnemyCreate(50);        // 一斉に50体出現
+			EnemyCreate(5);        // 一斉に50体出現
 			area.triggered = true; // 再出現を防止（1回限り）
+		}
+	}*/
+
+	enCounter++;
+	if (enCounter > ENCOUNT) 
+	{
+		enCounter = 0;
+		if (ENEMY_MAX >= enemys_.size()) 
+		{
+			int spawnCount = 1; // まとめて出したい数
+			EnemyCreate(spawnCount);
 		}
 	}
 
+	// 敵全滅チェック
+	allEnemyDefeated_ = true;
+	for (auto& enemy : enemys_)
+	{
+		if (enemy->IsAlive()) { // EnemyBase に IsAlive() を用意すると便利
+			allEnemyDefeated_ = false;
+			break;
+		}
+	}
+
+	// フラッグとの距離チェック
+	VECTOR playerPos = player_->GetTransform().pos;
+
+	float dx = playerPos.x - flagPos.x;
+	float dz = playerPos.z - flagPos.z;
+	float distSq = dx * dx + dz * dz;
+
+	bool inRange = (distSq < flagRadius_ * flagRadius_);
+
+	// ゲージ処理
+	if (allEnemyDefeated_ && !gameClear_)
+	{
+		if (inRange)
+		{
+			clearGauge_ += 0.5f; // フレームごとに加算
+			if (clearGauge_ >= clearGaugeMax_)
+			{
+				clearGauge_ = clearGaugeMax_;
+				gameClear_ = true;
+				// → ここでクリア処理（シーン遷移など）
+			}
+		}
+	}
 }
 
 void GameScene::Draw(void)
 {
 	skyDome_->Draw();
 	stage_->Draw();
-	for (auto& item : items_)
+	/*for (auto& item : items_)
 	{
 		item->Draw();
-	}
+	}*/
 	for (auto enemy : enemys_)
 	{
 		enemy->Draw();
@@ -242,8 +291,34 @@ void GameScene::Draw(void)
 		enemy->DrawBossHpBar();
 	}
 
+	flag_->Draw();
+
 	DrawMiniMap();
 	
+
+	float offsetY = 0.0f; // 地面に合わせる
+	// デバッグ用：XZ平面に円を描画
+	for (int angle = 0; angle < 360; angle += 10)
+	{
+		float rad_1 = angle * DX_PI_F / 180.0f;
+		float rad_2 = (angle + 10) * DX_PI_F / 180.0f;
+
+		float x1 = flagPos.x + cosf(rad_1) * flagRadius_;
+		float z1 = flagPos.z + sinf(rad_1) * flagRadius_;
+
+		float x2 = flagPos.x + cosf(rad_2) * flagRadius_;
+		float z2 = flagPos.z + sinf(rad_2) * flagRadius_;
+
+		DrawLine3D(VGet(x1, flagPos.y + offsetY, z1),
+			VGet(x2, flagPos.y + offsetY, z2),
+			GetColor(0, 255, 0));
+	}
+
+	// ゲージ描画（仮に画面左上に描画）
+	DrawBox(20, 20, 220, 40, GetColor(255, 255, 255), TRUE); // 背景
+	int gaugeWidth = static_cast<int>((clearGauge_ / clearGaugeMax_) * 200);
+	DrawBox(20, 20, 20 + gaugeWidth, 40, GetColor(0, 255, 0), TRUE);
+
 	DrawRotaGraph(100, 100, 0.8, 0.0, imgOpeGear_, true);
 
 	// 入力チェック or 時間経過でフェード開始
@@ -360,7 +435,7 @@ void GameScene::DrawMiniMap(void)
 	}
 
 	// アイテムの座標リストを作成
-	std::vector<MapVector2> itemPositions;
+	/*std::vector<MapVector2> itemPositions;
 	for (const auto& item : items_)
 	{
 		if (item->GetIsAlive())
@@ -370,49 +445,49 @@ void GameScene::DrawMiniMap(void)
 			i.z = item->GetTransform().pos.z;
 			itemPositions.push_back(i);
 		}
-	}
+	}*/
 
 	// ミニマップ描画呼び出し
-	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies, itemPositions);
+	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies);
 }
 
-void GameScene::AddItem(std::shared_ptr<Item> item)
-{
-	items_.push_back(item);
-}
+//void GameScene::AddItem(std::shared_ptr<Item> item)
+//{
+//	items_.push_back(item);
+//}
 
-std::shared_ptr<Item> GameScene::CreateItem(const VECTOR& spawnPos, float scale, Item::TYPE itemType)
-{
-	// 現在のアクティブ（生きている）アイテム数を数える
-	int aliveCount = 0;
-	for (const auto& item : items_) {
-		if (item->GetIsAlive()) {
-			aliveCount++;
-		}
-	}
-
-	// 再利用可能なアイテムを探す
-	if (itemType == Item::TYPE::WATER)
-	{
-		for (auto& item : items_) {
-			if (!item->GetIsAlive() && item->GetItemType() == Item::TYPE::WATER) {
-				OutputDebugStringA("再利用アイテムを使用\n");
-				item->Respawn(spawnPos);
-				item->SetScale(scale);
-				return item;
-			}
-		}
-	}
-
-	// 再利用できなければ新しく作成
-	OutputDebugStringA("新規アイテムを作成\n");
-	auto newItem = std::make_shared<Item>(*player_, Transform{}, itemType);
-	newItem->Init(); // 初期化（モデル読み込み等）
-	newItem->Respawn(spawnPos);
-	newItem->SetScale(scale);
-	items_.push_back(newItem);
-	return newItem;
-}
+//std::shared_ptr<Item> GameScene::CreateItem(const VECTOR& spawnPos, float scale, Item::TYPE itemType)
+//{
+//	// 現在のアクティブ（生きている）アイテム数を数える
+//	int aliveCount = 0;
+//	for (const auto& item : items_) {
+//		if (item->GetIsAlive()) {
+//			aliveCount++;
+//		}
+//	}
+//
+//	// 再利用可能なアイテムを探す
+//	if (itemType == Item::TYPE::WATER)
+//	{
+//		for (auto& item : items_) {
+//			if (!item->GetIsAlive() && item->GetItemType() == Item::TYPE::WATER) {
+//				OutputDebugStringA("再利用アイテムを使用\n");
+//				item->Respawn(spawnPos);
+//				item->SetScale(scale);
+//				return item;
+//			}
+//		}
+//	}
+//
+//	// 再利用できなければ新しく作成
+//	OutputDebugStringA("新規アイテムを作成\n");
+//	auto newItem = std::make_shared<Item>(*player_, Transform{}, itemType);
+//	newItem->Init(); // 初期化（モデル読み込み等）
+//	newItem->Respawn(spawnPos);
+//	newItem->SetScale(scale);
+//	items_.push_back(newItem);
+//	return newItem;
+//}
 
 const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 {
@@ -421,13 +496,15 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 
 void GameScene::EnemyCreate(int count)
 {
+	VECTOR flagPos = flag_->GetPosition();  //Flagの位置を取得
+
 	for (int i = 0; i < count; ++i)
 	{
-		VECTOR randPos = VGet(0.0f, 0.0f, 0.0f);
+		VECTOR randPos = flagPos;
 
         // 出現位置をランダムに設定（エリアの周囲に散らばせる）
-        randPos.x = GetRand(2000) - 1000;  // -1000 ～ +1000
-        randPos.z = GetRand(2000) - 1000;  
+        randPos.x = GetRand(200) - 100;  // -100 ～ +100
+        randPos.z = GetRand(200) - 100;  
 
         // ここを固定 → 例：EnemyDog を 50体生成
         std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();

@@ -24,7 +24,7 @@ public:
 	void SetParam(void) override;
 
 	//ドロップアイテム
-	Item::TYPE GetDropItemType() const override;
+	//Item::TYPE GetDropItemType() const override;
 
 	void DrawBossHpBar(void) override;
 };

@@ -2,15 +2,14 @@
 #include <memory>
 #include <vector>
 #include "SceneBase.h"
-#include "../Object/Item.h"
 
 class Stage;
 class EnemyBase;
 class SkyDome;
 class Player;
-class Item;
 class MiniMap;
 class Camera;
+class Flag;
 
 //スポーン場所
 struct SpawnArea
@@ -23,8 +22,8 @@ struct SpawnArea
 class GameScene : public SceneBase
 {
 public:
-	static constexpr int ENCOUNT = 120;		//エンカウンタ
-	static constexpr int ENEMY_MAX = 50;	//最大出現数
+	static constexpr int ENCOUNT = 60;		//エンカウンタ
+	static constexpr int ENEMY_MAX = 5;	//最大出現数
 	static constexpr int ENE_ENC = 30;		//最大許容量
 
 	GameScene(void);	// コンストラクタ
@@ -37,8 +36,8 @@ public:
 
 	void DrawMiniMap(void);
 
-	void AddItem(std::shared_ptr<Item> item);
-	std::shared_ptr<Item>CreateItem(const VECTOR& spawnPos, float scale,Item::TYPE itemType);
+	//void AddItem(std::shared_ptr<Item> item);
+	//std::shared_ptr<Item>CreateItem(const VECTOR& spawnPos, float scale,Item::TYPE itemType);
 	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
 
 private:
@@ -50,9 +49,10 @@ private:
 	std::unique_ptr<Stage> stage_;		// ステージ
 	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
 	std::shared_ptr<Player> player_;	// プレイヤー
-	std::vector<std::shared_ptr<Item>> items_;		//アイテム
+	//std::vector<std::shared_ptr<Item>> items_;		//アイテム
 	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
+	std::shared_ptr<Flag> flag_;	//フラッグ
 
 	int enemyModelId_;
 	int imgGameUi1_;
@@ -84,6 +84,20 @@ private:
 		ShowControls,// 操作説明画面
 		ShowItems    // アイテム概要画面
 	};
+
+	// 敵全滅フラグ
+	bool allEnemyDefeated_ = false;
+
+	// 旗関連
+	VECTOR flagPos = VGet(0, 0, 200); // 適当な位置
+	float flagRadius_ = 100.0f;       // 接近判定の距離
+
+	// ゲージ
+	float clearGauge_ = 0.0f;
+	float clearGaugeMax_ = 100.0f;
+	bool gameClear_ = false;
+
+	int lastSpawnTime_;  // 最後に敵を出現させた時間
 
 	PauseState pauseState_ = PauseState::Menu;
 	int  pauseImg_;

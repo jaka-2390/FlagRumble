@@ -48,14 +48,14 @@ void EnemyVirus::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-Item::TYPE EnemyVirus::GetDropItemType() const
-{
-	if (GetRand(RANDOM_VALUE))
-	{
-		return Item::TYPE::WATER;
-	}
-	else
-	{
-		return Item::TYPE::SPEED;
-	}
-}
+//Item::TYPE EnemyVirus::GetDropItemType() const
+//{
+//	if (GetRand(RANDOM_VALUE))
+//	{
+//		return Item::TYPE::WATER;
+//	}
+//	else
+//	{
+//		return Item::TYPE::SPEED;
+//	}
+//}

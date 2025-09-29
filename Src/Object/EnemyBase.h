@@ -4,7 +4,6 @@
 #include <functional>
 #include <vector>
 #include "ActorBase.h"
-#include "Item.h" 
 
 //担当　田中良明
 
@@ -118,7 +117,7 @@ public:
 	TYPE enemyType_;	//敵のタイプ
 
 	// 死亡時のドロップアイテムを決める関数（デフォルトはNONE）
-	virtual Item::TYPE GetDropItemType() const;
+	//virtual Item::TYPE GetDropItemType() const;
 	
 	void SetCollisionPos(const VECTOR collision);//衝突判定用の球体
 	VECTOR GetCollisionPos(void)const;	// 衝突用の中心座標の取得

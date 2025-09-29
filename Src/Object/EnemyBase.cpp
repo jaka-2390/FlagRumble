@@ -145,33 +145,33 @@ void EnemyBase::UpdateDeath(void)
 		float distance = VSize(VSub(dropPos, AsoUtility::VECTOR_ZERO));
 
 		// ドロップアイテムを取得
-		Item::TYPE dropType = GetDropItemType();
+		//Item::TYPE dropType = GetDropItemType();
 
 		//エネミーがボスのとき
-		if (enemyType_ == TYPE::BOSS)
-		{
-			// ボスのアイテムはスケール固定
-			float scale = DROP_SCALE_LARGE;
-			
-			scene_->CreateItem(dropPos, scale, dropType);
-		}
-		else
-		{
-			// 通常の敵は1つだけアイテムドロップ
-			// 距離でサイズを変える
-			float scale = DROP_SCALE_SMALL;
-			if (dropType == Item::TYPE::WATER)
-			{
-				if (distance >= DROP_DISTANCE_LARGE) {	// 中心から一定距離以上離れたら
-					scale = DROP_SCALE_LARGE;
-				}
-				else if (distance >= DROP_DISTANCE_MEDIUM) {	// 中心から一定距離以上離れたら
-					scale = DROP_SCALE_MEDIUM;
-				}
-			}
-			// アイテムを1つ出す（サイズ調整）
-			scene_->CreateItem(dropPos, scale, dropType);
-		}
+		//if (enemyType_ == TYPE::BOSS)
+		//{
+		//	// ボスのアイテムはスケール固定
+		//	float scale = DROP_SCALE_LARGE;
+		//	
+		//	scene_->CreateItem(dropPos, scale, dropType);
+		//}
+		//else
+		//{
+		//	// 通常の敵は1つだけアイテムドロップ
+		//	// 距離でサイズを変える
+		//	float scale = DROP_SCALE_SMALL;
+		//	if (dropType == Item::TYPE::WATER)
+		//	{
+		//		if (distance >= DROP_DISTANCE_LARGE) {	// 中心から一定距離以上離れたら
+		//			scale = DROP_SCALE_LARGE;
+		//		}
+		//		else if (distance >= DROP_DISTANCE_MEDIUM) {	// 中心から一定距離以上離れたら
+		//			scale = DROP_SCALE_MEDIUM;
+		//		}
+		//	}
+		//	// アイテムを1つ出す（サイズ調整）
+		//	scene_->CreateItem(dropPos, scale, dropType);
+		//}
 	}
 }
 
@@ -351,10 +351,10 @@ void EnemyBase::CheckHitAttackHit(void)
 	}
 }
 
-Item::TYPE EnemyBase::GetDropItemType() const
-{
-	return Item::TYPE::WATER;
-}
+//Item::TYPE EnemyBase::GetDropItemType() const
+//{
+//	return Item::TYPE::WATER;
+//}
 
 void EnemyBase::SetGameScene(GameScene* scene)
 {

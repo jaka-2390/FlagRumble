@@ -49,14 +49,14 @@ void EnemyMimic::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-Item::TYPE EnemyMimic::GetDropItemType() const
-{
-	if (GetRand(RANDOM_VALUE))
-	{
-		return Item::TYPE::WATER;
-	}
-	else
-	{
-		return Item::TYPE::HEAL;
-	}
-}
+//Item::TYPE EnemyMimic::GetDropItemType() const
+//{
+//	if (GetRand(RANDOM_VALUE))
+//	{
+//		return Item::TYPE::WATER;
+//	}
+//	else
+//	{
+//		return Item::TYPE::HEAL;
+//	}
+//}

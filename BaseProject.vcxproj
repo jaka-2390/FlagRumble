@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Flag.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyBoss.cpp" />
     <ClCompile Include="Src\Scene\DemoScene.cpp" />
     <ClCompile Include="Src\Manager\Sound.cpp" />
@@ -31,7 +32,6 @@
     <ClCompile Include="Src\Object\Enemy\EnemyOnion.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyThorn.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyVirus.cpp" />
-    <ClCompile Include="Src\Object\Item.cpp" />
     <ClCompile Include="Src\Object\EnemyBase.cpp" />
     <ClCompile Include="Src\Object\ActorBase.cpp" />
     <ClCompile Include="Src\Application.cpp" />
@@ -62,6 +62,7 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Flag.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyBoss.h" />
     <ClInclude Include="Src\Scene\DemoScene.h" />
     <ClInclude Include="Src\Manager\Sound.h" />
@@ -74,7 +75,6 @@
     <ClInclude Include="Src\Object\Enemy\EnemyOnion.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyThorn.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyVirus.h" />
-    <ClInclude Include="Src\Object\Item.h" />
     <ClInclude Include="Src\Object\EnemyBase.h" />
     <ClInclude Include="Src\Object\ActorBase.h" />
     <ClInclude Include="Src\Application.h" />
@@ -191,7 +191,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DxLib</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -199,7 +199,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\DxLib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

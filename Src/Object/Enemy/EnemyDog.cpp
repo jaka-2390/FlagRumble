@@ -50,14 +50,14 @@ void EnemyDog::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-Item::TYPE EnemyDog::GetDropItemType() const
-{
-	if (GetRand(RANDOM_VALUE))
-	{
-		return Item::TYPE::WATER;
-	}
-	else
-	{
-		return Item::TYPE::POWER;
-	}
-}
+//Item::TYPE EnemyDog::GetDropItemType() const
+//{
+//	if (GetRand(RANDOM_VALUE))
+//	{
+//		return Item::TYPE::WATER;
+//	}
+//	else
+//	{
+//		return Item::TYPE::POWER;
+//	}
+//}

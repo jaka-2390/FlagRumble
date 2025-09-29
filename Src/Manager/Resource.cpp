@@ -54,35 +54,27 @@ void Resource::Load(void)
 	{
 	case Resource::TYPE::IMG:
 		// âÊëú
-		SetUseASyncLoadFlag(TRUE);
 		handleId_ = LoadGraph(path_.c_str());
-		SetUseASyncLoadFlag(FALSE);
 		break;
 
 	case Resource::TYPE::IMGS:
 		// ï°êîâÊëú
 		handleIds_ = new int[numX_ * numY_];
-		SetUseASyncLoadFlag(TRUE);
 		LoadDivGraph(
 			path_.c_str(),
 			numX_ * numY_,
 			numX_, numY_,
 			sizeX_, sizeY_,
 			&handleIds_[0]);
-		SetUseASyncLoadFlag(FALSE);
 		break;
 
 	case Resource::TYPE::MODEL:
 		// ÉÇÉfÉã
-		SetUseASyncLoadFlag(TRUE);
 		handleId_ = MV1LoadModel(path_.c_str());
-		SetUseASyncLoadFlag(FALSE);
 		break;
 
 	case Resource::TYPE::EFFEKSEER:
-		SetUseASyncLoadFlag(TRUE);
 		handleId_ = LoadEffekseerEffect(path_.c_str());
-		SetUseASyncLoadFlag(FALSE);
 		break;
 
 	}

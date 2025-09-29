@@ -73,8 +73,8 @@ public:
 
     void Draw(const MapVector2& playerPos, float playerAngleRad,
         float cameraAngleRad,
-        const std::vector<std::shared_ptr<EnemyBase>>& enemies,
-        const std::vector<MapVector2>& items);
+        const std::vector<std::shared_ptr<EnemyBase>>& enemies/*,
+        const std::vector<MapVector2>& items*/);
 
 private:
     float worldHalfSize;      // ゲーム空間の広さ（片側）
@@ -94,7 +94,7 @@ private:
     //敵をリストで受け取り、ミニマップ上に変換して描画
     void DrawEnemies(const std::vector<std::shared_ptr<EnemyBase>>& enemies);
     //アイテムをリストで受け取り、ミニマップ上に変換して描画
-    void DrawItems(const std::vector<MapVector2>& items);
+    //void DrawItems(const std::vector<MapVector2>& items);
 
     // 円の範囲内に制限
     bool IsInsideCircle(int x, int y) const;
