@@ -15,6 +15,9 @@ public:
 	// ˆÊ’u
 	VECTOR GetPosition() const;
 
+	//‰~‚ÌƒfƒoƒbƒO
+	void DrawCircleOnMap(VECTOR center, float radius, int color);
+
 private:
 
 	int modelIdB_;	//ƒ‚ƒfƒ‹‚ÌŠi”[(•c–Ø)

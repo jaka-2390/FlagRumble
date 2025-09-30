@@ -37,3 +37,24 @@ VECTOR Flag::GetPosition() const
 {
 	return pos_;
 }
+
+void Flag::DrawCircleOnMap(VECTOR center, float radius, int color)
+{
+	const int div = 36;
+
+	for (int i = 0; i < div; i++)
+	{
+		float t1 = (float)i / div;
+		float t2 = (float)(i + 1) / div;
+
+		float x1 = center.x + cosf(t1 * 2.0f * 3.14159265f) * radius;
+		float z1 = center.z + sinf(t1 * 2.0f * 3.14159265f) * radius;
+
+		float x2 = center.x + cosf(t2 * 2.0f * 3.14159265f) * radius;
+		float z2 = center.z + sinf(t2 * 2.0f * 3.14159265f) * radius;
+
+		float y = center.y;
+
+		DrawLine3D(VGet(x1, y, z1), VGet(x2, y, z2), color);
+	}
+}

@@ -155,7 +155,7 @@ void ClearScene::Draw(void)
 
 	// メッセージ（下のテキスト）を表示
 	SetFontSize(128);
-	DrawString(Application::SCREEN_SIZE_X/2-128*5.5,830, "こうして世界はうまれた", true);
+	DrawString(Application::SCREEN_SIZE_X/2-128*3.5,830, "陣地を奪還した", true);
 	SetFontSize(16);
 
 	// メッセージの上に背景で覆う（横方向）

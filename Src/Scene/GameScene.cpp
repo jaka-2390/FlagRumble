@@ -251,7 +251,7 @@ void GameScene::Update(void)
 	VECTOR playerPos = player_->GetTransform().pos;
 
 	float dx = playerPos.x - flagPos.x;
-	float dz = playerPos.z - flagPos.z;
+	float dz = playerPos.z - flagPos.z + 150;
 	float distSq = dx * dx + dz * dz;
 
 	bool inRange = (distSq < flagRadius_ * flagRadius_);
@@ -266,7 +266,7 @@ void GameScene::Update(void)
 			{
 				clearGauge_ = clearGaugeMax_;
 				gameClear_ = true;
-				// → ここでクリア処理（シーン遷移など）
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 			}
 		}
 	}
@@ -295,23 +295,10 @@ void GameScene::Draw(void)
 
 	DrawMiniMap();
 	
-
-	float offsetY = 0.0f; // 地面に合わせる
-	// デバッグ用：XZ平面に円を描画
-	for (int angle = 0; angle < 360; angle += 10)
+	if (allEnemyDefeated_)
 	{
-		float rad_1 = angle * DX_PI_F / 180.0f;
-		float rad_2 = (angle + 10) * DX_PI_F / 180.0f;
-
-		float x1 = flagPos.x + cosf(rad_1) * flagRadius_;
-		float z1 = flagPos.z + sinf(rad_1) * flagRadius_;
-
-		float x2 = flagPos.x + cosf(rad_2) * flagRadius_;
-		float z2 = flagPos.z + sinf(rad_2) * flagRadius_;
-
-		DrawLine3D(VGet(x1, flagPos.y + offsetY, z1),
-			VGet(x2, flagPos.y + offsetY, z2),
-			GetColor(0, 255, 0));
+		// フラッグの位置を中心に半径100の円を描画
+		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, GetColor(0, 255, 0));
 	}
 
 	// ゲージ描画（仮に画面左上に描画）
