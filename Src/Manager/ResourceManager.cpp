@@ -21,7 +21,6 @@ ResourceManager& ResourceManager::GetInstance(void)
 
 void ResourceManager::Init(void)
 {
-
 	// 推奨しませんが、どうしても使いたい方は
 	using RES = Resource;
 	using RES_T = RES::TYPE;
@@ -272,7 +271,6 @@ ResourceManager::ResourceManager(void)
 
 Resource& ResourceManager::_Load(SRC src)
 {
-
 	// ロード済みチェック
 	const auto& lPair = loadedMap_.find(src);
 	if (lPair != loadedMap_.end())
@@ -295,5 +293,4 @@ Resource& ResourceManager::_Load(SRC src)
 	loadedMap_.emplace(src, *rPair->second);
 
 	return *rPair->second;
-
 }

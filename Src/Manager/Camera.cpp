@@ -8,8 +8,6 @@
 #include "../Object/Common/Transform.h"
 #include "Camera.h"
 
-//髙野
-
 Camera::Camera(void)
 {
 	angles_ = VECTOR();
@@ -26,9 +24,7 @@ Camera::~Camera(void)
 
 void Camera::Init(void)
 {
-
 	ChangeMode(MODE::FIXED_POINT);
-
 }
 
 void Camera::Update(void)
@@ -110,7 +106,6 @@ float Camera::GetHorizontalAngleRad(void) const
 
 void Camera::ChangeMode(MODE mode)
 {
-
 	// カメラの初期設定
 	SetDefault();
 
@@ -125,12 +120,10 @@ void Camera::ChangeMode(MODE mode)
 	case Camera::MODE::FOLLOW:
 		break;
 	}
-
 }
 
 void Camera::SetDefault(void)
 {
-
 	// カメラの初期設定
 	pos_ = DEFAULT_CAMERA_POS;
 
@@ -145,12 +138,10 @@ void Camera::SetDefault(void)
 	angles_.z = 0.0f;
 
 	rot_ = Quaternion();
-
 }
 
 void Camera::SyncFollow(void)
 {
-
 	auto& gIns = GravityManager::GetInstance();
 
 	// 同期先の位置
@@ -177,7 +168,6 @@ void Camera::SyncFollow(void)
 
 	// カメラの上方向
 	cameraUp_ = gRot.GetUp();
-
 }
 
 void Camera::ProcessRot(void)
@@ -217,13 +207,11 @@ void Camera::SetBeforeDrawFixedPoint(void)
 
 void Camera::SetBeforeDrawFollow(void)
 {
-
 	// カメラ操作
 	ProcessRot();
 
 	// 追従対象との相対位置を同期
 	SyncFollow();
-
 }
 
 void Camera::SetBeforeDrawSelfShot(void)

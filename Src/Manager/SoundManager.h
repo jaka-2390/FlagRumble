@@ -4,6 +4,7 @@
 
 class SoundManager
 {
+
 public:
 
 	//リソース名
@@ -69,6 +70,7 @@ private:
 
 	// デストラクタも同様
 	~SoundManager(void) = default;
+
 };
 
 

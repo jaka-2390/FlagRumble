@@ -40,7 +40,6 @@ GravityManager& GravityManager::GetInstance(void)
 
 void GravityManager::Init(void)
 {
-
 	dirGravity_ = AsoUtility::DIR_D;
 	preDirGravity_ = AsoUtility::VECTOR_ZERO;
 	step_ = -1.0f;
@@ -48,12 +47,10 @@ void GravityManager::Init(void)
 
 	transform_.quaRot = Quaternion();
 	transform_.Update();
-
 }
 
 void GravityManager::Update(void)
 {
-
  	switch (state_)
 	{
 	case GravityManager::STATE::IDLE:
@@ -66,7 +63,6 @@ void GravityManager::Update(void)
 
 	// 重力方向や、正方向の計算
 	Calculate();
-
 }
 
 void GravityManager::UpdateIdle(void)
@@ -102,7 +98,6 @@ void GravityManager::Calculate(void)
 	Quaternion goal = rot.Mult(transform_.quaRot);
 	//from = Quaternion::Slerp(from, to, 0.1f);
 	transform_.quaRot = Quaternion::Slerp(transform_.quaRot, goal, slerpPow_);
-
 }
 
 std::weak_ptr<Planet> GravityManager::GetActivePlanet(void) const
@@ -112,10 +107,8 @@ std::weak_ptr<Planet> GravityManager::GetActivePlanet(void) const
 
 void GravityManager::ChangeActivePlanet(std::weak_ptr<Planet> planet)
 {
-
 	// 新しい惑星をセット
 	activePlanet_ = planet;
-
 }
 
 void GravityManager::SetPlayer(std::shared_ptr<Player> player)
@@ -175,7 +168,6 @@ VECTOR GravityManager::GetLastHitPos(void) const
 
 void GravityManager::ChangeState(STATE state)
 {
-
 	state_ = state;
 	switch (state_)
 	{
@@ -184,12 +176,10 @@ void GravityManager::ChangeState(STATE state)
 	case GravityManager::STATE::STAGE_CHANGE:
 		break;
 	}
-
 }
 
 VECTOR GravityManager::CalcDirGravity(void) const
 {
-
 	VECTOR ret = AsoUtility::DIR_D;
 
 	if (activePlanet_.lock() == nullptr || player_ == nullptr)
@@ -224,5 +214,4 @@ VECTOR GravityManager::CalcDirGravity(void) const
 	}
 
 	return ret;
-
 }

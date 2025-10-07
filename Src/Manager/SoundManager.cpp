@@ -130,7 +130,6 @@ void SoundManager::Init(void)
 	res = Sound(Sound::TYPE::SOUND_2D, Application::PATH_SOUND + "WarningSE.mp3");
 	res.ChangeMaxVolume(1.5);
 	soundMap_.emplace(SRC::WARNING_SE, res);
-
 }
 
 void SoundManager::Release(void)
@@ -152,7 +151,6 @@ void SoundManager::Destroy(void)
 
 bool SoundManager::Play(SRC src, Sound::TIMES times)
 {
-
 	const auto& lPair = soundMap_.find(src);
 	if (lPair != soundMap_.end())
 	{

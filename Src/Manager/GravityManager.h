@@ -2,6 +2,7 @@
 #include <memory>
 #include "../Object/Common/Transform.h"
 #include "../Common/Quaternion.h"
+
 class SceneManager;
 class Planet;
 class Player;

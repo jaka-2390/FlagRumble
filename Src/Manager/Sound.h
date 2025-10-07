@@ -4,7 +4,9 @@
 
 class Sound
 {
+
 public:
+
     enum class TYPE
     {
         NONE,
@@ -40,10 +42,12 @@ public:
     void ChangeMaxVolume(float per);
 
 private:
+
     TYPE soundType_;
     std::string path_;
     int handleIds_[MAX_HANDLE_NUM];
     int maxVolume_;
     VECTOR pos_;
     float radius_;
+
 };

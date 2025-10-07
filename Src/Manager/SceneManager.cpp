@@ -53,12 +53,10 @@ void SceneManager::Init(void)
 
 	// 初期シーンの設定
 	DoChangeScene(SCENE_ID::TITLE);
-
 }
 
 void SceneManager::Init3D(void)
 {
-
 	// 背景色設定
 	SetBackgroundColor(0, 139, 139);
 
@@ -80,12 +78,10 @@ void SceneManager::Init3D(void)
 	//環境光
 	SetGlobalAmbientLight(GetColorF(0.3f, 0.3f, 0.3f, 1.0f));
 
-
 	// フォグ設定
 	SetFogEnable(true);
 	SetFogColor(5, 5, 5);
 	SetFogStartEnd(10000.0f, 20000.0f);
-
 }
 
 void SceneManager::Update(void)
@@ -116,12 +112,10 @@ void SceneManager::Update(void)
 
 	// カメラ更新
 	camera_->Update();
-
 }
 
 void SceneManager::Draw(void)
 {
-	
 	// 描画先グラフィック領域の指定
 	// (３Ｄ描画で使用するカメラの設定などがリセットされる)
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -146,23 +140,19 @@ void SceneManager::Draw(void)
 	
 	// 暗転・明転
 	fader_->Draw();
-
 }
 
 
 void SceneManager::Destroy(void)
 {
-
 	// 重力管理初期化
 	GravityManager::GetInstance().Destroy();
 
 	delete instance_;
-
 }
 
 void SceneManager::ChangeScene(SCENE_ID nextId)
 {
-
 	// フェード処理が終わってからシーンを変える場合もあるため、
 	// 遷移先シーンをメンバ変数に保持
 	waitSceneId_ = nextId;
@@ -170,7 +160,6 @@ void SceneManager::ChangeScene(SCENE_ID nextId)
 	// フェードアウト(暗転)を開始する
 	fader_->SetFade(Fader::STATE::FADE_OUT);
 	isSceneChanging_ = true;
-
 }
 
 SceneManager::SCENE_ID SceneManager::GetSceneID(void)
@@ -191,7 +180,6 @@ std::weak_ptr<Camera> SceneManager::GetCamera(void) const
 
 SceneManager::SceneManager(void)
 {
-
 	sceneId_ = SCENE_ID::NONE;
 	waitSceneId_ = SCENE_ID::NONE;
 
@@ -204,7 +192,6 @@ SceneManager::SceneManager(void)
 	deltaTime_ = 1.0f / 60.0f;
 
 	camera_ = nullptr;
-
 }
 
 void SceneManager::ResetDeltaTime(void)
@@ -263,7 +250,6 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 
 void SceneManager::Fade(void)
 {
-
     Fader::STATE fState = fader_->GetState();
     switch (fState)
     {
