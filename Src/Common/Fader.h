@@ -36,9 +36,6 @@ public:
 
 private:
 
-
-
-
 	// ó‘Ô
 	STATE state_;
 

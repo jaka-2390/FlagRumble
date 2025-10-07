@@ -88,12 +88,10 @@ void Fader::Update(void)
 	default:
 		return;
 	}
-
 }
 
 void Fader::Draw(void)
 {
-
 	switch (state_)
 	{
 	case STATE::NONE:
@@ -120,5 +118,4 @@ void Fader::Draw(void)
 
 		DrawGraph(1200, 900, imgLoad_[index], TRUE);
 	}
-
 }

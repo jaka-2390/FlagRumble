@@ -37,7 +37,6 @@ Quaternion Quaternion::Euler(const VECTOR& rad)
 
 Quaternion Quaternion::Euler(double radX, double radY, double radZ)
 {
-
     Quaternion ret = Quaternion();
 
     radX = AsoUtility::RadIn2PI(radX);
@@ -62,12 +61,10 @@ Quaternion Quaternion::Euler(double radX, double radY, double radZ)
     ret.z = cosX * cosY * sinZ - sinX * sinY * cosZ;
 
     return ret;
-
 }
 
 Quaternion Quaternion::Mult(const Quaternion& q1, const Quaternion& q2)
 {
-
     Quaternion ret = Quaternion();
     double d1, d2, d3, d4;
 
@@ -100,7 +97,6 @@ Quaternion Quaternion::Mult(const Quaternion& q1, const Quaternion& q2)
     ret.z = d1 + d2 + d3 + d4;
 
     return ret;
-
 }
 
 Quaternion Quaternion::Mult(const Quaternion& q) const
@@ -110,7 +106,6 @@ Quaternion Quaternion::Mult(const Quaternion& q) const
 
 Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
 {
-
     Quaternion ret = Quaternion();
 
     double norm;
@@ -141,7 +136,6 @@ Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
     ret.z = s * axis.z;
 
     return ret;
-
 }
 
 VECTOR Quaternion::PosAxis(const Quaternion& q, VECTOR pos)
@@ -162,7 +156,6 @@ VECTOR Quaternion::PosAxis(VECTOR pos) const
 
 VECTOR Quaternion::ToEuler(const Quaternion& q)
 {
-
     VECTOR ret;
 
     double r11 = 2 * (q.x * q.z + q.w * q.y);
@@ -176,7 +169,6 @@ VECTOR Quaternion::ToEuler(const Quaternion& q)
     ret.z = static_cast<float>(atan2(r31, r32));
 
     return ret;
-
 }
 
 VECTOR Quaternion::ToEuler(void) const
@@ -186,7 +178,6 @@ VECTOR Quaternion::ToEuler(void) const
 
 MATRIX Quaternion::ToMatrix(const Quaternion& q)
 {
-
     MATRIX mat;
 
     FLOAT4 fq = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
@@ -205,43 +196,8 @@ MATRIX Quaternion::ToMatrix(const Quaternion& q)
     mat.m[1][0] = cz - wz;			mat.m[1][1] = 1.0f - (sx + sz);	mat.m[1][2] = cx + wx;			mat.m[1][3] = 0.0f;
     mat.m[2][0] = cy + wy;			mat.m[2][1] = cx - wx;			mat.m[2][2] = 1.0f - (sx + sy);	mat.m[2][3] = 0.0f;
     mat.m[3][0] = 0.0f;				mat.m[3][1] = 0.0f;				mat.m[3][2] = 0.0f;				mat.m[3][3] = 1.0f;
-    //mat.m[3][0] = trans.x;				mat.m[3][1] = trans.y;				mat.m[3][2] = trans.z;				mat.m[3][3] = 1.0f;
-
+    
     return mat;
-
-    //double sqw = q.w * q.w;
-    //double sqx = q.x * q.x;
-    //double sqy = q.y * q.y;
-    //double sqz = q.z * q.z;
-    //double invs = 1.0 / (sqx + sqy + sqz + sqw);
-
-    //MATRIX matrix = MGetIdent();
-
-    //matrix.m[0][0] = static_cast<float>((sqx - sqy - sqz + sqw) * invs);
-    //matrix.m[1][1] = static_cast<float>((-sqx + sqy - sqz + sqw) * invs);
-    //matrix.m[2][2] = static_cast<float>((-sqx - sqy + sqz + sqw) * invs);
-
-    //double tmp1 = q.x * q.y;
-    //double tmp2 = q.z * q.w;
-    ////matrix.m[0][1] = static_cast<float>(2.0 * (tmp1 + tmp2) * invs);
-    ////matrix.m[1][0] = static_cast<float>(2.0 * (tmp1 - tmp2) * invs);
-    //matrix.m[0][1] = static_cast<float>(2.0 * (tmp1 - tmp2) * invs);
-    //matrix.m[1][0] = static_cast<float>(2.0 * (tmp1 + tmp2) * invs);
-
-    //tmp1 = q.x * q.z;
-    //tmp2 = q.y * q.w;
-    //matrix.m[0][2] = static_cast<float>(2.0 * (tmp1 - tmp2) * invs);
-    //matrix.m[2][0] = static_cast<float>(2.0 * (tmp1 + tmp2) * invs);
-
-    //tmp1 = q.y * q.z;
-    //tmp2 = q.x * q.w;
-    ////matrix.m[1][2] = static_cast<float>(2.0 * (tmp1 + tmp2) * invs);
-    ////matrix.m[2][1] = static_cast<float>(2.0 * (tmp1 - tmp2) * invs);
-    //matrix.m[1][2] = static_cast<float>(2.0 * (tmp1 - tmp2) * invs);
-    //matrix.m[2][1] = static_cast<float>(2.0 * (tmp1 + tmp2) * invs);
-
-    //return matrix;
-
 }
 
 MATRIX Quaternion::ToMatrix(void) const
@@ -257,7 +213,6 @@ Quaternion Quaternion::LookRotation(VECTOR dir)
 
 Quaternion Quaternion::LookRotation(VECTOR dir, VECTOR up)
 {
-
     dir = AsoUtility::VNormalize(dir);
     VECTOR right = AsoUtility::VNormalize(VCross(up, dir));
     up = VCross(dir, right);
@@ -270,7 +225,6 @@ Quaternion Quaternion::LookRotation(VECTOR dir, VECTOR up)
     auto m20 = dir.x;
     auto m21 = dir.y;
     auto m22 = dir.z;
-
 
     float num8 = (m00 + m11) + m22;
     auto quaternion = Quaternion();
@@ -286,14 +240,6 @@ Quaternion Quaternion::LookRotation(VECTOR dir, VECTOR up)
     }
     if ((m00 >= m11) && (m00 >= m22))
     {
-        // xÇ∆wÇ™ãtÅH
-        //auto num7 = sqrt(((1.0f + m00) - m11) - m22);
-        //auto num4 = 0.5f / num7;
-        //quaternion.x = 0.5f * num7;
-        //quaternion.y = (m01 + m10) * num4;
-        //quaternion.z = (m02 + m20) * num4;
-        //quaternion.w = (m12 - m21) * num4;
-        //return quaternion.Normalized();
         auto num7 = sqrt(((1.0f + m00) - m11) - m22);
         auto num4 = 0.5f / num7;
         quaternion.x = ((double)m12 - m21) * num4;
@@ -319,12 +265,10 @@ Quaternion Quaternion::LookRotation(VECTOR dir, VECTOR up)
     quaternion.z = 0.5 * num5;
     quaternion.w = ((double)m01 - m10) * num2;
     return quaternion.Normalized();
-
 }
 
 Quaternion Quaternion::GetRotation(MATRIX mat)
 {
-
     Quaternion ret;
 
     float s;
@@ -379,59 +323,6 @@ Quaternion Quaternion::GetRotation(MATRIX mat)
     }
 
     return ret;
-
-
-    //float elem[4];
-    //elem[0] = mat.m[0][0] - mat.m[1][1] - mat.m[2][2] + 1.0f;
-    //elem[1] = -mat.m[0][0] + mat.m[1][1] - mat.m[2][2] + 1.0f;
-    //elem[2] = -mat.m[0][0] - mat.m[1][1] + mat.m[2][2] + 1.0f;
-    //elem[3] = mat.m[0][0] + mat.m[1][1] + mat.m[2][2] + 1.0f;
-
-    //int biggestIdx = 0;
-    //for (int i = 0; i < 4; i++)
-    //{
-    //    if (elem[i] > elem[biggestIdx])
-    //    {
-    //        biggestIdx = i;
-    //    }
-    //}
-
-    //if (elem[biggestIdx] < 0)
-    //{
-    //    return Quaternion();
-    //}
-
-    //float q[4];
-    //float v = sqrt(elem[biggestIdx]) * 0.5f;
-    //q[biggestIdx] = v;
-    //float mult = 0.25f / v;
-
-    //switch (biggestIdx)
-    //{
-    //case 0:
-    //    q[1] = (mat.m[1][0] + mat.m[0][1]) * mult;
-    //    q[2] = (mat.m[0][2] + mat.m[2][0]) * mult;
-    //    q[3] = (mat.m[2][1] - mat.m[1][2]) * mult;
-    //    break;
-    //case 1:
-    //    q[0] = (mat.m[1][0] + mat.m[0][1]) * mult;
-    //    q[2] = (mat.m[2][1] + mat.m[1][2]) * mult;
-    //    q[3] = (mat.m[0][2] - mat.m[2][0]) * mult;
-    //    break;
-    //case 2:
-    //    q[0] = (mat.m[0][2] + mat.m[2][0]) * mult;
-    //    q[1] = (mat.m[2][1] + mat.m[1][2]) * mult;
-    //    q[3] = (mat.m[1][0] - mat.m[0][1]) * mult;
-    //    break;
-    //case 3:
-    //    q[0] = (mat.m[2][1] - mat.m[1][2]) * mult;
-    //    q[1] = (mat.m[0][2] - mat.m[2][0]) * mult;
-    //    q[2] = (mat.m[1][0] - mat.m[0][1]) * mult;
-    //    break;
-    //}
-
-    //return Quaternion(q[3], q[0], q[1], q[2]);
-
 }
 
 VECTOR Quaternion::GetDir(VECTOR dir) const
@@ -489,31 +380,25 @@ Quaternion Quaternion::Normalize(const Quaternion& q)
 
 Quaternion Quaternion::Normalized(void) const
 {
-
     double mag = sqrt(w * w + x * x + y * y + z * z);
     return Quaternion(w / mag, x / mag, y / mag, z / mag);
-
 }
 
 void Quaternion::Normalize(void)
 {
-
     double mag = sqrt(w * w + x * x + y * y + z * z);
 
     w /= mag;
     x /= mag;
     y /= mag;
     z /= mag;
-
 }
 
 Quaternion Quaternion::Inverse(void) const
 {
-
     double n = 1.0f / (w * w + x * x + y * y + z * z);
     Quaternion tmp = Quaternion(w, -x, -y, -z);
     return Quaternion(tmp.w * n, tmp.x * n, tmp.y * n, tmp.z * n);;
-
 }
 
 Quaternion Quaternion::Slerp(Quaternion from, Quaternion to, double t)
@@ -521,20 +406,20 @@ Quaternion Quaternion::Slerp(Quaternion from, Quaternion to, double t)
     if (t > 1) t = 1;
     if (t < 0) t = 0;
     return SlerpUnclamped(from, to, (float)t);
-
 }
 
-inline float SIGN(float x) {
+inline float SIGN(float x) 
+{
     return (x >= 0.0f) ? +1.0f : -1.0f;
 }
 
-inline float NORM(float a, float b, float c, float d) {
+inline float NORM(float a, float b, float c, float d) 
+{
     return sqrt(a * a + b * b + c * c + d * d);
 }
 
 Quaternion Quaternion::FromToRotation(VECTOR fromDir, VECTOR toDir)
 {
-
 	VECTOR axis = VCross(fromDir, toDir);
 	double angle = AsoUtility::AngleDeg(fromDir, toDir);
 	if (angle >= 179.9196)
@@ -551,7 +436,6 @@ Quaternion Quaternion::FromToRotation(VECTOR fromDir, VECTOR toDir)
 
 	axis = AsoUtility::VNormalize(axis);
 	return Quaternion::AngleAxis(AsoUtility::Deg2RadD(angle), axis);
-
 }
 
 Quaternion Quaternion::RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta)
@@ -574,7 +458,6 @@ double Quaternion::Angle(const Quaternion& q1, const Quaternion& q2)
 
 Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
 {
-
     // if either input is zero, return the other.
     if (a.LengthSquared() == 0.0f)
     {
@@ -589,7 +472,6 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
         return a;
     }
 
-
     float cosHalfAngle = (float)(a.w * b.w) + VDot(a.xyz(), b.xyz());
 
     if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
@@ -599,7 +481,6 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
     }
     else if (cosHalfAngle < 0.0f)
     {
-        //b.xyz() = -b.xyz();
 		b.x = b.x * -1.0f;
 		b.y = b.y * -1.0f;
 		b.z = b.z * -1.0f;
@@ -625,9 +506,7 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
         blendB = t;
     }
 
-    //Quaternion result = Quaternion(blendA * a.xyz() + blendB * b.xyz(), blendA * a.w + blendB * b.w);
     VECTOR v = VAdd(VScale(a.xyz(), blendA), VScale(b.xyz(), blendB));
-    //Quaternion result = Quaternion(v.x, v.y, v.z, blendA * a.w + blendB * b.w);
 	Quaternion result = Quaternion(blendA * a.w + blendB * b.w, v.x, v.y, v.z);
     if (result.LengthSquared() > 0.0f)
     {
@@ -637,7 +516,6 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
     {
         return Identity();
     }
-
 }
 
 Quaternion Quaternion::Identity(void)
@@ -662,7 +540,6 @@ VECTOR Quaternion::xyz(void) const
 
 void Quaternion::ToAngleAxis(float* angle, VECTOR* axis)
 {
-
 	if (abs(this->w) > 1.0f)
 	{
 		this->Normalize();
@@ -689,21 +566,24 @@ void Quaternion::ToAngleAxis(float* angle, VECTOR* axis)
 		// Not a problem: just set an arbitrary normalized axis.
 		*axis = { 1.0f, 0.0f, 0.0f };
 	}
-
 }
 
-Quaternion Quaternion::operator*(float& f) {
+Quaternion Quaternion::operator*(float& f) 
+{
     return Quaternion(w * f, x * f, y * f, z * f);
 }
 
-const Quaternion Quaternion::operator*(const float& f) {
+const Quaternion Quaternion::operator*(const float& f) 
+{
     return Quaternion(w * f, x * f, y * f, z * f);
 }
 
-Quaternion Quaternion::operator+(Quaternion& rhs) {
+Quaternion Quaternion::operator+(Quaternion& rhs) 
+{
     return Quaternion(w + rhs.w, x + rhs.x, y + rhs.y, z + rhs.z);
 }
 
-const Quaternion Quaternion::operator+(const Quaternion& rhs) {
+const Quaternion Quaternion::operator+(const Quaternion& rhs) 
+{
     return Quaternion(w + rhs.w, x + rhs.x, y + rhs.y, z + rhs.z);
 }
