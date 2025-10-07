@@ -312,7 +312,7 @@ bool Player::IsPlay(void) const
 void Player::InitAnimation(void)
 {
 
-	std::string path = Application::PATH_MODEL + "NPlayer/";
+	std::string path = Application::PATH_MODEL + "Player/";
 
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
 	
