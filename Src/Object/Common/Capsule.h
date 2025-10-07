@@ -1,5 +1,6 @@
 #pragma once
 #include <DxLib.h>
+
 class Transform;
 
 class Capsule

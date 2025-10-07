@@ -46,7 +46,6 @@ Transform::~Transform(void)
 
 void Transform::Update(void)
 {
-
 	// ‘å‚«‚³
 	matScl = MGetScale(scl);
 
@@ -75,7 +74,6 @@ void Transform::Update(void)
 	{
 		MV1RefreshCollInfo(modelId);
 	}
-
 }
 
 void Transform::SetModel(int model)
@@ -85,7 +83,6 @@ void Transform::SetModel(int model)
 
 void Transform::MakeCollider(Collider::TYPE type)
 {
-
 	if (modelId == -1)
 	{
 		return;
@@ -93,7 +90,6 @@ void Transform::MakeCollider(Collider::TYPE type)
 
 	collider = std::make_shared<Collider>(type, modelId);
 	int ret = MV1SetupCollInfo(modelId, -1, 1, 1, 1);
-
 }
 
 VECTOR Transform::GetForward(void) const

@@ -2,6 +2,7 @@
 #include <string>
 #include <DxLib.h>
 #include "Transform.h"
+
 class SceneManager;
 
 class SpeechBalloon

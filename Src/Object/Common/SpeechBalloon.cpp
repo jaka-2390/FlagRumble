@@ -8,7 +8,6 @@
 
 SpeechBalloon::SpeechBalloon(TYPE type, const Transform& parent) : transformParent_(parent)
 {
-
 	type_ = type;
 
 	Resource res = ResourceManager::GetInstance().Load(ResourceManager::SRC::SPEECH_BALLOON);
@@ -19,7 +18,6 @@ SpeechBalloon::SpeechBalloon(TYPE type, const Transform& parent) : transformPare
 
 	pos_ = { 0.0f, 0.0f, 0.0f };
 	localPos_ = { 0.0f, 0.0f, 0.0f };
-
 }
 
 SpeechBalloon::~SpeechBalloon(void)
@@ -28,7 +26,6 @@ SpeechBalloon::~SpeechBalloon(void)
 
 void SpeechBalloon::Draw(void)
 {
-
 	if (!isVisiblePermanent_)
 	{
 		visibleTime_ -= SceneManager::GetInstance().GetDeltaTime();
@@ -52,12 +49,10 @@ void SpeechBalloon::Draw(void)
 		DrawSpeech();
 		break;
 	}
-
 }
 
 void SpeechBalloon::DrawTextOrg(void)
 {
-
 	// カメラのSetCameraNearFarから外れていた場合、表示しない
 	if (pos_.z > 0.0f && pos_.z < 1.0f)
 	{
@@ -65,12 +60,10 @@ void SpeechBalloon::DrawTextOrg(void)
 			static_cast<int>(pos_.x), static_cast<int>(pos_.y),
 			0xdd0000, "%s", text_.c_str());
 	}
-
 }
 
 void SpeechBalloon::DrawSpeech(void)
 {
-
 	// カメラのSetCameraNearFarから外れていた場合、表示しない
 	if (pos_.z > 0.0f && pos_.z < 1.0f)
 	{
@@ -81,7 +74,6 @@ void SpeechBalloon::DrawSpeech(void)
 		int width = GetDrawStringWidth(text_.c_str(), len);
 		DrawFormatString(x - (width / 2), y - 15, 0x000000, "%s", text_.c_str());
 	}
-
 }
 
 void SpeechBalloon::SetText(const std::string& text)

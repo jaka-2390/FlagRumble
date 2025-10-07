@@ -26,7 +26,6 @@ AnimationController::~AnimationController(void)
 
 void AnimationController::Add(int type, const std::string& path, float speed, int number)
 {
-
 	Animation anim;
 
 	anim.model = MV1LoadModel(path.c_str());
@@ -47,13 +46,11 @@ void AnimationController::Add(int type, const std::string& path, float speed, in
 		animations_[type].attachNo = anim.attachNo;
 		animations_[type].totalTime = anim.totalTime;
 	}
-
 }
 
 void AnimationController::Play(int type, bool isLoop, 
 	float startStep, float endStep, bool isStop, bool isForce)
 {
-
 	if (playType_ != type || isForce) {
 
 		if (playType_ != -1)
@@ -102,12 +99,10 @@ void AnimationController::Play(int type, bool isLoop,
 		stepEndLoopEnd_ = -1.0f;
 		switchLoopReverse_ = 1.0f;
 	}
-
 }
 
 void AnimationController::Update(void)
 {
-
 	// 経過時間の取得
 	float deltaTime = SceneManager::GetInstance().GetDeltaTime();
 
@@ -176,7 +171,6 @@ void AnimationController::Update(void)
 
 	// アニメーション設定
 	MV1SetAttachAnimTime(modelId_, playAnim_.attachNo, playAnim_.step);
-
 }
 
 void AnimationController::SetEndLoop(float startStep, float endStep, float speed)
@@ -193,7 +187,6 @@ int AnimationController::GetPlayType(void) const
 
 bool AnimationController::IsEnd(void) const
 {
-
 	bool ret = false;
 
 	if (isLoop_)
@@ -210,5 +203,4 @@ bool AnimationController::IsEnd(void) const
 	}
 
 	return ret;
-
 }
