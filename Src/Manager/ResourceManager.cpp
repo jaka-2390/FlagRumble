@@ -122,7 +122,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::SPEECH_BALLOON, std::move(res));
 	
 	// プレイヤー
-	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "NPlayer/Player.mv1");
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Player/Player.mv1");
 	resourcesMap_.emplace(SRC::PLAYER, std::move(res));
 
 	// プレイヤー影
