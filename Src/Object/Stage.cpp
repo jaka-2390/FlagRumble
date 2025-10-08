@@ -11,9 +11,6 @@
 #include "Common/Transform.h"
 #include "Stage.h"
 
-//担当します　中山です
-
-
 Stage::Stage(Player& player) 
 	: resMng_(ResourceManager::GetInstance()), player_(player)
 {
@@ -23,10 +20,8 @@ Stage::Stage(Player& player)
 
 Stage::~Stage(void)
 {
-		
 	// 惑星
 	planets_.clear();
-
 }
 
 void Stage::Init(void)
@@ -39,7 +34,6 @@ void Stage::Init(void)
 
 void Stage::Update(void)
 {
-
 	// 重力範囲が重なっていた場合、惑星がコロコロ切り替わらないように
 	// 一定時間ステージが変わらないようにする
 	bool isPossibleChange = true;
@@ -75,18 +69,15 @@ void Stage::Update(void)
 
 void Stage::Draw(void)const
 {
-
 	// 惑星
 	for (const auto& s : planets_)
 	{
 		s.second->Draw();
 	}
-
 }
 
 void Stage::ChangeStage(NAME type)
 {
-
 	activeName_ = type;
 
 	// 対象のステージを取得する
@@ -99,7 +90,6 @@ void Stage::ChangeStage(NAME type)
 
 	// 重力制御に惑星を渡す
 	GravityManager::GetInstance().ChangeActivePlanet(activePlanet_);
-
 }
 
 std::weak_ptr<Planet> Stage::GetPlanet(NAME type)
@@ -124,7 +114,6 @@ std::vector<VECTOR> Stage::GetPlanetsPositions() const
 
 void Stage::MakeMainStage(void)
 {
-
 	// 最初の惑星
 	//------------------------------------------------------------------------------
 	Transform planetTrans;
@@ -146,7 +135,6 @@ void Stage::MakeMainStage(void)
 	planet->Init();
 	planets_.emplace(name, std::move(planet));
 	//------------------------------------------------------------------------------
-
 }
 
 void Stage::MakeGoalStar(void)
@@ -155,5 +143,4 @@ void Stage::MakeGoalStar(void)
 
 void Stage::MainStage(void)
 {	
-
 }

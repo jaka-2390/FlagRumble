@@ -9,22 +9,81 @@ class SkyDome;
 class Player;
 class MiniMap;
 class Camera;
-class Flag;
-
-//スポーン場所
-struct SpawnArea
-{
-	VECTOR center;     // 中心座標
-	float radius;      // 半径
-	bool triggered;    // もうスポーン済みか（1回きりの場合）
-};
 
 class GameScene : public SceneBase
 {
+
 public:
-	static constexpr int ENCOUNT = 60;		//エンカウンタ
-	static constexpr int ENEMY_MAX = 5;	//最大出現数
+
+	static constexpr int ENCOUNT = 300;		//エンカウンタ
+	static constexpr int ENEMY_MAX = 200;	//最大出現数
 	static constexpr int ENE_ENC = 30;		//最大許容量
+	static constexpr int BORN_DIR = 3;		//敵の出現方向
+	static constexpr int STAGE_WIDTH = 20000; //ステージの全体
+	static constexpr int STAGE_LANGE = 10000;	//ステージの幅
+
+	static constexpr int LV_MAX = 100;		//木のレベル最大
+	static constexpr int LV_OLD = 75;		//木の成長段階
+	static constexpr int LV_ADULT = 50;		//木の成長段階
+	static constexpr int LV_KID = 25;		//木の成長段階
+	static constexpr int HP_ZERO = 0;		//木の体力0
+
+	static constexpr int BOSS_WAIT = 0;		//ボス出現待機
+	static constexpr int BOSS_ON = 1;		//ボス出現可能
+	static constexpr int BOSS_OFF = 2;		//ボス出現不可
+
+	//UI関係-----------------------------------------------------
+	//-------------------------------------------------------------------
+
+	static constexpr int GAME_HEIGHT_1 = 80;			//ゲーム開始時の注意書き
+
+	//画像サイズ
+	static constexpr float IMG_GAME_UI_1_SIZE = 0.5;	//imgGameUi1_のサイズ
+	static constexpr float IMG_OPEGEAR_UI_SIZE = 0.8;	//imgOpeGear_のサイズ
+	static constexpr float PAUSE_IMG_UI_SIZE = 0.65;	//pauseImg_のサイズ
+
+	//ポーズメニュー関連
+	static constexpr int PAUSE_MENU_ITEM_COUNT = 4;						//ポーズメニューの数
+	static constexpr int PAUSE_MENU_DOWN = 1;							//下に移動
+	static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動（+3 の代わり）
+
+	//フェード系
+	static constexpr int AUTO_FADE = 240;				//自動フェード
+	static constexpr int FLASH = 45;					//点滅
+	static constexpr int ONE_SECOND_FRAME = 60;			//1秒
+
+	//設定系
+	static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
+
+	static constexpr int UI_PAUSE_IMG_HEIGHT = 150;				//pauseImg_の高さ
+
+	static constexpr int UI_WIDTH_PAUSE_1 = 160;				//UIを調整する
+	static constexpr int UI_WIDTH_PAUSE_2 = 200;				//UIを調整する
+	static constexpr int UI_WIDTH_PAUSE_3 = 240;				//UIを調整する
+
+	static constexpr int UI_HEIGHT_PAUSE_1 = 350;				//１個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_2 = 470;				//２個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_3 = 590;				//３個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_4 = 710;				//４個目のUIの高さ
+
+	static constexpr int UI_ATTACK_X = 10;						//攻撃の文字のX座標
+	static constexpr int UI_NORMAL_ATTACK_Y = 450;				//通常攻撃のY座標
+	static constexpr int UI_SLASH_ATTACK_Y = 500;				//スラッシュのY座標
+	static constexpr int UI_EX_ATTACK_Y = 550;					//回転斬りのY座標
+
+	static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
+	static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
+
+	//-------------------------------------------------------------------
+
+	//色
+	int white = 0xffffff; //白
+	int black = 0x000000; //黒
+	int red = 0xff0000;	  //赤
+	int green = 0x00ff00; //緑
+	int blue = 0x0000ff;  //青
+	int yellow = 0xffff00;//黄
+	int purpl = 0x800080; //紫
 
 	GameScene(void);	// コンストラクタ
 	~GameScene(void);	// デストラクタ
@@ -36,23 +95,21 @@ public:
 
 	void DrawMiniMap(void);
 
-	//void AddItem(std::shared_ptr<Item> item);
-	//std::shared_ptr<Item>CreateItem(const VECTOR& spawnPos, float scale,Item::TYPE itemType);
 	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
 
 private:
+
 	int cnt;
 
-	void EnemyCreate(int count);
+	void EnemyCreate(void);
 
-	std::vector<SpawnArea> spawnAreas_;	// スポーン場所
+	bool PauseMenu(void);
+
 	std::unique_ptr<Stage> stage_;		// ステージ
 	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
 	std::shared_ptr<Player> player_;	// プレイヤー
-	//std::vector<std::shared_ptr<Item>> items_;		//アイテム
 	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
-	std::shared_ptr<Flag> flag_;	//フラッグ
 
 	int enemyModelId_;
 	int imgGameUi1_;
@@ -67,10 +124,6 @@ private:
 	std::vector<std::shared_ptr<EnemyBase>> enemys_;
 	int enCounter;//敵の出現頻度
 
-	bool unlockedQ = false;           // Lv25に達したか
-	bool showQFlash = false;          // 点滅中かどうか
-	int qUnlockTime = 0;              // 解放された時の時間（ミリ秒）
-
 	int isB_;
 
 	// ポーズ
@@ -78,26 +131,12 @@ private:
 	int pauseSelectIndex_;    // ポーズメニューの選択項目（上下選択）
 	int pauseExplainImgs_[2];
 
-	enum class PauseState 
+	enum class PauseState
 	{
 		Menu,        // 通常のポーズメニュー
 		ShowControls,// 操作説明画面
 		ShowItems    // アイテム概要画面
 	};
-
-	// 敵全滅フラグ
-	bool allEnemyDefeated_ = false;
-
-	// 旗関連
-	VECTOR flagPos = VGet(0, 0, 200); // 適当な位置
-	float flagRadius_ = 100.0f;       // 接近判定の距離
-
-	// ゲージ
-	float clearGauge_ = 0.0f;
-	float clearGaugeMax_ = 100.0f;
-	bool gameClear_ = false;
-
-	int lastSpawnTime_;  // 最後に敵を出現させた時間
 
 	PauseState pauseState_ = PauseState::Menu;
 	int  pauseImg_;

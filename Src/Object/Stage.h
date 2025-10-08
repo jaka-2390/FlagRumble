@@ -2,6 +2,7 @@
 #include <memory>
 #include <map>
 #include "Common/Transform.h"
+
 class ResourceManager;
 class Planet;
 class Player;

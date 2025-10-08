@@ -6,14 +6,12 @@
 
 SkyDome::SkyDome(const Transform& syncTransform) : syncTransform_(syncTransform)
 {
-
 	state_ = STATE::NONE;
 	
 	// 状態管理
 	stateChanges_.emplace(STATE::NONE, std::bind(&SkyDome::ChangeStateNone, this));
 	stateChanges_.emplace(STATE::STAY, std::bind(&SkyDome::ChangeStateStay, this));
 	stateChanges_.emplace(STATE::FOLLOW, std::bind(&SkyDome::ChangeStateFollow, this));
-
 }
 
 SkyDome::~SkyDome(void)
@@ -22,7 +20,6 @@ SkyDome::~SkyDome(void)
 
 void SkyDome::Init(void)
 {
-
 	// モデル制御の基本情報
 	transform_.SetModel(
 		resMng_.LoadModelDuplicate(
@@ -51,15 +48,12 @@ void SkyDome::Init(void)
 	{
 		ChangeState(STATE::FOLLOW);
 	}
-
 }
 
 void SkyDome::Update(void)
 {
-
 	// 更新ステップ
 	stateUpdate_();
-
 }
 
 void SkyDome::Draw(void)
@@ -69,13 +63,11 @@ void SkyDome::Draw(void)
 
 void SkyDome::ChangeState(STATE state)
 {
-
 	// 状態変更
 	state_ = state;
 
 	// 各状態遷移の初期処理
 	stateChanges_[state_]();
-
 }
 
 void SkyDome::ChangeStateNone(void)

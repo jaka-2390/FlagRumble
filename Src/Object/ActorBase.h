@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Transform.h"
+
 class ResourceManager;
 class SceneManager;
 class GravityManager;

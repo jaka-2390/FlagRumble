@@ -7,7 +7,6 @@
 
 Planet::Planet(const Stage::NAME& name, const TYPE& type, const Transform& transform)
 {
-
 	name_ = name;
 	type_ = type;
 	transform_ = transform;
@@ -15,7 +14,6 @@ Planet::Planet(const Stage::NAME& name, const TYPE& type, const Transform& trans
 	gravityPow_ = 0.0f;
 	gravityRadius_ = 0.0f;
 	deadLength_ = 0.0f;
-
 }
 
 Planet::~Planet(void)
@@ -36,10 +34,6 @@ void Planet::Update(void)
 void Planet::Draw(void)
 {
 	MV1DrawModel(transform_.modelId);
-	
-	//// èdóÕîÕàÕ
-	//DrawSphere3D(
-	//	transform_.pos, gravityRadius_, 10, 0xff0000, 0xff0000, false);
 }
 
 void Planet::SetPosition(const VECTOR& pos)
