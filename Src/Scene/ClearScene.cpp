@@ -50,35 +50,35 @@ void ClearScene::Init(void)
 	// 画像サイズ取得
 
 	GetGraphSize(imgClearWolrd_, &imgW_, &imgH_);
-	msgX_ = Application::SCREEN_SIZE_X / 2 - imgW_ / 2;
-	msgY_ = 800;
+	messageX_ = Application::SCREEN_SIZE_X / VALUE_TWO - imgW_ / VALUE_TWO;
+	messageY_ = MESSAGE_Y;
 
 	// マスクの初期位置（完全に隠れている状態）
-	maskLeftX_ = msgX_;
-	maskSpeed_ = 5;
+	maskLeftX_ = messageX_;
+	maskSpeed_ = MASK_SPEED;
 
 	// フェード処理
 	clearAlpha_ = 0;     // 完全に透明から始める
-	fadeSpeed_ = 2;      // 徐々に表示（速さはお好みで）
+	fadeSpeed_ = FADE_SPEED;      // 徐々に表示（速さはお好みで）
 
 	// presskey用
-	pressKeyY_ = Application::SCREEN_SIZE_Y + 100;         // 画面下 + α からスタート
-	targetPressKeyY_ = 600;         // 目標位置
-	pressKeyAlpha_ = 0;             // 透明から始める
+	pressKeyY_ = Application::SCREEN_SIZE_Y + PRESS_KEY_OFFSET_Y;	// 画面下 + α からスタート
+	targetPressKeyY_ = PRESS_KEY_TARGET_Y;	// 目標位置
+	pressKeyAlpha_ = 0;	// 透明から始める
 	isPressKeyAnimStart_ = false;
 	isPressKeyAnimEnd_ = false;
 
 	// 敵
 	enemy_.SetModel(resMng_.LoadModelDuplicate(ResourceManager::SRC::MUSH));
-	enemy_.pos = { -490.0f, -600.0f, 50.0f };
-	enemy_.scl = { 1.3f, 1.3f, 1.3f };
-	enemy_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(-20.0f), 0.0f);
+	enemy_.pos = ENEMY_INIT_POS;
+	enemy_.scl = ENEMY_INIT_SCL;
+	enemy_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(ENEMY_INIT_ROT_Y_DEG), 0.0f);
 	enemy_.Update();
 
 	// 敵のアニメーション
 	std::string path1 = Application::PATH_MODEL + "Enemy/mushroom/";
 	animationControllerEnemy_ = std::make_unique<AnimationController>(enemy_.modelId);
-	animationControllerEnemy_->Add(0, path1 + "mushroom.mv1", 40.0f, 1);
+	animationControllerEnemy_->Add(0, path1 + "mushroom.mv1", -ENEMY_INIT_ROT_Y_DEG, 1);
 	animationControllerEnemy_->Play(0);
 	isAnimEnd_ = false;
 	// ---------------------------------------------
@@ -92,20 +92,20 @@ void ClearScene::Update(void)
 	cheackCounter_++;
 
 	// アニメーション更新
-	if (maskLeftX_ < msgX_ + imgW_) {
+	if (maskLeftX_ < messageX_ + imgW_) {
 		maskLeftX_ += maskSpeed_;
-		if (maskLeftX_ > msgX_ + imgW_) {
-			maskLeftX_ = msgX_ + imgW_;
+		if (maskLeftX_ > messageX_ + imgW_) {
+			maskLeftX_ = messageX_ + imgW_;
 		}
 	}
 
-	if (clearAlpha_ < 255) {
+	if (clearAlpha_ < ALPHA_MAX) {
 		clearAlpha_ += fadeSpeed_;
-		if (clearAlpha_ > 255) clearAlpha_ = 255;
+		if (clearAlpha_ > ALPHA_MAX) clearAlpha_ = ALPHA_MAX;
 	}
 
 	// アニメーション終了チェック
-	if (!isAnimEnd_ && maskLeftX_ >= msgX_ + imgW_ && clearAlpha_ >= 255) {
+	if (!isAnimEnd_ && maskLeftX_ >= messageX_ + imgW_ && clearAlpha_ >= ALPHA_MAX) {
 		isAnimEnd_ = true;
 		isPressKeyAnimStart_ = true; // ← ここで pressKey のアニメーション開始
 	}
@@ -118,26 +118,26 @@ void ClearScene::Update(void)
 	}
 
 	// 強制遷移
-	if (cheackCounter_ >= 3600) {
+	if (cheackCounter_ >= AUTO_RETURN_FRAME) {
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
 
 	if (isPressKeyAnimStart_ && !isPressKeyAnimEnd_) {
 		// Y座標を補間（滑らかに近づける）
-		pressKeyY_ -= 6;  // スライドスピード
-		enemy_.pos.y += 4.0f;
+		pressKeyY_ -= PRESS_KEY_SLIDE_SPEED;  // スライドスピード
+		enemy_.pos.y += ENEMY_FLOAT_SPEED_Y;
 		if (pressKeyY_ <= targetPressKeyY_) {
 			pressKeyY_ = targetPressKeyY_;
 		}
 
 		// アルファ値を増加（フェードイン）
-		if (pressKeyAlpha_ < 255) {
-			pressKeyAlpha_ += 5;  // フェードスピード
-			if (pressKeyAlpha_ > 255) pressKeyAlpha_ = 255;
+		if (pressKeyAlpha_ < ALPHA_MAX) {
+			pressKeyAlpha_ += PRESS_KEY_FADE_SPEED;  // フェードスピード
+			if (pressKeyAlpha_ > ALPHA_MAX) pressKeyAlpha_ = ALPHA_MAX;
 		}
 
 		// アニメーション完了フラグ更新
-		if (pressKeyY_ == targetPressKeyY_ && pressKeyAlpha_ == 255) {
+		if (pressKeyY_ == targetPressKeyY_ && pressKeyAlpha_ == ALPHA_MAX) {
 			isPressKeyAnimEnd_ = true;
 		}
 	}
@@ -151,19 +151,20 @@ void ClearScene::Draw(void)
 	// 背景を描く
 	DrawGraph(0, 0, imgBackGameClaer_, true);
 
-	DrawRotaGraph(Application::SCREEN_SIZE_X/2,200,1.3,0,imgClear_,true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / VALUE_TWO, CLEAR_IMG_Y, CLEAR_IMG_SCALE, 0, imgClear_, true);
 
 	// メッセージ（下のテキスト）を表示
-	SetFontSize(128);
-	DrawString(Application::SCREEN_SIZE_X/2-128*3.5,830, "陣地を奪還した", true);
-	SetFontSize(16);
+	SetFontSize(MESSAGE_FONT_SIZE);
+	DrawString(Application::SCREEN_SIZE_X / VALUE_TWO - MESSAGE_FONT_SIZE * MESSAGE_X_SCALE, MESSAGE_Y,
+		"陣地を奪還した", true);
+	SetFontSize(FONT_SIZE_DEFAULT);
 
 	// メッセージの上に背景で覆う（横方向）
-	int horizontalMaskW = msgX_ + imgW_ - maskLeftX_;
+	int horizontalMaskW = messageX_ + imgW_ - maskLeftX_;
 	if (horizontalMaskW > 0) {
 		DrawRectGraph(
-			maskLeftX_, msgY_,                    // 表示先（画面上）
-			maskLeftX_, msgY_, horizontalMaskW, imgH_, // 背景画像の一部
+			maskLeftX_, messageY_,                    // 表示先（画面上）
+			maskLeftX_, messageY_, horizontalMaskW, imgH_, // 背景画像の一部
 			imgBackGameClaer_, TRUE, FALSE
 		);
 	}
