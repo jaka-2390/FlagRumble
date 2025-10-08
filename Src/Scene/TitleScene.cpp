@@ -80,7 +80,7 @@ void TitleScene::NewFunction()
 	enemyDirection_ = 1;
 
 	// プレイヤーのアニメーション
-	std::string path = Application::PATH_MODEL + "NPlayer/";
+	std::string path = Application::PATH_MODEL + "Player/";
 	animationControllerPlayer_ = std::make_unique<AnimationController>(charactor_.modelId);
 	animationControllerPlayer_->Add(0, path + "Player.mv1", ANIMATION_TIME, PLAYER_ANIM_NUM);
 	animationControllerPlayer_->Play(0);

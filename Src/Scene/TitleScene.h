@@ -28,7 +28,7 @@ public:
 	static constexpr float ANIMATION_TIME = 20.0f;
 
 	static constexpr int PLAYER_ANIM_NUM = 2;
-	static constexpr int ENEMY_ANIM_NUM = 1;
+	static constexpr int ENEMY_ANIM_NUM = 2;
 
 	static constexpr float PLAYER_SPEED = 5.0f;
 	static constexpr float ENEMY_SPEED = 5.0f;
