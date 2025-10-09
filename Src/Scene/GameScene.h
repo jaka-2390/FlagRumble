@@ -14,9 +14,9 @@ class Flag;
 //スポーン場所
 struct SpawnArea
 {
-	VECTOR center;     // 中心座標
-	float radius;      // 半径
-	bool triggered;    // もうスポーン済みか（1回きりの場合）
+	VECTOR center;     //中心座標
+	float radius;      //半径
+	bool triggered;    //もうスポーン済みか（1回きりの場合）
 };
 
 class GameScene : public SceneBase
@@ -30,6 +30,7 @@ public:
 	static constexpr int BORN_DIR = 3;			//敵の出現方向
 	static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
 	static constexpr int STAGE_LANGE = 10000;	//ステージの幅
+	static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
 
 	static constexpr int LV_MAX = 100;		//木のレベル最大
 	static constexpr int LV_OLD = 75;		//木の成長段階
@@ -45,6 +46,10 @@ public:
 	//-------------------------------------------------------------------
 
 	static constexpr int GAME_HEIGHT_1 = 80;			//ゲーム開始時の注意書き
+
+	//ミニマップ
+	static constexpr float MINIMAP_RANGE = 30000.0f;	//描画するマップの範囲
+	static constexpr int   MINIMAP_SIZE = 300;			//マップのサイズ
 
 	//画像サイズ
 	static constexpr float IMG_GAME_UI_1_SIZE = 0.5;	//imgGameUi1_のサイズ
@@ -83,6 +88,17 @@ public:
 	static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
 	static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
 
+	//フラッグ
+	static constexpr float FLAG_POS_OFFSET = 150.0f;			//flagとの距離補正
+	static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
+	static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
+
+	//クリアゲージ
+	static constexpr int GAUGE_X = 20;                //左上X位置
+	static constexpr int GAUGE_Y = 20;                //左上Y位置
+	static constexpr int GAUGE_WIDTH = 200;           //ゲージの全幅
+	static constexpr int GAUGE_HEIGHT = 20;           //ゲージの高さ
+
 	//-------------------------------------------------------------------
 
 	//色
@@ -94,8 +110,8 @@ public:
 	int yellow = 0xffff00;//黄
 	int purpl = 0x800080; //紫
 
-	GameScene(void);	// コンストラクタ
-	~GameScene(void);	// デストラクタ
+	GameScene(void);	//コンストラクタ
+	~GameScene(void);	//デストラクタ
 
 	void Init(void) override;
 	void Update(void) override;
@@ -114,13 +130,13 @@ private:
 
 	bool PauseMenu(void);
 
-	std::vector<SpawnArea> spawnAreas_;	// スポーン場所
-	std::unique_ptr<Stage> stage_;		// ステージ
-	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
-	std::shared_ptr<Player> player_;	// プレイヤー
+	std::vector<SpawnArea> spawnAreas_;	//スポーン場所
+	std::unique_ptr<Stage> stage_;		//ステージ
+	std::unique_ptr<SkyDome> skyDome_;	//スカイドーム
+	std::shared_ptr<Player> player_;	//プレイヤー
 	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
-	std::shared_ptr<Flag> flag_;	//フラッグ
+	std::shared_ptr<Flag> flag_;		//フラッグ
 
 	int enemyModelId_;
 	int imgGameUi1_;
@@ -129,7 +145,7 @@ private:
 	bool uiFadeStart_ = false;
 	int uiFadeFrame_ = 0;
 
-	// 設定開く
+	//設定開く
 	int imgOpeGear_;
 
 	std::vector<std::shared_ptr<EnemyBase>> enemys_;
@@ -137,31 +153,31 @@ private:
 
 	int isB_;
 
-	// ポーズ
-	bool isPaused_;           // ポーズ中かどうか
-	int pauseSelectIndex_;    // ポーズメニューの選択項目（上下選択）
+	//ポーズ
+	bool isPaused_;           //ポーズ中かどうか
+	int pauseSelectIndex_;    //ポーズメニューの選択項目（上下選択）
 	int pauseExplainImgs_[2];
 
 	enum class PauseState
 	{
-		Menu,        // 通常のポーズメニュー
-		ShowControls,// 操作説明画面
-		ShowItems    // アイテム概要画面
+		Menu,        //通常のポーズメニュー
+		ShowControls,//操作説明画面
+		ShowItems    //アイテム概要画面
 	};
 
-	// 敵全滅フラグ
+	//敵全滅フラグ
 	bool allEnemyDefeated_ = false;
 
-	// 旗関連
-	VECTOR flagPos = VGet(0, 0, 200); // 適当な位置
-	float flagRadius_ = 100.0f;       // 接近判定の距離
+	//旗関連
+	VECTOR flagPos = VGet(0, 0, 200); //適当な位置
+	float flagRadius_ = 100.0f;       //接近判定の距離
 
-	// ゲージ
+	//ゲージ
 	float clearGauge_ = 0.0f;
 	float clearGaugeMax_ = 100.0f;
 	bool gameClear_ = false;
 
-	int lastSpawnTime_;  // 最後に敵を出現させた時間
+	int lastSpawnTime_;  //最後に敵を出現させた時間
 
 	PauseState pauseState_ = PauseState::Menu;
 	int  pauseImg_;

@@ -51,8 +51,8 @@ void GameScene::Init(void)
 
 	//敵のモデル
 	//EnemyCreate(0);
-	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), 100.0f, false }); // 例：X=1000, Z=2000 の周囲500の円
-	lastSpawnTime_ = GetNowCount();  // 開始時の時間を記録
+	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), SPAWN_RADIUS, false });
+	lastSpawnTime_ = GetNowCount();  //開始時の時間を記録
 
 	player_->SetEnemy(&enemys_);
 
@@ -67,7 +67,7 @@ void GameScene::Init(void)
 	skyDome_ = std::make_unique<SkyDome>(player_->GetTransform());
 	skyDome_->Init();
 
-	map_ = std::make_unique<MiniMap>(30000.0f, 300);
+	map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
 	map_->Init();
 
 	flag_ = std::make_shared<Flag>();
@@ -79,8 +79,8 @@ void GameScene::Init(void)
 
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
 
-	pauseExplainImgs_[0] = resMng_.Load(ResourceManager::SRC::PAUSEOPE).handleId_; // 操作説明
-	pauseExplainImgs_[1] = resMng_.Load(ResourceManager::SRC::PAUSEITEM).handleId_;   // アイテム概要
+	pauseExplainImgs_[0] = resMng_.Load(ResourceManager::SRC::PAUSEOPE).handleId_;	//操作説明
+	pauseExplainImgs_[1] = resMng_.Load(ResourceManager::SRC::PAUSEITEM).handleId_;	//アイテム概要
 
 	//カウンタ
 	uiFadeStart_ = false;
@@ -94,7 +94,7 @@ void GameScene::Init(void)
 	//カメラのポーズ解除
 	camera_ = SceneManager::GetInstance().GetCamera().lock();
 	if (camera_) {
-		camera_->SetPaused(false); // ← ここが重要！
+		camera_->SetPaused(false); //← ここが重要！
 
 		//ミニマップ用カメラ
 		camera_->SetFollow(&player_->GetTransform());
@@ -115,7 +115,7 @@ void GameScene::Update(void)
 	cnt++;
 	InputManager& ins = InputManager::GetInstance();
 
-	if (PauseMenu()) return; // ポーズ中ならここで止める
+	if (PauseMenu()) return; //ポーズ中ならここで止める
 
 	//-------------------------
 	//通常時のゲーム進行（ポーズされてないときだけ）
@@ -151,36 +151,36 @@ void GameScene::Update(void)
 		enCounter = 0;
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			int spawnCount = 1; // まとめて出したい数
+			int spawnCount = 1; //まとめて出したい数
 			EnemyCreate(spawnCount);
 		}
 	}
 
-	// 敵全滅チェック
+	//敵全滅チェック
 	allEnemyDefeated_ = true;
 	for (auto& enemy : enemys_)
 	{
-		if (enemy->IsAlive()) { // EnemyBase に IsAlive() を用意すると便利
+		if (enemy->IsAlive()) { //EnemyBase に IsAlive() を用意すると便利
 			allEnemyDefeated_ = false;
 			break;
 		}
 	}
 
-	// フラッグとの距離チェック
+	//フラッグとの距離チェック
 	VECTOR playerPos = player_->GetTransform().pos;
 
 	float dx = playerPos.x - flagPos.x;
-	float dz = playerPos.z - flagPos.z + 150;
+	float dz = playerPos.z - flagPos.z + FLAG_POS_OFFSET;
 	float distSq = dx * dx + dz * dz;
 
 	bool inRange = (distSq < flagRadius_* flagRadius_);
 
-	// ゲージ処理
+	//ゲージ処理
 	if (allEnemyDefeated_ && !gameClear_)
 	{
 		if (inRange)
 		{
-			clearGauge_ += 0.5f; // フレームごとに加算
+			clearGauge_ += GAUGE_INCREMENT; //フレームごとに加算
 			if (clearGauge_ >= clearGaugeMax_)
 			{
 				clearGauge_ = clearGaugeMax_;
@@ -212,14 +212,14 @@ void GameScene::Draw(void)
 
 	if (allEnemyDefeated_)
 	{
-		// フラッグの位置を中心に半径100の円を描画
-		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, GetColor(0, 255, 0));
+		//フラッグの位置を中心に半径100の円を描画
+		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, green);
 	}
 
-	// ゲージ描画（仮に画面左上に描画）
-	DrawBox(20, 20, 220, 40, GetColor(255, 255, 255), TRUE); // 背景
+	//ゲージ描画（仮に画面左上に描画）
+	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + GAUGE_WIDTH, GAUGE_X + GAUGE_HEIGHT, white, TRUE); //背景
 	int gaugeWidth = static_cast<int>((clearGauge_ / clearGaugeMax_) * 200);
-	DrawBox(20, 20, 20 + gaugeWidth, 40, GetColor(0, 255, 0), TRUE);
+	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + gaugeWidth, GAUGE_X + GAUGE_HEIGHT, green, TRUE);
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -230,7 +230,7 @@ void GameScene::Draw(void)
 			|| CheckHitKey(KEY_INPUT_A)
 			|| CheckHitKey(KEY_INPUT_S)
 			|| CheckHitKey(KEY_INPUT_D))
-			|| uiDisplayFrame_ >= AUTO_FADE)  // 時間経過による自動フェード
+			|| uiDisplayFrame_ >= AUTO_FADE)  //時間経過による自動フェード
 		{
 			uiFadeStart_ = true;
 			uiFadeFrame_ = 0;
@@ -238,12 +238,12 @@ void GameScene::Draw(void)
 	}
 	if (!uiFadeStart_)
 	{
-		// フェード前（通常表示）
+		//フェード前（通常表示）
 		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
 	}
 	else if (uiFadeFrame_ < ONE_SECOND_FRAME)
 	{
-		// フェード中（60フレームで徐々に消す）
+		//フェード中（60フレームで徐々に消す）
 		int alpha = static_cast<int>(255 * (ONE_SECOND_FRAME - uiFadeFrame_) / ONE_SECOND_FRAME);
 		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
 		uiFadeFrame_++;
@@ -327,7 +327,7 @@ void GameScene::DrawMiniMap(void)
 
 	float cameraAngleRad = 0.0f;
 	if (camera_) {
-		cameraAngleRad = camera_->GetAngles().y;  // ここ！
+		cameraAngleRad = camera_->GetAngles().y;
 	}
 
 	//敵の座標リストを作成
@@ -357,11 +357,11 @@ void GameScene::EnemyCreate(int count)
 	{
 		VECTOR randPos = flagPos;
 
-		// 出現位置をランダムに設定（エリアの周囲に散らばせる）
-		randPos.x = GetRand(200) - 100;  // -100 ～ +100
-		randPos.z = GetRand(200) - 100;
+		//出現位置をランダムに設定（エリアの周囲に散らばせる）
+		randPos.x = flagPos.x + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.z = flagPos.z + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
 
-		// ここを固定 → 例：EnemyDog を 50体生成
+		//EnemyDogを生成
 		std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
 
 		//生成された敵の初期化
@@ -379,7 +379,7 @@ bool GameScene::PauseMenu(void)
 {
 	InputManager& ins = InputManager::GetInstance();
 
-	// TABキーでポーズのON/OFF切り替え（Menu中のみ）
+	//TABキーでポーズのON/OFF切り替え（Menu中のみ）
 	if (ins.IsTrgDown(KEY_INPUT_TAB) && pauseState_ == PauseState::Menu)
 	{
 		isPaused_ = !isPaused_;
@@ -388,7 +388,7 @@ bool GameScene::PauseMenu(void)
 		return true;
 	}
 
-	if (!isPaused_) return false; // ポーズ中でなければ通常更新
+	if (!isPaused_) return false; //ポーズ中でなければ通常更新
 
 	if (pauseState_ == PauseState::Menu)
 	{
