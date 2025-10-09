@@ -9,17 +9,26 @@ class SkyDome;
 class Player;
 class MiniMap;
 class Camera;
+class Flag;
+
+//スポーン場所
+struct SpawnArea
+{
+	VECTOR center;     // 中心座標
+	float radius;      // 半径
+	bool triggered;    // もうスポーン済みか（1回きりの場合）
+};
 
 class GameScene : public SceneBase
 {
 
 public:
 
-	static constexpr int ENCOUNT = 300;		//エンカウンタ
-	static constexpr int ENEMY_MAX = 200;	//最大出現数
-	static constexpr int ENE_ENC = 30;		//最大許容量
-	static constexpr int BORN_DIR = 3;		//敵の出現方向
-	static constexpr int STAGE_WIDTH = 20000; //ステージの全体
+	static constexpr int ENCOUNT = 60;			//エンカウンタ
+	static constexpr int ENEMY_MAX = 5;			//最大出現数
+	static constexpr int ENE_ENC = 30;			//最大許容量
+	static constexpr int BORN_DIR = 3;			//敵の出現方向
+	static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
 	static constexpr int STAGE_LANGE = 10000;	//ステージの幅
 
 	static constexpr int LV_MAX = 100;		//木のレベル最大
@@ -101,15 +110,17 @@ private:
 
 	int cnt;
 
-	void EnemyCreate(void);
+	void EnemyCreate(int count);
 
 	bool PauseMenu(void);
 
+	std::vector<SpawnArea> spawnAreas_;	// スポーン場所
 	std::unique_ptr<Stage> stage_;		// ステージ
 	std::unique_ptr<SkyDome> skyDome_;	// スカイドーム
 	std::shared_ptr<Player> player_;	// プレイヤー
 	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
+	std::shared_ptr<Flag> flag_;	//フラッグ
 
 	int enemyModelId_;
 	int imgGameUi1_;
@@ -138,6 +149,21 @@ private:
 		ShowItems    // アイテム概要画面
 	};
 
+	// 敵全滅フラグ
+	bool allEnemyDefeated_ = false;
+
+	// 旗関連
+	VECTOR flagPos = VGet(0, 0, 200); // 適当な位置
+	float flagRadius_ = 100.0f;       // 接近判定の距離
+
+	// ゲージ
+	float clearGauge_ = 0.0f;
+	float clearGaugeMax_ = 100.0f;
+	bool gameClear_ = false;
+
+	int lastSpawnTime_;  // 最後に敵を出現させた時間
+
 	PauseState pauseState_ = PauseState::Menu;
 	int  pauseImg_;
+
 };

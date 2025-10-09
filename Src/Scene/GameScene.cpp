@@ -22,8 +22,11 @@
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
+#include "../Object/Flag.h"
 #include "MiniMap.h"
 #include "GameScene.h"
+
+//担当いけだ
 
 GameScene::GameScene(void)
 {
@@ -47,7 +50,9 @@ void GameScene::Init(void)
 	player_->Init();
 
 	//敵のモデル
-	EnemyCreate();
+	//EnemyCreate(0);
+	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), 100.0f, false }); // 例：X=1000, Z=2000 の周囲500の円
+	lastSpawnTime_ = GetNowCount();  // 開始時の時間を記録
 
 	player_->SetEnemy(&enemys_);
 
@@ -64,6 +69,9 @@ void GameScene::Init(void)
 
 	map_ = std::make_unique<MiniMap>(30000.0f, 300);
 	map_->Init();
+
+	flag_ = std::make_shared<Flag>();
+	flag_->Init();
 
 	//画像
 	imgGameUi1_ = resMng_.Load(ResourceManager::SRC::GAMEUI_1).handleId_;
@@ -124,14 +132,61 @@ void GameScene::Update(void)
 		enemy->Update();
 	}
 
+	flag_->Update();
+
 	//敵のエンカウント処理
+	/*enCounter++;
+	if (enCounter > ENCOUNT)
+	{
+		enCounter = 0;
+		if (ENEMY_MAX >= enemys_.size())
+		{
+			EnemyCreate(1);
+		}
+	}*/
+
 	enCounter++;
 	if (enCounter > ENCOUNT)
 	{
 		enCounter = 0;
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			EnemyCreate();
+			int spawnCount = 1; // まとめて出したい数
+			EnemyCreate(spawnCount);
+		}
+	}
+
+	// 敵全滅チェック
+	allEnemyDefeated_ = true;
+	for (auto& enemy : enemys_)
+	{
+		if (enemy->IsAlive()) { // EnemyBase に IsAlive() を用意すると便利
+			allEnemyDefeated_ = false;
+			break;
+		}
+	}
+
+	// フラッグとの距離チェック
+	VECTOR playerPos = player_->GetTransform().pos;
+
+	float dx = playerPos.x - flagPos.x;
+	float dz = playerPos.z - flagPos.z + 150;
+	float distSq = dx * dx + dz * dz;
+
+	bool inRange = (distSq < flagRadius_* flagRadius_);
+
+	// ゲージ処理
+	if (allEnemyDefeated_ && !gameClear_)
+	{
+		if (inRange)
+		{
+			clearGauge_ += 0.5f; // フレームごとに加算
+			if (clearGauge_ >= clearGaugeMax_)
+			{
+				clearGauge_ = clearGaugeMax_;
+				gameClear_ = true;
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+			}
 		}
 	}
 }
@@ -151,7 +206,20 @@ void GameScene::Draw(void)
 		enemy->DrawBossHpBar();
 	}
 
+	flag_->Draw();
+
 	DrawMiniMap();
+
+	if (allEnemyDefeated_)
+	{
+		// フラッグの位置を中心に半径100の円を描画
+		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, GetColor(0, 255, 0));
+	}
+
+	// ゲージ描画（仮に画面左上に描画）
+	DrawBox(20, 20, 220, 40, GetColor(255, 255, 255), TRUE); // 背景
+	int gaugeWidth = static_cast<int>((clearGauge_ / clearGaugeMax_) * 200);
+	DrawBox(20, 20, 20 + gaugeWidth, 40, GetColor(0, 255, 0), TRUE);
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -281,79 +349,30 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 	return enemys_;
 }
 
-void GameScene::EnemyCreate(void)
+void GameScene::EnemyCreate(int count)
 {
-	int randDir = GetRand(BORN_DIR);
-	VECTOR randPos = VGet(0.0f, 0.0f, 0.0f);
-	switch (randDir)//位置
+	VECTOR flagPos = flag_->GetPosition();  //Flagの位置を取得
+
+	for (int i = 0; i < count; ++i)
 	{
-	case 0://前
-		randPos.x = GetRand(STAGE_WIDTH) - STAGE_LANGE;
-		randPos.z = STAGE_LANGE;
-		break;
-	case 1://後
-		randPos.x = GetRand(STAGE_WIDTH) - STAGE_LANGE;
-		randPos.z = -STAGE_LANGE;
-		break;
-	case 2://左
-		randPos.x = -STAGE_LANGE;
-		randPos.z = GetRand(STAGE_WIDTH) - STAGE_LANGE;
-		break;
-	case 3://右
-		randPos.x = STAGE_LANGE;
-		randPos.z = GetRand(STAGE_WIDTH) - STAGE_LANGE;
-		break;
-	default:
-		break;
+		VECTOR randPos = flagPos;
+
+		// 出現位置をランダムに設定（エリアの周囲に散らばせる）
+		randPos.x = GetRand(200) - 100;  // -100 ～ +100
+		randPos.z = GetRand(200) - 100;
+
+		// ここを固定 → 例：EnemyDog を 50体生成
+		std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
+
+		//生成された敵の初期化
+		enemy->SetGameScene(this);
+		enemy->SetPos(randPos);
+		enemy->SetPlayer(player_);
+		enemy->Init();
+
+		//リストに追加
+		enemys_.emplace_back(std::move(enemy));
 	}
-
-	std::shared_ptr<EnemyBase> enemy;
-
-	//敵のtype
-	if (isB_ == 1)
-	{
-		EnemyBase::TYPE type_ = static_cast<EnemyBase::TYPE>(EnemyBase::TYPE::BOSS);
-		enemy = std::make_shared<EnemyBoss>();
-	}
-	else
-	{
-		EnemyBase::TYPE type_ = static_cast<EnemyBase::TYPE>(GetRand(static_cast<int>(EnemyBase::TYPE::MAX) - 2));
-		switch (type_)
-		{
-		case EnemyBase::TYPE::SABO:
-			enemy = std::make_shared<EnemyCactus>();
-			break;
-		case EnemyBase::TYPE::DOG:
-			enemy = std::make_shared<EnemyDog>();
-			break;
-		case EnemyBase::TYPE::MIMIC:
-			enemy = std::make_shared<EnemyMimic>();
-			break;
-		case EnemyBase::TYPE::MUSH:
-			enemy = std::make_shared<EnemyMushroom>();
-			break;
-		case EnemyBase::TYPE::ONION:
-			enemy = std::make_shared<EnemyOnion>();
-			break;
-		case EnemyBase::TYPE::TOGE:
-			enemy = std::make_shared<EnemyThorn>();
-			break;
-		case EnemyBase::TYPE::VIRUS:
-			enemy = std::make_shared<EnemyVirus>();
-			break;
-		default:
-			enemy = std::make_shared<EnemyCactus>();
-			break;
-		}
-	}
-
-	//生成された敵の初期化
-	enemy->SetGameScene(this);
-	enemy->SetPos(randPos);
-	enemy->SetPlayer(player_);
-	enemy->Init();
-
-	enemys_.emplace_back(std::move(enemy));
 }
 
 bool GameScene::PauseMenu(void)

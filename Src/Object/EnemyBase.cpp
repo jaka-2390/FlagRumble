@@ -211,35 +211,14 @@ void EnemyBase::ChasePlayer(void)
 	}
 
 	//エネミーの視野内に入ったら追いかける
-	if (distance <= VIEW_RANGE
-		&& state_ == STATE::PLAY
-		&& player_->pstate_ == Player::PlayerState::NORMAL)
-	{
-		VECTOR dirToPlayer = VNorm(toPlayer);
-		VECTOR moveVec = VScale(dirToPlayer, speed_);
+	VECTOR dirToPlayer = VNorm(toPlayer);
+	VECTOR moveVec = VScale(dirToPlayer, speed_);
 
-		transform_.pos = VAdd(transform_.pos, moveVec);
+	transform_.pos = VAdd(transform_.pos, moveVec);
 
-		//方向からクォータニオンに変換
-		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
-	}
-	else
-	{
-		//原点に向かう
-		VECTOR toOrigin = VSub(AsoUtility::VECTOR_ZERO, transform_.pos);
-		toOrigin.y = VALUE_ZERO;  //高さ無視
-
-		float distToOrigin = VSize(toOrigin);
-		if (distToOrigin > MIN_MOVE_DISTANCE) //近すぎる場合は動かない
-		{
-			VECTOR dirToOrigin = VNorm(toOrigin);
-			VECTOR moveVec = VScale(dirToOrigin, speed_);
-			transform_.pos = VAdd(transform_.pos, moveVec);
-
-			//方向からクォータニオンに変換
-			transform_.quaRot = Quaternion::LookRotation(dirToOrigin);
-		}
-	}
+	//方向からクォータニオンに変換
+	transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+	
 }
 
 void EnemyBase::Draw(void)
