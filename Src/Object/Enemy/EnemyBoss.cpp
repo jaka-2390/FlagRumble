@@ -14,10 +14,10 @@ void EnemyBoss::InitAnimation(void)
 
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
 
-	animationController_->Add((int)ANIM_TYPE::IDLE,		path, 20.0f, 2);
-	animationController_->Add((int)ANIM_TYPE::RUN,		path, 20.0f, 4);
-	animationController_->Add((int)ANIM_TYPE::ATTACK,	path, 15.0f, 0);
-	animationController_->Add((int)ANIM_TYPE::DEATH,	path, 20.0f, 1);
+	animationController_->Add((int)ANIM_TYPE::IDLE, path, ANIM_SPEED, ANIM_IDLE_INDEX);
+	animationController_->Add((int)ANIM_TYPE::RUN, path, ANIM_SPEED, ANIM_RUN_INDEX);
+	animationController_->Add((int)ANIM_TYPE::ATTACK, path, ANIM_ATK_SPEED, ANIM_ATTACK_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DEATH, path, ANIM_SPEED, ANIM_DEATH_INDEX);
 
 	animationController_->Play((int)ANIM_TYPE::RUN);
 }
@@ -28,34 +28,29 @@ void EnemyBoss::SetParam(void)
 	// モデルデータをいくつもメモリ上に存在させない
 	transform_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::BOSS));
 
-	transform_.scl = { 1.0f, 1.0f, 1.0f };						// 大きさの設定
+	transform_.scl = { AsoUtility::VECTOR_ONE };						// 大きさの設定
 	transform_.quaRotLocal = Quaternion::Euler(AsoUtility::Deg2RadF(0.0f)
-		, AsoUtility::Deg2RadF(180.0f), 0.0f);//クォータニオンをいじると向きが変わる
-	transform_.dir = { 0.0f, 0.0f, 0.0f };						// 右方向に移動する
+		, AsoUtility::Deg2RadF(DEGREE), 0.0f);//クォータニオンをいじると向きが変わる
+	transform_.dir = { AsoUtility::VECTOR_ZERO };						// 右方向に移動する
 
-	speed_ = 2.0f;		// 移動スピード
+	speed_ = SPEED;		// 移動スピード
 
 	isAlive_ = true;	// 初期は生存状態
 
 	hp_ = BOSS_MAX_HP;	// HPの設定
 
-	attackPow_ = 3;
+	attackPow_ = ATTACK_POW;	//攻撃力
 
-	collisionRadius_ = 200.0f;	// 衝突判定用の球体半径
-	collisionLocalPos_ = { 0.0f, 60.0f, 0.0f };	// 衝突判定用の球体中心の調整座標
+	collisionRadius_ = COLLOSION_RADIUS * VALUE_TWO;	// 衝突判定用の球体半径
+	collisionLocalPos_ = COLLISION_POS;	// 衝突判定用の球体中心の調整座標
 
-	attackCollisionRadius_ = 200.0f;		// 攻撃判定用と攻撃範囲の球体半径
+	attackCollisionRadius_ = COLLOSION_RADIUS * VALUE_TWO;	// 攻撃判定用と攻撃範囲の球体半径
 
 	enemyType_ = TYPE::BOSS;
 
 	// 初期状態
 	ChangeState(STATE::PLAY);
 }
-
-//Item::TYPE EnemyBoss::GetDropItemType() const
-//{
-//	return Item::TYPE::ALL;
-//}
 
 void EnemyBoss::DrawBossHpBar(void)
 {
@@ -64,23 +59,23 @@ void EnemyBoss::DrawBossHpBar(void)
 		return;
 	}
 
-	int barX = (Application::SCREEN_SIZE_X - BOSS_HP_BAR_WIDTH) / 2; // 中央X
+	int barX = (Application::SCREEN_SIZE_X - BOSS_HP_BAR_WIDTH) / static_cast<int>(VALUE_TWO); // 中央X
 	int barY = BOSS_HP_BAR_Y; // 上から80px
 
 	float hpRate = static_cast<float>(hp_) / BOSS_MAX_HP;
 	int hpDrawWidth = static_cast<int>(BOSS_HP_BAR_WIDTH * hpRate);
 
 	// ラベル
-	SetFontSize(55);
-	DrawFormatString(barX + BOSS_LABEL_OFFSET_X, barY + BOSS_LABEL_OFFSET_Y, GetColor(255, 255, 255), "BOSS");
-	SetFontSize(16);
+	SetFontSize(FONT_SIZE);
+	DrawFormatString(barX + BOSS_LABEL_OFFSET_X, barY + BOSS_LABEL_OFFSET_Y, white, "BOSS");
+	SetFontSize(DEFAULT_FONT_SIZE);
 
 	// 背景バー（黒）
-	DrawBox(barX, barY, barX + BOSS_HP_BAR_WIDTH, barY + BOSS_HP_BAR_HEIGHT, GetColor(0, 0, 0), TRUE);
+	DrawBox(barX, barY, barX + BOSS_HP_BAR_WIDTH, barY + BOSS_HP_BAR_HEIGHT, black, TRUE);
 
 	// HPバー（赤）
-	DrawBox(barX, barY, barX + hpDrawWidth, barY + BOSS_HP_BAR_HEIGHT, GetColor(255, 0, 0), TRUE);
+	DrawBox(barX, barY, barX + hpDrawWidth, barY + BOSS_HP_BAR_HEIGHT, red, TRUE);
 
 	// 枠線（白）
-	DrawBox(barX, barY, barX + BOSS_HP_BAR_WIDTH, barY + BOSS_HP_BAR_HEIGHT, GetColor(255, 255, 255), FALSE);
+	DrawBox(barX, barY, barX + BOSS_HP_BAR_WIDTH, barY + BOSS_HP_BAR_HEIGHT, white, FALSE);
 }

@@ -3,9 +3,8 @@
 #include "../Common/AnimationController.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Utility/AsoUtility.h"
-//#include "../Common/Capsule.h"
 
-EnemyMushroom::EnemyMushroom():EnemyBase()
+EnemyMushroom::EnemyMushroom() :EnemyBase()
 {
 }
 
@@ -14,13 +13,12 @@ void EnemyMushroom::InitAnimation(void)
 	std::string path = Application::PATH_MODEL + "Enemy/mushroom/mushroom.mv1";
 
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
-	//mushroom/mushroom
 
-	animationController_->Add((int)ANIM_TYPE::IDLE,  path, 20.0f, 1);
-	animationController_->Add((int)ANIM_TYPE::RUN,   path, 20.0f, 2);
-	animationController_->Add((int)ANIM_TYPE::ATTACK,path, 16.0f, 3);
-	animationController_->Add((int)ANIM_TYPE::DAMAGE,path, 20.0f, 4);
-	animationController_->Add((int)ANIM_TYPE::DEATH, path, 20.0f, 5);
+	animationController_->Add((int)ANIM_TYPE::IDLE, path, ANIM_SPEED, ANIM_IDLE_INDEX);
+	animationController_->Add((int)ANIM_TYPE::RUN, path, ANIM_SPEED, ANIM_RUN_INDEX);
+	animationController_->Add((int)ANIM_TYPE::ATTACK, path, ANIM_SPEED, ANIM_ATTACK_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DAMAGE, path, ANIM_SPEED, ANIM_DAMAGE_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DEATH, path, ANIM_SPEED, ANIM_DEATH_INDEX);
 
 	animationController_->Play((int)ANIM_TYPE::RUN);
 }
@@ -31,19 +29,19 @@ void EnemyMushroom::SetParam(void)
 	// モデルデータをいくつもメモリ上に存在させない
 	transform_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::MUSH));
 
-	transform_.scl = { 1.0f, 1.0f, 1.0f };						// 大きさの設定
+	transform_.scl = { AsoUtility::VECTOR_ONE };						// 大きさの設定
 	transform_.quaRotLocal = Quaternion::Euler(AsoUtility::Deg2RadF(0.0f)
-		, AsoUtility::Deg2RadF(180.0f), 0.0f);//クォータニオンをいじると向きが変わる
-	transform_.dir = { 0.0f, 0.0f, 0.0f };						// 右方向に移動する
+		, AsoUtility::Deg2RadF(DEGREE), 0.0f);//クォータニオンをいじると向きが変わる
+	transform_.dir = { AsoUtility::VECTOR_ZERO };						// 右方向に移動する
 
-	speed_ = 5.0f;		// 移動スピード
+	speed_ = SPEED;		// 移動スピード
 
 	isAlive_ = true;	// 初期は生存状態
 
-	hp_ = 3;	// HPの設定
+	hp_ = HP;	// HPの設定
 
-	collisionRadius_ = 100.0f;	// 衝突判定用の球体半径
-	collisionLocalPos_ = { 0.0f, 60.0f, 0.0f };	// 衝突判定用の球体中心の調整座標
+	collisionRadius_ = COLLOSION_RADIUS;	// 衝突判定用の球体半径
+	collisionLocalPos_ = COLLISION_POS;	// 衝突判定用の球体中心の調整座標
 
 	attackCollisionRadius_ = ATTACK_RADIUS_SIZE;		// 攻撃判定用と攻撃範囲の球体半径
 
