@@ -135,6 +135,14 @@ void Player::Update(void)
 	//更新ステップ
 	stateUpdate_();
 
+	//移動方向への回転
+	auto moveRot = Quaternion::LookRotation(moveDir_);
+
+	transform_.quaRot = Quaternion::Slerp(
+		transform_.quaRot, moveRot, 0.2f
+	);
+
+	//モデル制御更新
 	transform_.Update();
 
 	//アニメーション再生
@@ -337,8 +345,8 @@ void Player::UpdatePlay(void)
 	transform_.pos = movedPos_;
 
 	//重力方向に沿って回転させる
-	transform_.quaRot = grvMng_.GetTransform().quaRot;
-	transform_.quaRot = transform_.quaRot.Mult(playerRotY_);
+	/*transform_.quaRot = grvMng_.GetTransform().quaRot;
+	transform_.quaRot = transform_.quaRot.Mult(playerRotY_);*/
 
 	//歩きエフェクト
 	EffectFootSmoke();
@@ -487,25 +495,41 @@ void Player::ProcessMove(void)
 
 	if (!isAttack_ && !isAttack2_ && !exAttack_ && IsEndLanding())
 	{
-		if (ins.IsNew(KEY_INPUT_W))
+		if (GetJoypadNum() == 0)
 		{
-			dir = cameraRot.GetForward();
-			rotRad = AsoUtility::Deg2RadF(ROT_FORWARD_DEG);
+			if (ins.IsNew(KEY_INPUT_W))
+			{
+				dir = cameraRot.GetForward();
+				rotRad = AsoUtility::Deg2RadF(ROT_FORWARD_DEG);
+			}
+			if (ins.IsNew(KEY_INPUT_S))
+			{
+				dir = cameraRot.GetBack();
+				rotRad = AsoUtility::Deg2RadF(ROT_BACK_DEG);
+			}
+			if (ins.IsNew(KEY_INPUT_D))
+			{
+				dir = cameraRot.GetRight();
+				rotRad = AsoUtility::Deg2RadF(ROT_RIGHT_DEG);
+			}
+			if (ins.IsNew(KEY_INPUT_A))
+			{
+				dir = cameraRot.GetLeft();
+				rotRad = AsoUtility::Deg2RadF(ROT_LEFT_DEG);
+			}
 		}
-		if (ins.IsNew(KEY_INPUT_S))
+		else
 		{
-			dir = cameraRot.GetBack();
-			rotRad = AsoUtility::Deg2RadF(ROT_BACK_DEG);
-		}
-		if (ins.IsNew(KEY_INPUT_D))
-		{
-			dir = cameraRot.GetRight();
-			rotRad = AsoUtility::Deg2RadF(ROT_RIGHT_DEG);
-		}
-		if (ins.IsNew(KEY_INPUT_A))
-		{
-			dir = cameraRot.GetLeft();
-			rotRad = AsoUtility::Deg2RadF(ROT_LEFT_DEG);
+			// 接続されているゲームパッド１の情報を取得
+			InputManager::JOYPAD_IN_STATE padState =
+				ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+			// アナログキーの入力値から方向を取得
+			dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+			//カメラがクォータニオンを採用している場合
+			//アナログキーをカメラ方向に回転
+			dir = cameraRot.PosAxis(dir);
 		}
 
 		if (!AsoUtility::EqualsVZero(dir))

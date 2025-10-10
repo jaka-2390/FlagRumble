@@ -174,29 +174,45 @@ void Camera::ProcessRot(void)
 {
 	auto& ins = InputManager::GetInstance();
 
-	if (ins.IsNew(KEY_INPUT_UP))
+	if (GetJoypadNum() == 0)
 	{
-		angles_.x += AsoUtility::Deg2RadF(1.5);
-		if (angles_.x > LIMIT_X_UP_RAD)
+		if (ins.IsNew(KEY_INPUT_UP))
 		{
-			angles_.x = LIMIT_X_UP_RAD;
+			angles_.x += AsoUtility::Deg2RadF(1.5);
+			if (angles_.x > LIMIT_X_UP_RAD)
+			{
+				angles_.x = LIMIT_X_UP_RAD;
+			}
+		}
+		if (ins.IsNew(KEY_INPUT_DOWN))
+		{
+			angles_.x -= AsoUtility::Deg2RadF(1.5);
+			if (angles_.x < -LIMIT_X_DW_RAD)
+			{
+				angles_.x = -LIMIT_X_DW_RAD;
+			}
+		}
+		if (ins.IsNew(KEY_INPUT_RIGHT))
+		{
+			angles_.y += AsoUtility::Deg2RadF(1.5);
+		}
+		if (ins.IsNew(KEY_INPUT_LEFT))
+		{
+			angles_.y -= AsoUtility::Deg2RadF(1.5);
 		}
 	}
-	if (ins.IsNew(KEY_INPUT_DOWN))
+	else
 	{
-		angles_.x -= AsoUtility::Deg2RadF(1.5);
-		if (angles_.x < -LIMIT_X_DW_RAD)
-		{
-			angles_.x = -LIMIT_X_DW_RAD;
-		}
-	}
-	if (ins.IsNew(KEY_INPUT_RIGHT))
-	{
-		angles_.y += AsoUtility::Deg2RadF(1.5);
-	}
-	if (ins.IsNew(KEY_INPUT_LEFT))
-	{
-		angles_.y -= AsoUtility::Deg2RadF(1.5);
+		// 接続されているゲームパッド１の情報を取得
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+		// アナログキーの入力値から方向を取得
+		angles_ = ins.GetDirectionXZAKey(padState.AKeyRX, padState.AKeyRY);
+
+		//カメラがクォータニオンを採用している場合
+		//アナログキーをカメラ方向に回転
+		//dir = cameraRot.PosAxis(dir);
 	}
 }
 

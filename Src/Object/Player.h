@@ -16,7 +16,7 @@ class Player : public ActorBase
 public:
 
 	//プレイヤー
-	static constexpr VECTOR PLAYER_POS = { 0.0f, 0.0f, -600.0f };	//初期位置
+	static constexpr VECTOR PLAYER_POS = { 0.0f, 300.0f, -600.0f };	//初期位置
 	static constexpr VECTOR CAPSULE_TOP = { 0.0f, 110.0f, 0.0f };	//カプセルの頂点
 	static constexpr VECTOR CAPSULE_BOTTOM = { 0.0f,  30.0f, 0.0f };//カプセルの足元
 	static constexpr float PLAYER_ROT_Y = 180.0f;					//Y軸回転(度数)
