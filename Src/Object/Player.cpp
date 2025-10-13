@@ -124,7 +124,7 @@ void Player::Init(void)
 	collisionRadius_ = COLLISION_RADIUS;
 
 	//Õ“Ë”»’è—p‚Ì‹…‘Ì’†S‚Ì’²®À•W
-	collisionLocalPos_ = { 0.0f, capsule_->GetCenter().y, 0.0f };
+	collisionLocalPos_ = { 0.0f, capsule_->GetCenter().y - COLL_OFFSET, 0.0f };
 
 	//‰Šúó‘Ô
 	ChangeState(STATE::PLAY);

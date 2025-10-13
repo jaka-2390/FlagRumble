@@ -168,9 +168,10 @@ void GameScene::Update(void)
 
 	//フラッグとの距離チェック
 	VECTOR playerPos = player_->GetTransform().pos;
+	VECTOR flagPos = flag_->GetPosition();
 
 	float dx = playerPos.x - flagPos.x;
-	float dz = playerPos.z - flagPos.z + FLAG_POS_OFFSET;
+	float dz = playerPos.z - flagPos.z;
 	float distSq = dx * dx + dz * dz;
 
 	bool inRange = (distSq < flagRadius_* flagRadius_);

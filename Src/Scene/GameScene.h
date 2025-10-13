@@ -89,7 +89,6 @@ public:
 	static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
 
 	//フラッグ
-	static constexpr float FLAG_POS_OFFSET = 150.0f;			//flagとの距離補正
 	static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
 	static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
 
@@ -169,7 +168,6 @@ private:
 	bool allEnemyDefeated_ = false;
 
 	//旗関連
-	VECTOR flagPos = VGet(0, 0, 200); //適当な位置
 	float flagRadius_ = 100.0f;       //接近判定の距離
 
 	//ゲージ

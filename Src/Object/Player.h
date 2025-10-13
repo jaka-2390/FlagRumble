@@ -124,6 +124,9 @@ public:
 	//カプセル
 	static constexpr int CAPSULE_CNT = 10;
 
+	//当たり判定用のオフセット
+	float COLL_OFFSET = 300.0f;
+
 	//色
 	int white = 0xffffff; //白
 	int black = 0x000000; //黒
