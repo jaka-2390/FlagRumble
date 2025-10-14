@@ -921,6 +921,8 @@ void Player::Damage(int damage)
 	if (hp_ <= 0) {
 		hp_ = 0;
 
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
+
 		//SE
 		SoundManager::GetInstance().Play(SoundManager::SRC::P_DOWN_SE, Sound::TIMES::ONCE);
 		StartRevival();  //Ž€–S‚Å‚Í‚È‚­•œŠˆ‘Ò‹@

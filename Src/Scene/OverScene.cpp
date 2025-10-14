@@ -106,11 +106,13 @@ void OverScene::Update(void)
 
 	if (isMenuActive_)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsTrgDown(KEY_INPUT_DOWN)) {
+		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsTrgDown(KEY_INPUT_DOWN) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN)) {
 			selectedIndex_ = 1 - selectedIndex_;
 		}
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN)) {
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
 			if (selectedIndex_ == 0) {
 				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			}

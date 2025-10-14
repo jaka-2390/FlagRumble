@@ -2,6 +2,7 @@
 #include <memory>
 #include "SceneBase.h"
 #include "../Object/Common/Transform.h"
+#include "../Manager/InputManager.h"
 
 class AnimationController;
 class SceneManager;
@@ -95,5 +96,7 @@ private:
 
 	// アニメーション終わり
 	bool isAnimEnd_;
+
+	InputManager& ins = InputManager::GetInstance();
 
 };
