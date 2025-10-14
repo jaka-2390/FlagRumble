@@ -25,7 +25,7 @@ class GameScene : public SceneBase
 public:
 
 	static constexpr int ENCOUNT = 60;			//エンカウンタ
-	static constexpr int ENEMY_MAX = 5;			//最大出現数
+	static constexpr int ENEMY_MAX = 2;			//最大出現数
 	static constexpr int ENE_ENC = 30;			//最大許容量
 	static constexpr int BORN_DIR = 3;			//敵の出現方向
 	static constexpr int STAGE_WIDTH = 20000;	//ステージの全体

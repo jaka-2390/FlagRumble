@@ -7,7 +7,6 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/SoundManager.h"
-#include "../Manager/InputManager.h"
 #include "../Manager/Camera.h"
 #include "Common/AnimationController.h"
 #include "Common/Capsule.h"
@@ -480,8 +479,6 @@ void Player::DrawDebug(void)
 
 void Player::ProcessMove(void)
 {
-	auto& ins = InputManager::GetInstance();
-
 	//方向量をゼロ
 	movePow_ = AsoUtility::VECTOR_ZERO;
 
@@ -536,9 +533,18 @@ void Player::ProcessMove(void)
 		{
 			//移動量
 			speed_ = SPEED_MOVE;
-			if (ins.IsNew(KEY_INPUT_LSHIFT))
+			if (ins.IsNew(KEY_INPUT_LSHIFT) || 
+				ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,InputManager::JOYPAD_BTN::RB))
 			{
 				speed_ = SPEED_RUN;
+
+				//アニメーション
+				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
+			}
+			else
+			{
+				//アニメーション
+				animationController_->Play((int)ANIM_TYPE::RUN);
 			}
 
 			//アイテム獲得時のスピード
@@ -553,16 +559,6 @@ void Player::ProcessMove(void)
 
 			//回転処理IDLE
 			SetGoalRotate(rotRad);
-
-			//アニメーション
-			if (ins.IsNew(KEY_INPUT_LSHIFT))
-			{
-				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
-			}
-			else
-			{
-				animationController_->Play((int)ANIM_TYPE::RUN);
-			}
 		}
 		else
 		{
@@ -825,7 +821,8 @@ void Player::CalcGravityPow(void)
 
 void Player::ProcessAttack(void)
 {
-	bool isHit = CheckHitKey(KEY_INPUT_E);
+	bool isHit = CheckHitKey(KEY_INPUT_E) ||
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP);
 	bool isHit_N = CheckHitKey(KEY_INPUT_Q);
 	bool isHit_E = CheckHitKey(KEY_INPUT_R);
 

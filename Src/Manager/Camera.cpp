@@ -203,16 +203,32 @@ void Camera::ProcessRot(void)
 	}
 	else
 	{
-		// 接続されているゲームパッド１の情報を取得
+		//接続されているゲームパッド１の情報を取得
 		InputManager::JOYPAD_IN_STATE padState =
 			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
-		// アナログキーの入力値から方向を取得
-		angles_ = ins.GetDirectionXZAKey(padState.AKeyRX, padState.AKeyRY);
+		//アナログキーの入力値から方向を取得
+		float rotX = (float)padState.AKeyRY / InputManager::AKEY_VAL_MAX;
+		float rotY = (float)padState.AKeyRX / InputManager::AKEY_VAL_MAX;
 
-		//カメラがクォータニオンを採用している場合
-		//アナログキーをカメラ方向に回転
-		//dir = cameraRot.PosAxis(dir);
+		//入力値がしきい値を超えていたら回転量に加算
+		if (fabsf(rotX) > InputManager::THRESHOLD)
+		{
+			angles_.x -= rotX * AsoUtility::Deg2RadF(SPEED);
+			if (angles_.x > LIMIT_X_UP_RAD)
+			{
+				angles_.x = LIMIT_X_UP_RAD;
+			}
+			if (angles_.x < LIMIT_X_DW_RAD)
+			{
+				angles_.x = LIMIT_X_DW_RAD;
+			}
+		}
+
+		if (fabsf(rotY) > InputManager::THRESHOLD) 
+		{
+			angles_.y += rotY * AsoUtility::Deg2RadF(SPEED);
+		}
 	}
 }
 

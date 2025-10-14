@@ -132,8 +132,6 @@ void GameScene::Update(void)
 		enemy->Update();
 	}
 
-	flag_->Update();
-
 	//敵のエンカウント処理
 	/*enCounter++;
 	if (enCounter > ENCOUNT)
@@ -157,38 +155,28 @@ void GameScene::Update(void)
 	}
 
 	//敵全滅チェック
-	allEnemyDefeated_ = true;
-	for (auto& enemy : enemys_)
-	{
-		if (enemy->IsAlive()) { //EnemyBase に IsAlive() を用意すると便利
-			allEnemyDefeated_ = false;
-			break;
-		}
-	}
-
-	//フラッグとの距離チェック
-	VECTOR playerPos = player_->GetTransform().pos;
-	VECTOR flagPos = flag_->GetPosition();
-
-	float dx = playerPos.x - flagPos.x;
-	float dz = playerPos.z - flagPos.z;
-	float distSq = dx * dx + dz * dz;
-
-	bool inRange = (distSq < flagRadius_* flagRadius_);
-
-	//ゲージ処理
-	if (allEnemyDefeated_ && !gameClear_)
-	{
-		if (inRange)
+	if (!enemys_.empty()) {
+		allEnemyDefeated_ = true;
+		for (auto& enemy : enemys_)
 		{
-			clearGauge_ += GAUGE_INCREMENT; //フレームごとに加算
-			if (clearGauge_ >= clearGaugeMax_)
-			{
-				clearGauge_ = clearGaugeMax_;
-				gameClear_ = true;
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+			if (enemy->IsAlive()) {
+				allEnemyDefeated_ = false;
+				break;
 			}
 		}
+	}
+	else {
+		//敵がまだ出現していない時はfalseにしておく
+		allEnemyDefeated_ = false;
+	}
+
+	// 敵全滅情報をFlagに伝える
+	flag_->Update(player_->GetTransform().pos, allEnemyDefeated_);
+
+	// フラッグでクリアしたらシーン遷移
+	if (flag_->IsGameClear())
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
 }
 
@@ -210,17 +198,6 @@ void GameScene::Draw(void)
 	flag_->Draw();
 
 	DrawMiniMap();
-
-	if (allEnemyDefeated_)
-	{
-		//フラッグの位置を中心に半径100の円を描画
-		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, green);
-	}
-
-	//ゲージ描画（仮に画面左上に描画）
-	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + GAUGE_WIDTH, GAUGE_X + GAUGE_HEIGHT, white, TRUE); //背景
-	int gaugeWidth = static_cast<int>((clearGauge_ / clearGaugeMax_) * 200);
-	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + gaugeWidth, GAUGE_X + GAUGE_HEIGHT, green, TRUE);
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -381,7 +358,7 @@ bool GameScene::PauseMenu(void)
 	InputManager& ins = InputManager::GetInstance();
 
 	//TABキーでポーズのON/OFF切り替え（Menu中のみ）
-	if (ins.IsTrgDown(KEY_INPUT_TAB) && pauseState_ == PauseState::Menu)
+	if (ins.IsTrgDown(KEY_INPUT_TAB) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::STRAT) && pauseState_ == PauseState::Menu)
 	{
 		isPaused_ = !isPaused_;
 		pauseSelectIndex_ = 0;
@@ -393,13 +370,13 @@ bool GameScene::PauseMenu(void)
 
 	if (pauseState_ == PauseState::Menu)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_DOWN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_DOWN) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_UP))
+		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_UP) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
 			switch (pauseSelectIndex_)
 			{
@@ -415,7 +392,7 @@ bool GameScene::PauseMenu(void)
 	}
 	else
 	{
-		if (ins.IsTrgDown(KEY_INPUT_RETURN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 			pauseState_ = PauseState::Menu;
 	}
 

@@ -3,6 +3,7 @@
 #include <map>
 #include <functional>
 #include <DxLib.h>
+#include "../Manager/InputManager.h"
 #include "../Application.h"
 #include "EnemyBase.h"
 
@@ -373,5 +374,7 @@ private:
 
 	//デバッグ処理
 	void DrawDebug(void);
+
+	InputManager& ins = InputManager::GetInstance();
 
 };
