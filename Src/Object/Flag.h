@@ -18,6 +18,9 @@ public:
 
 private:
 
+	//旗を立てる処理
+	void CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated);
+
 	//円のデバッグ
 	void DrawCircleOnMap(VECTOR center, float radius, int color);
 	

@@ -31,6 +31,30 @@ void Flag::Init(void)
 
 void Flag::Update(const VECTOR& playerPos, bool allEnemyDefeated)
 {
+	CheckCircle(playerPos, allEnemyDefeated);
+}
+
+void Flag::Draw(void)
+{
+	// 円を表示
+	if (circleVisible_)
+	{
+		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
+		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
+	}
+
+	// フラッグを表示
+	if (flagVisible_)
+	{
+		MV1SetScale(modelIdB_, scl_);
+		MV1SetRotationXYZ(modelIdB_, rot_);
+		MV1SetPosition(modelIdB_, pos_);
+		MV1DrawModel(modelIdB_);
+	}
+}
+
+void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
+{
 	if (gameClear_) return;
 
 	// 敵全滅したら円を出現
@@ -76,25 +100,6 @@ void Flag::Update(const VECTOR& playerPos, bool allEnemyDefeated)
 				gameClear_ = true;
 			}
 		}
-	}
-}
-
-void Flag::Draw(void)
-{
-	// 円を表示
-	if (circleVisible_)
-	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
-		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
-	}
-
-	// フラッグを表示
-	if (flagVisible_)
-	{
-		MV1SetScale(modelIdB_, scl_);
-		MV1SetRotationXYZ(modelIdB_, rot_);
-		MV1SetPosition(modelIdB_, pos_);
-		MV1DrawModel(modelIdB_);
 	}
 }
 
