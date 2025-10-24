@@ -1,5 +1,5 @@
 #include <DxLib.h>
-#include"../Application.h"
+#include"../../Application.h"
 #include "Flag.h"
 
 Flag::Flag(void)
@@ -17,13 +17,12 @@ void Flag::Init(void)
 
 	scl_ = { 3.0f, 2.5f, 3.0f };							//大きさ
 	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
-	//pos_ = { 2300.0f, 254.0f, 445.0f };						//位置
-	pos_ = { -660.0f, 254.0f, -100.0f };
+	pos_ = { -660.0f, 254.0f, -100.0f };					//位置
 
 	flagAlive_ = false;
 	circleVisible_ = false;
 	flagVisible_ = false;
-	gameClear_ = false;
+	flagClear_ = false;
 	clearGauge_ = 0.0f;
 	clearGaugeMax_ = 100.0f;
 	flagRadius_ = 100.0f;
@@ -46,16 +45,16 @@ void Flag::Draw(void)
 	// フラッグを表示
 	if (flagVisible_)
 	{
-		MV1SetScale(modelIdB_, scl_);
+		/*MV1SetScale(modelIdB_, scl_);
 		MV1SetRotationXYZ(modelIdB_, rot_);
 		MV1SetPosition(modelIdB_, pos_);
-		MV1DrawModel(modelIdB_);
+		MV1DrawModel(modelIdB_);*/
 	}
 }
 
 void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
 {
-	if (gameClear_) return;
+	if (flagClear_) return;
 
 	// 敵全滅したら円を出現
 	if (allEnemyDefeated && !circleVisible_)
@@ -78,27 +77,14 @@ void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
 			if (clearGauge_ >= clearGaugeMax_)
 			{
 				clearGauge_ = clearGaugeMax_;
-				flagVisible_ = true; // フラッグ登場！
+				flagVisible_ = true; //フラッグ登場
+				flagClear_ = true;
 			}
 		}
 		else
 		{
 			clearGauge_ -= 0.2f; // 離れると少し減るなども可能
 			if (clearGauge_ < 0.0f) clearGauge_ = 0.0f;
-		}
-	}
-
-	// フラッグ出現後（円の中で再度ゲージを満タンにするとクリア）
-	else if (flagVisible_ && !gameClear_)
-	{
-		if (inRange)
-		{
-			clearGauge_ += 0.5f;
-			if (clearGauge_ >= clearGaugeMax_) // 2段階目
-			{
-				clearGauge_ = clearGaugeMax_;
-				gameClear_ = true;
-			}
 		}
 	}
 }
@@ -140,9 +126,9 @@ void Flag::DrawGauge3D(VECTOR center, float gaugeRate)
 	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(0, 255, 0), TRUE);
 }
 
-bool Flag::IsGameClear() const
+bool Flag::IsFlagClear() const
 {
-	return gameClear_;
+	return flagClear_;
 }
 
 VECTOR Flag::GetPosition() const

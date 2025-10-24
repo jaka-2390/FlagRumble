@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Object\Flag.cpp" />
+    <ClCompile Include="Src\Object\FlagBase.cpp" />
+    <ClCompile Include="Src\Manager\FlagManager.cpp" />
+    <ClCompile Include="Src\Object\Flag\Flag.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyBoss.cpp" />
     <ClCompile Include="Src\Scene\DemoScene.cpp" />
     <ClCompile Include="Src\Manager\Sound.cpp" />
@@ -62,7 +64,9 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Object\Flag.h" />
+    <ClInclude Include="Src\Object\FlagBase.h" />
+    <ClInclude Include="Src\Manager\FlagManager.h" />
+    <ClInclude Include="Src\Object\Flag\Flag.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyBoss.h" />
     <ClInclude Include="Src\Scene\DemoScene.h" />
     <ClInclude Include="Src\Manager\Sound.h" />

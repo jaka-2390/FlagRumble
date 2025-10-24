@@ -1,6 +1,7 @@
 #pragma once
+#include "../FlagBase.h"
 
-class Flag
+class Flag : public FlagBase
 {
 
 public:
@@ -12,7 +13,7 @@ public:
 	void Update(const VECTOR& playerPos, bool allEnemyDefeated);	//XVˆ—
 	void Draw(void);												//•`‰æˆ—
 
-	bool IsGameClear() const;
+	bool IsFlagClear() const;
 
 	VECTOR GetPosition() const;
 
@@ -38,7 +39,7 @@ private:
 
 	bool flagVisible_;
 
-	bool gameClear_;
+	bool flagClear_;
 
 	float clearGauge_;
 

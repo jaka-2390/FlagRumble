@@ -28,7 +28,7 @@ void EnemyBoss::SetParam(void)
 	// モデルデータをいくつもメモリ上に存在させない
 	transform_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::BOSS));
 
-	transform_.scl = { AsoUtility::VECTOR_ONE };						// 大きさの設定
+	transform_.scl = { BOSS_SCALE };						// 大きさの設定
 	transform_.quaRotLocal = Quaternion::Euler(AsoUtility::Deg2RadF(0.0f)
 		, AsoUtility::Deg2RadF(DEGREE), 0.0f);//クォータニオンをいじると向きが変わる
 	transform_.dir = { AsoUtility::VECTOR_ZERO };						// 右方向に移動する

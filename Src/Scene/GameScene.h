@@ -9,7 +9,7 @@ class SkyDome;
 class Player;
 class MiniMap;
 class Camera;
-class Flag;
+class FlagManager;
 
 //スポーン場所
 struct SpawnArea
@@ -31,16 +31,7 @@ public:
 	static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
 	static constexpr int STAGE_LANGE = 10000;	//ステージの幅
 	static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
-
-	static constexpr int LV_MAX = 100;		//木のレベル最大
-	static constexpr int LV_OLD = 75;		//木の成長段階
-	static constexpr int LV_ADULT = 50;		//木の成長段階
-	static constexpr int LV_KID = 25;		//木の成長段階
-	static constexpr int HP_ZERO = 0;		//木の体力0
-
-	static constexpr int BOSS_WAIT = 0;		//ボス出現待機
-	static constexpr int BOSS_ON = 1;		//ボス出現可能
-	static constexpr int BOSS_OFF = 2;		//ボス出現不可
+	static constexpr VECTOR BOSS_POS = { 0.0f, 254.0f, 0.0f };
 
 	//UI関係-----------------------------------------------------
 	//-------------------------------------------------------------------
@@ -127,7 +118,11 @@ private:
 
 	void EnemyCreate(int count);
 
+	void SpawnBoss(void);
+
 	bool PauseMenu(void);
+
+	void ClearCheck(void);
 
 	std::vector<SpawnArea> spawnAreas_;	//スポーン場所
 	std::unique_ptr<Stage> stage_;		//ステージ
@@ -135,7 +130,7 @@ private:
 	std::shared_ptr<Player> player_;	//プレイヤー
 	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
-	std::shared_ptr<Flag> flag_;		//フラッグ
+	std::shared_ptr<FlagManager> flagManager_;		//フラッグ
 
 	int enemyModelId_;
 	int imgGameUi1_;
@@ -149,8 +144,6 @@ private:
 
 	std::vector<std::shared_ptr<EnemyBase>> enemys_;
 	int enCounter;//敵の出現頻度
-
-	int isB_;
 
 	//ポーズ
 	bool isPaused_;           //ポーズ中かどうか
@@ -170,12 +163,9 @@ private:
 	//旗関連
 	float flagRadius_ = 100.0f;       //接近判定の距離
 
-	//ゲージ
-	float clearGauge_ = 0.0f;
-	float clearGaugeMax_ = 100.0f;
-	bool gameClear_ = false;
-
 	int lastSpawnTime_;  //最後に敵を出現させた時間
+
+	bool bossSpawned_ = false;
 
 	PauseState pauseState_ = PauseState::Menu;
 	int  pauseImg_;

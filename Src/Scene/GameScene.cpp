@@ -7,6 +7,7 @@
 #include "../Manager/SoundManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/ResourceManager.h"
+#include "../Manager/FlagManager.h"
 #include "../Object/Common/Capsule.h"
 #include "../Object/Common/Collider.h"
 #include "../Object/SkyDome.h"
@@ -22,7 +23,6 @@
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
-#include "../Object/Flag.h"
 #include "MiniMap.h"
 #include "GameScene.h"
 
@@ -70,8 +70,8 @@ void GameScene::Init(void)
 	map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
 	map_->Init();
 
-	flag_ = std::make_shared<Flag>();
-	flag_->Init();
+	flagManager_ = std::make_shared<FlagManager>();
+	flagManager_->Init();
 
 	//画像
 	imgGameUi1_ = resMng_.Load(ResourceManager::SRC::GAMEUI_1).handleId_;
@@ -106,8 +106,6 @@ void GameScene::Init(void)
 
 	mainCamera->SetFollow(&player_->GetTransform());
 	mainCamera->ChangeMode(Camera::MODE::FOLLOW);
-
-	isB_ = BOSS_WAIT;
 }
 
 void GameScene::Update(void)
@@ -131,17 +129,6 @@ void GameScene::Update(void)
 	{
 		enemy->Update();
 	}
-
-	//敵のエンカウント処理
-	/*enCounter++;
-	if (enCounter > ENCOUNT)
-	{
-		enCounter = 0;
-		if (ENEMY_MAX >= enemys_.size())
-		{
-			EnemyCreate(1);
-		}
-	}*/
 
 	enCounter++;
 	if (enCounter > ENCOUNT)
@@ -171,13 +158,16 @@ void GameScene::Update(void)
 	}
 
 	// 敵全滅情報をFlagに伝える
-	flag_->Update(player_->GetTransform().pos, allEnemyDefeated_);
+	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
 
 	// フラッグでクリアしたらシーン遷移
-	if (flag_->IsGameClear())
+	if (flagManager_->AllFlagsCleared() && !bossSpawned_)
 	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+		SpawnBoss();
+		bossSpawned_ = true;
 	}
+
+	ClearCheck();
 }
 
 void GameScene::Draw(void)
@@ -195,7 +185,7 @@ void GameScene::Draw(void)
 		enemy->DrawBossHpBar();
 	}
 
-	flag_->Draw();
+	flagManager_->Draw();
 
 	DrawMiniMap();
 
@@ -329,7 +319,7 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 
 void GameScene::EnemyCreate(int count)
 {
-	VECTOR flagPos = flag_->GetPosition();  //Flagの位置を取得
+	VECTOR flagPos = flagManager_->GetPosition();  //Flagの位置を取得
 
 	for (int i = 0; i < count; ++i)
 	{
@@ -351,6 +341,30 @@ void GameScene::EnemyCreate(int count)
 		//リストに追加
 		enemys_.emplace_back(std::move(enemy));
 	}
+}
+
+void GameScene::SpawnBoss(void)
+{
+	// すでにボスが出現しているなら何もしない
+	for (auto& enemy : enemys_) {
+		if (std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			return;
+		}
+	}
+
+	// ボス出現位置を決める（ステージ中央など）
+	VECTOR bossPos = BOSS_POS;
+
+	// EnemyBossを生成
+	std::shared_ptr<EnemyBase> boss = std::make_shared<EnemyBoss>();
+
+	boss->SetGameScene(this);
+	boss->SetPos(bossPos);
+	boss->SetPlayer(player_);
+	boss->Init();
+
+	// 敵リストに追加
+	enemys_.emplace_back(std::move(boss));
 }
 
 bool GameScene::PauseMenu(void)
@@ -397,4 +411,23 @@ bool GameScene::PauseMenu(void)
 	}
 
 	return true;
+}
+
+void GameScene::ClearCheck(void)
+{
+	//ボスが存在するかチェック
+	bool bossDefeated = true;
+	for (auto& enemy : enemys_) {
+		if (auto boss = std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			if (boss->IsAlive()) {  //isAlive_がtrueならまだ倒されていない
+				bossDefeated = false;
+				break;
+			}
+		}
+	}
+
+	//全旗を奪還済み && ボス倒したらクリア
+	if (bossSpawned_ && bossDefeated) {
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+	}
 }
