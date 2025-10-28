@@ -2,7 +2,7 @@
 #include"../../Application.h"
 #include "Flag.h"
 
-Flag::Flag(void)
+Flag::Flag(VECTOR pos):pos_(pos)
 {
 }
 

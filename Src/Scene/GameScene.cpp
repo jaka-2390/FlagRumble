@@ -319,7 +319,7 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 
 void GameScene::EnemyCreate(int count)
 {
-	VECTOR flagPos = flagManager_->GetPosition();  //Flag‚ÌˆÊ’u‚ðŽæ“¾
+	VECTOR flagPos = flagManager_->GetFlagPosition(0);  //Flag‚ÌˆÊ’u‚ðŽæ“¾
 
 	for (int i = 0; i < count; ++i)
 	{

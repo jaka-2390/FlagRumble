@@ -6,7 +6,7 @@ class Flag : public FlagBase
 
 public:
 
-	Flag(void);							//コンストラクタ
+	Flag(VECTOR pos);							//コンストラクタ
 	~Flag(void);						//デストラクタ
 
 	void Init(void);												//初期化処理

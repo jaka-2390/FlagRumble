@@ -12,6 +12,8 @@ public:
     void Update(const VECTOR& playerPos, bool allEnemyDefeated);
     void Draw();
 
+    VECTOR GetFlagPosition(int index) const;
+
     bool AllFlagsCleared() const;
 
 private:
