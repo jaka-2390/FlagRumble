@@ -137,7 +137,7 @@ void GameScene::Update(void)
 		if (ENEMY_MAX >= enemys_.size())
 		{
 			int spawnCount = 1; //まとめて出したい数
-			EnemyCreate(spawnCount);
+			//EnemyCreate(spawnCount);
 		}
 	}
 
@@ -157,11 +157,23 @@ void GameScene::Update(void)
 		allEnemyDefeated_ = false;
 	}
 
+	// 次に立てる旗の位置で敵を生成
+    if (enemys_.empty()) {
+        // 敵生成タイミングをここで制御
+        int nextFlagIdx = flagManager_->GetNextFlagIndex();
+        if (nextFlagIdx < FLAG_MAX) // 3つまで
+        {
+            VECTOR flagPos = flagManager_->GetFlagPosition(nextFlagIdx);
+            int spawnCount = 1;
+            EnemyCreateAt(flagPos, spawnCount); // ここでランダム位置も加える
+        }
+    }
+
 	// 敵全滅情報をFlagに伝える
 	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
 
 	// フラッグでクリアしたらシーン遷移
-	if (flagManager_->AllFlagsCleared() && !bossSpawned_)
+	if (flagManager_->GetClearedFlagCount() >= FLAG_MAX && !bossSpawned_)
 	{
 		SpawnBoss();
 		bossSpawned_ = true;
@@ -339,6 +351,24 @@ void GameScene::EnemyCreate(int count)
 		enemy->Init();
 
 		//リストに追加
+		enemys_.emplace_back(std::move(enemy));
+	}
+}
+
+void GameScene::EnemyCreateAt(VECTOR flagPos, int count)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		VECTOR randPos = flagPos;
+		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+
+		auto enemy = std::make_shared<EnemyDog>();
+		enemy->SetGameScene(this);
+		enemy->SetPos(randPos);
+		enemy->SetPlayer(player_);
+		enemy->Init();
+
 		enemys_.emplace_back(std::move(enemy));
 	}
 }

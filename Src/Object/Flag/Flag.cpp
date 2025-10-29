@@ -17,9 +17,7 @@ void Flag::Init(void)
 
 	scl_ = { 3.0f, 2.5f, 3.0f };							//大きさ
 	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
-	pos_ = { -660.0f, 254.0f, -100.0f };					//位置
 
-	flagAlive_ = false;
 	circleVisible_ = false;
 	flagVisible_ = false;
 	flagClear_ = false;
@@ -38,13 +36,14 @@ void Flag::Draw(void)
 	// 円を表示
 	if (circleVisible_)
 	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
+		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
 		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
 	}
 
 	// フラッグを表示
 	if (flagVisible_)
 	{
+		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
 		/*MV1SetScale(modelIdB_, scl_);
 		MV1SetRotationXYZ(modelIdB_, rot_);
 		MV1SetPosition(modelIdB_, pos_);

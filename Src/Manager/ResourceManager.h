@@ -82,7 +82,9 @@ public:
 		VIRUS,
 		BOSS,
 		//エフェクト
-		TREE_RANGE,
+		NONE_AREA,
+		PLAYER_AREA,
+		ENEMY_AREA,
 		EFF_POWER,
 		EFF_SPEED,
 		EFF_HEAL

@@ -16,8 +16,13 @@ public:
 
     bool AllFlagsCleared() const;
 
+    int GetNextFlagIndex() const;
+
+    int GetClearedFlagCount() const;
+
 private:
 
     std::vector<std::unique_ptr<Flag>> flags_;
 
+    int nextFlagIndex_ = 0;
 };

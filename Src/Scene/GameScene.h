@@ -82,6 +82,7 @@ public:
 	//フラッグ
 	static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
 	static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
+	static constexpr int FLAG_MAX = 3;							//フラッグの数
 
 	//クリアゲージ
 	static constexpr int GAUGE_X = 20;                //左上X位置
@@ -117,6 +118,8 @@ private:
 	int cnt;
 
 	void EnemyCreate(int count);
+
+	void EnemyCreateAt(VECTOR flagPos, int count);
 
 	void SpawnBoss(void);
 

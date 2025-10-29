@@ -137,7 +137,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::SKY_DOME, std::move(res));
 
 	// 最初の惑星
-	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Stage2.mv1");
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/testStage.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, std::move(res));
 
 	// 足煙
@@ -208,8 +208,14 @@ void ResourceManager::Init(void)
 	//-------------------------
 
 	//木の視野
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "TreeRange.efkefc");
-	resourcesMap_.emplace(SRC::TREE_RANGE, std::move(res));
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "NoneArea.efkefc");
+	resourcesMap_.emplace(SRC::NONE_AREA, std::move(res));
+	
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PlayerArea.efkefc");
+	resourcesMap_.emplace(SRC::PLAYER_AREA, std::move(res));
+	
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "EnemyArea.efkefc");
+	resourcesMap_.emplace(SRC::ENEMY_AREA, std::move(res));
 	
 	//パワーアップ
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PowerUp.efkefc");

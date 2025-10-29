@@ -20,9 +20,15 @@ void FlagManager::Init()
 
 void FlagManager::Update(const VECTOR& playerPos, bool allEnemyDefeated)
 {
-    for (auto& flag : flags_)
+    for (size_t i = 0; i < flags_.size(); ++i)
     {
-        flag->Update(playerPos, allEnemyDefeated);
+        flags_[i]->Update(playerPos, allEnemyDefeated);
+
+        // Šø‚ª—§‚Á‚½‚çŽŸ‚ÌŠø‚Éi‚ß‚é
+        if (i == nextFlagIndex_ && flags_[i]->IsFlagClear())
+        {
+            nextFlagIndex_++;
+        }
     }
 }
 
@@ -51,4 +57,21 @@ bool FlagManager::AllFlagsCleared() const
     }
 
     return true;
+}
+
+int FlagManager::GetNextFlagIndex() const
+{
+    return nextFlagIndex_;
+}
+
+int FlagManager::GetClearedFlagCount() const
+{
+    int count = 0;
+
+    for (const auto& flag : flags_)
+    {
+        if (flag->IsFlagClear()) count++;
+    }
+
+    return count;
 }

@@ -28,7 +28,6 @@ private:
 	void DrawGauge3D(VECTOR center, float gaugeRate);
 
 	int modelIdB_;		//ƒ‚ƒfƒ‹‚ÌŠi”[(•c–Ø)
-	bool flagAlive_;	//¶‘¶”»’è
 
 	VECTOR scl_;	//‚¨‚¨‚«‚³
 	VECTOR pos_;	//ˆÊ’u
