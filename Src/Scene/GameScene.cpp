@@ -164,7 +164,7 @@ void GameScene::Update(void)
         if (nextFlagIdx < FLAG_MAX) // 3‚Â‚Ü‚Å
         {
             VECTOR flagPos = flagManager_->GetFlagPosition(nextFlagIdx);
-            int spawnCount = 1;
+            int spawnCount = 2;
             EnemyCreateAt(flagPos, spawnCount); // ‚±‚±‚Åƒ‰ƒ“ƒ_ƒ€ˆÊ’u‚à‰Á‚¦‚é
         }
     }

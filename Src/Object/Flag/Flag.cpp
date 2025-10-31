@@ -18,7 +18,7 @@ void Flag::Init(void)
 	scl_ = { 3.0f, 2.5f, 3.0f };							//大きさ
 	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
 
-	circleVisible_ = false;
+	circleVisible_ = true;
 	flagVisible_ = false;
 	flagClear_ = false;
 	clearGauge_ = 0.0f;
@@ -68,7 +68,7 @@ void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
 	bool inRange = (distSq < flagRadius_* flagRadius_);
 
 	// フラッグ出現前（円の中でゲージを貯める）
-	if (circleVisible_ && !flagVisible_)
+	if (allEnemyDefeated && !flagVisible_)
 	{
 		if (inRange)
 		{
