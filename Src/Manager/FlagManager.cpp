@@ -59,11 +59,6 @@ bool FlagManager::AllFlagsCleared() const
     return true;
 }
 
-int FlagManager::GetNextFlagIndex() const
-{
-    return nextFlagIndex_;
-}
-
 int FlagManager::GetClearedFlagCount() const
 {
     int count = 0;
@@ -74,4 +69,19 @@ int FlagManager::GetClearedFlagCount() const
     }
 
     return count;
+}
+
+std::vector<int> FlagManager::GetSpawnFlag(const VECTOR& playerPos)
+{
+    std::vector<int> result;
+    for (int i = 0; i < (int)flags_.size(); ++i)
+    {
+        if (flags_[i]->SpawnEnemies(playerPos))
+        {
+            result.push_back(i);
+            flags_[i]->SetEnemySpawned(true); // èoåªçœÇ›Ç…ÇµÇƒÇ®Ç≠
+        }
+    }
+
+    return result;
 }

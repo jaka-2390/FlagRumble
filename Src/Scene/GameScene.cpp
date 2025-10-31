@@ -130,7 +130,7 @@ void GameScene::Update(void)
 		enemy->Update();
 	}
 
-	enCounter++;
+	/*enCounter++;
 	if (enCounter > ENCOUNT)
 	{
 		enCounter = 0;
@@ -139,7 +139,7 @@ void GameScene::Update(void)
 			int spawnCount = 1; //まとめて出したい数
 			//EnemyCreate(spawnCount);
 		}
-	}
+	}*/
 
 	//敵全滅チェック
 	if (!enemys_.empty()) {
@@ -156,21 +156,17 @@ void GameScene::Update(void)
 		//敵がまだ出現していない時はfalseにしておく
 		allEnemyDefeated_ = false;
 	}
-
-	// 次に立てる旗の位置で敵を生成
-    if (enemys_.empty()) {
-        // 敵生成タイミングをここで制御
-        int nextFlagIdx = flagManager_->GetNextFlagIndex();
-        if (nextFlagIdx < FLAG_MAX) // 3つまで
-        {
-            VECTOR flagPos = flagManager_->GetFlagPosition(nextFlagIdx);
-            int spawnCount = 2;
-            EnemyCreateAt(flagPos, spawnCount); // ここでランダム位置も加える
-        }
-    }
-
+	
 	// 敵全滅情報をFlagに伝える
 	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
+
+	// プレイヤーが旗に近づいたら敵を生成
+	auto spawnFlags = flagManager_->GetSpawnFlag(player_->GetTransform().pos);
+	for (int index : spawnFlags)
+	{
+		VECTOR flagPos = flagManager_->GetFlagPosition(index);
+		EnemyCreateAt(flagPos, 2); // 各旗の周囲に3体
+	}
 
 	// フラッグでクリアしたらシーン遷移
 	if (flagManager_->GetClearedFlagCount() >= FLAG_MAX && !bossSpawned_)

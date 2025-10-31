@@ -17,6 +17,10 @@ public:
 
 	VECTOR GetPosition() const;
 
+	bool SpawnEnemies(const VECTOR& playerPos) const; // 敵を出すべきか判定
+
+	void SetEnemySpawned(bool spawned); // 出現済みをセット
+
 private:
 
 	//旗を立てる処理
@@ -34,15 +38,13 @@ private:
 	VECTOR rot_;	//回転
 	VECTOR dir_;	//移動用
 
-	bool circleVisible_;
-
-	bool flagVisible_;
-
-	bool flagClear_;
+	bool circleVisible_;	//円の描画
+	bool flagVisible_;		//flagの描画
+	bool flagClear_;		//奪還したか
+	bool enemySpawned_;		// 敵をすでに出したか
+	bool playerInRange_;	// プレイヤーが円内にいるか
 
 	float clearGauge_;
-
 	float clearGaugeMax_;
-
 	float flagRadius_;
 };

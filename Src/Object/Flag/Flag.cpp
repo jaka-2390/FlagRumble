@@ -21,6 +21,8 @@ void Flag::Init(void)
 	circleVisible_ = true;
 	flagVisible_ = false;
 	flagClear_ = false;
+	enemySpawned_ = false;
+	playerInRange_ = false;
 	clearGauge_ = 0.0f;
 	clearGaugeMax_ = 100.0f;
 	flagRadius_ = 100.0f;
@@ -133,4 +135,20 @@ bool Flag::IsFlagClear() const
 VECTOR Flag::GetPosition() const
 {
 	return pos_;
+}
+
+bool Flag::SpawnEnemies(const VECTOR& playerPos) const
+{
+	if (enemySpawned_) return false;  // Ç‡Ç§èoÇµÇƒÇÈ
+
+	float dx = playerPos.x - pos_.x;
+	float dz = playerPos.z - pos_.z;
+	float distSq = dx * dx + dz * dz;
+
+	return (distSq < flagRadius_* flagRadius_);
+}
+
+void Flag::SetEnemySpawned(bool spawned)
+{
+	enemySpawned_ = spawned;
 }
