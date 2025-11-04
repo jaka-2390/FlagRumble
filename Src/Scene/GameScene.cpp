@@ -161,15 +161,26 @@ void GameScene::Update(void)
 	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
 
 	// プレイヤーが旗に近づいたら敵を生成
-	auto spawnFlags = flagManager_->GetSpawnFlag(player_->GetTransform().pos);
+	/*auto spawnFlags = flagManager_->GetSpawnFlag(player_->GetTransform().pos);
 	for (int index : spawnFlags)
+	{*/
+	enCounter++;
+	if (enCounter > ENCOUNT)
 	{
-		VECTOR flagPos = flagManager_->GetFlagPosition(index);
-		EnemyCreateAt(flagPos, 2); // 各旗の周囲に3体
+		enCounter = 0;
+		if (ENEMY_MAX >= enemys_.size())
+		{
+			VECTOR flagPos = flagManager_->GetFlagPosition(0);
+			EnemyCreateAt(flagPos, 1); // 各旗の周囲に3体
+		}
 	}
+	/*}*/
 
 	// フラッグでクリアしたらシーン遷移
-	if (flagManager_->GetClearedFlagCount() >= FLAG_MAX && !bossSpawned_)
+	int cleared = flagManager_->GetClearedFlagCount();
+	int total = flagManager_->GetFlagMax();
+
+	if (!bossSpawned_ && cleared >= total)
 	{
 		SpawnBoss();
 		bossSpawned_ = true;

@@ -20,9 +20,13 @@ public:
 
     std::vector<int> GetSpawnFlag(const VECTOR& playerPos); // 敵を出す旗のインデックスを返す
 
+    int GetFlagMax() const;
+
 private:
 
     std::vector<std::unique_ptr<Flag>> flags_;
 
     int nextFlagIndex_ = 0;
+
+    int flagMax_ = 0;
 };

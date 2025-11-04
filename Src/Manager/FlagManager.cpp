@@ -16,6 +16,8 @@ void FlagManager::Init()
     {
         flag->Init();
     }
+
+    flagMax_ = static_cast<int>(flags_.size());
 }
 
 void FlagManager::Update(const VECTOR& playerPos, bool allEnemyDefeated)
@@ -84,4 +86,9 @@ std::vector<int> FlagManager::GetSpawnFlag(const VECTOR& playerPos)
     }
 
     return result;
+}
+
+int FlagManager::GetFlagMax() const
+{
+    return flagMax_;
 }

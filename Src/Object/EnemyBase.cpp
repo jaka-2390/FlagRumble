@@ -211,13 +211,22 @@ void EnemyBase::ChasePlayer(void)
 	}
 
 	//エネミーの視野内に入ったら追いかける
-	VECTOR dirToPlayer = VNorm(toPlayer);
-	VECTOR moveVec = VScale(dirToPlayer, speed_);
+	if (distance <= VIEW_RANGE
+		&& state_ == STATE::PLAY
+		&& player_->pstate_ == Player::PlayerState::NORMAL)
+	{
+		VECTOR dirToPlayer = VNorm(toPlayer);
+		VECTOR moveVec = VScale(dirToPlayer, speed_);
 
-	transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.pos = VAdd(transform_.pos, moveVec);
 
-	//方向からクォータニオンに変換
-	transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+		//方向からクォータニオンに変換
+		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+	}
+	else
+	{
+
+	}
 	
 }
 
@@ -241,7 +250,7 @@ void EnemyBase::Draw(void)
 	DrawDebug();
 
 	//視野範囲の描画
-	//DrawDebugSearchRange();
+	DrawDebugSearchRange();
 }
 
 void EnemyBase::Release(void)
@@ -563,34 +572,41 @@ void EnemyBase::DrawDebug(void)
 void EnemyBase::DrawDebugSearchRange(void)
 {
 	VECTOR centerPos = transform_.pos;
+	float radius = VIEW_RANGE;
+	int segments = 60;
 
-	//プレイヤーの座標
+	// プレイヤーの座標
 	VECTOR playerPos = player_->GetTransform().pos; // プレイヤーオブジェクトの参照を持っている想定
 
-	//プレイヤーと敵の距離（XZ平面）
+	// プレイヤーと敵の距離（XZ平面）
 	float dx = playerPos.x - centerPos.x;
 	float dz = playerPos.z - centerPos.z;
 	float distance = sqrtf(dx * dx + dz * dz);
 
-	//範囲内か判定
-	bool inRange = (distance <= VIEW_RANGE);
+	// 範囲内か判定
+	bool inRange = (distance <= radius);
 
-	float angleStep = AsoUtility::FULL_ROTATION_RAD / VALUE_SIXTY;
+	// 色を決定（範囲内なら赤、範囲外は元の色）
+	unsigned int color = inRange ? 0xff0000 : 0xffdead;
 
-	for (int i = static_cast<int>(VALUE_ZERO); i < VALUE_SIXTY; ++i)
+	float angleStep = DX_PI * 2.0f / segments;
+
+	for (int i = 0; i < segments; ++i)
 	{
 		float angle1 = angleStep * i;
-		float angle2 = angleStep * (i + VALUE_ONE);
+		float angle2 = angleStep * (i + 1);
 
 		VECTOR p1 = {
-			centerPos.x + VIEW_RANGE * sinf(angle1),
+			centerPos.x + radius * sinf(angle1),
 			centerPos.y,
-			centerPos.z + VIEW_RANGE * cosf(angle1)
+			centerPos.z + radius * cosf(angle1)
 		};
 		VECTOR p2 = {
-			centerPos.x + VIEW_RANGE * sinf(angle2),
+			centerPos.x + radius * sinf(angle2),
 			centerPos.y,
-			centerPos.z + VIEW_RANGE * cosf(angle2)
+			centerPos.z + radius * cosf(angle2)
 		};
+		DrawTriangle3D(centerPos, p1, p2, color, false);
 	}
+	DrawSphere3D(centerPos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
 }
