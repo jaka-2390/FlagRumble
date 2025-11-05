@@ -14,8 +14,6 @@ public:
 
     VECTOR GetFlagPosition(int index) const;
 
-    bool AllFlagsCleared() const;
-
     int GetClearedFlagCount() const;
 
     std::vector<int> GetSpawnFlag(const VECTOR& playerPos); // 敵を出す旗のインデックスを返す

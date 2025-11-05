@@ -160,21 +160,16 @@ void GameScene::Update(void)
 	// 敵全滅情報をFlagに伝える
 	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
 
-	// プレイヤーが旗に近づいたら敵を生成
-	/*auto spawnFlags = flagManager_->GetSpawnFlag(player_->GetTransform().pos);
-	for (int index : spawnFlags)
-	{*/
-	enCounter++;
-	if (enCounter > ENCOUNT)
+	//それぞれの旗に敵を生成
+	int flagCount = flagManager_->GetFlagMax();
+	for (int i = 0; i < flagCount; ++i)
 	{
-		enCounter = 0;
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			VECTOR flagPos = flagManager_->GetFlagPosition(0);
-			EnemyCreateAt(flagPos, 1); // 各旗の周囲に3体
+			VECTOR flagPos = flagManager_->GetFlagPosition(i);
+			EnemyCreateAt(flagPos, 1); //各旗の周囲に1体
 		}
 	}
-	/*}*/
 
 	// フラッグでクリアしたらシーン遷移
 	int cleared = flagManager_->GetClearedFlagCount();

@@ -57,12 +57,6 @@ void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
 {
 	if (flagClear_) return;
 
-	// 敵全滅したら円を出現
-	if (allEnemyDefeated && !circleVisible_)
-	{
-		circleVisible_ = true;
-	}
-
 	// 円の中心とプレイヤーの距離を計算
 	float dx = playerPos.x - pos_.x;
 	float dz = playerPos.z - pos_.z;
@@ -139,7 +133,7 @@ VECTOR Flag::GetPosition() const
 
 bool Flag::SpawnEnemies(const VECTOR& playerPos) const
 {
-	if (enemySpawned_) return false;  // もう出してる
+	if (enemySpawned_) return false;  //もう出してる
 
 	float dx = playerPos.x - pos_.x;
 	float dz = playerPos.z - pos_.z;

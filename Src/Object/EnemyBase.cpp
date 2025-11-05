@@ -119,16 +119,21 @@ void EnemyBase::UpdateAttack(void)
 		isAttack_ = true; //多重ヒット防止用フラグ
 		isAttack_P = false;
 	}
-	else if (!isAttack_ && isAttack_T)
+
+	const auto& anim = animationController_->GetPlayAnim();
+	if (anim.step > 15.0f && isAttack_ == true)
 	{
-		isAttack_ = true;
-		isAttack_T = false;
+		isAttack_ = false;
+		CheckHitAttackHit();
+	}
+	else if(anim.step > 30.0f && enemyType_ == TYPE::BOSS)
+	{
+		CheckHitAttackHit();
+		return;
 	}
 
 	//アニメーション終了で次の状態に遷移
 	if (animationController_->IsEnd() || state_ != STATE::ATTACK) {
-		isAttack_ = false;
-		CheckHitAttackHit();
 		ChangeState(STATE::IDLE);
 	}
 }
