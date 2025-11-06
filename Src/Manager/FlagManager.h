@@ -9,7 +9,7 @@ class FlagManager
 public:
 
     void Init();
-    void Update(const VECTOR& playerPos, bool allEnemyDefeated);
+    void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);
     void Draw();
 
     VECTOR GetFlagPosition(int index) const;

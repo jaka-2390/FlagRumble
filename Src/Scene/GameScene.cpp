@@ -158,7 +158,7 @@ void GameScene::Update(void)
 	}
 	
 	// “G‘S–Åî•ñ‚ðFlag‚É“`‚¦‚é
-	flagManager_->Update(player_->GetTransform().pos, allEnemyDefeated_);
+	flagManager_->Update(player_->GetTransform().pos, enemys_);
 
 	//‚»‚ê‚¼‚ê‚ÌŠø‚É“G‚ð¶¬
 	int flagCount = flagManager_->GetFlagMax();

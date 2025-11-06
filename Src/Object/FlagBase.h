@@ -1,5 +1,6 @@
 #pragma once
 #include <DxLib.h>
+#include "EnemyBase.h"
 
 class FlagBase 
 {
@@ -9,7 +10,7 @@ public:
     virtual ~FlagBase() {}
 
     virtual void Init() = 0;
-    virtual void Update(const VECTOR& playerPos, bool allEnemyDefeated) = 0;
+    virtual void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies) = 0;
     virtual void Draw() = 0;
 
     bool IsFlagClear() const;

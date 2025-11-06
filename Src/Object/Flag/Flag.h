@@ -10,7 +10,7 @@ public:
 	~Flag(void);						//デストラクタ
 
 	void Init(void);												//初期化処理
-	void Update(const VECTOR& playerPos, bool allEnemyDefeated);	//更新処理
+	void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);	//更新処理
 	void Draw(void);												//描画処理
 
 	bool IsFlagClear() const;
@@ -24,7 +24,10 @@ public:
 private:
 
 	//旗を立てる処理
-	void CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated);
+	void CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);
+
+	//円との距離
+	float DistanceSqXZ(const VECTOR& a, const VECTOR& b) const;
 
 	//円のデバッグ
 	void DrawCircleOnMap(VECTOR center, float radius, int color);
@@ -41,10 +44,12 @@ private:
 	bool circleVisible_;	//円の描画
 	bool flagVisible_;		//flagの描画
 	bool flagClear_;		//奪還したか
-	bool enemySpawned_;		// 敵をすでに出したか
-	bool playerInRange_;	// プレイヤーが円内にいるか
+	bool enemySpawned_;		//敵をすでに出したか
+	bool playerInRange_;	//プレイヤーが円内にいるか
+	bool enemyNear_;		//敵がflagの近くにいるか
 
 	float clearGauge_;
 	float clearGaugeMax_;
 	float flagRadius_;
+	float enemyCheckRadius_;
 };

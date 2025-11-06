@@ -20,11 +20,11 @@ void FlagManager::Init()
     flagMax_ = static_cast<int>(flags_.size());
 }
 
-void FlagManager::Update(const VECTOR& playerPos, bool allEnemyDefeated)
+void FlagManager::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
     for (size_t i = 0; i < flags_.size(); ++i)
     {
-        flags_[i]->Update(playerPos, allEnemyDefeated);
+        flags_[i]->Update(playerPos, enemies);
     }
 }
 

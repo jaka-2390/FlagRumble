@@ -23,14 +23,16 @@ void Flag::Init(void)
 	flagClear_ = false;
 	enemySpawned_ = false;
 	playerInRange_ = false;
+	enemyNear_ = false;
 	clearGauge_ = 0.0f;
 	clearGaugeMax_ = 100.0f;
 	flagRadius_ = 100.0f;
+	enemyCheckRadius_ = 200.0f;
 }
 
-void Flag::Update(const VECTOR& playerPos, bool allEnemyDefeated)
+void Flag::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
-	CheckCircle(playerPos, allEnemyDefeated);
+	CheckCircle(playerPos, enemies);
 }
 
 void Flag::Draw(void)
@@ -53,35 +55,56 @@ void Flag::Draw(void)
 	}
 }
 
-void Flag::CheckCircle(const VECTOR& playerPos, bool allEnemyDefeated)
+void Flag::CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
 	if (flagClear_) return;
 
 	// 円の中心とプレイヤーの距離を計算
-	float dx = playerPos.x - pos_.x;
-	float dz = playerPos.z - pos_.z;
-	float distSq = dx * dx + dz * dz;
-	bool inRange = (distSq < flagRadius_* flagRadius_);
-
-	// フラッグ出現前（円の中でゲージを貯める）
-	if (allEnemyDefeated && !flagVisible_)
+	playerInRange_ = false;
+	if (DistanceSqXZ(playerPos, pos_) < flagRadius_ * flagRadius_)
 	{
-		if (inRange)
+		playerInRange_ = true;
+	}
+
+	//円の近くに敵がいるか
+	enemyNear_ = false;
+	for (auto& enemy : enemies)
+	{
+		if (!enemy) continue;
+		if (!enemy->IsAlive()) continue;
+		VECTOR ePos = enemy->GetTransform().pos;
+
+		if (DistanceSqXZ(ePos, pos_) < enemyCheckRadius_ * enemyCheckRadius_)
 		{
-			clearGauge_ += 0.5f;
-			if (clearGauge_ >= clearGaugeMax_)
-			{
-				clearGauge_ = clearGaugeMax_;
-				flagVisible_ = true; //フラッグ登場
-				flagClear_ = true;
-			}
+			enemyNear_ = true;
+			break;
 		}
-		else
+
+	}
+
+	//ゲージを貯める
+	if (!enemyNear_ && playerInRange_)
+	{
+		clearGauge_ += 0.5f;
+		if (clearGauge_ >= clearGaugeMax_)
 		{
-			clearGauge_ -= 0.2f; // 離れると少し減るなども可能
-			if (clearGauge_ < 0.0f) clearGauge_ = 0.0f;
+			clearGauge_ = clearGaugeMax_;
+			flagVisible_ = true; //フラッグ登場
+			flagClear_ = true;
 		}
 	}
+	else
+	{
+		clearGauge_ -= 0.2f; // 離れると少し減るなども可能
+		if (clearGauge_ < 0.0f) clearGauge_ = 0.0f;
+	}
+}
+
+float Flag::DistanceSqXZ(const VECTOR& a, const VECTOR& b) const
+{
+	float dx = a.x - b.x;
+	float dz = a.z - b.z;
+	return  dx * dx + dz * dz;
 }
 
 void Flag::DrawCircleOnMap(VECTOR center, float radius, int color)
