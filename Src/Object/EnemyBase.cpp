@@ -51,6 +51,8 @@ void EnemyBase::Init(void)
 	SetParam();
 	InitAnimation();
 
+	startPos_ = transform_.pos;
+
 	damageCnt_ = 0;
 
 	damage1img_ = LoadGraph("Data/Image/1.png");
@@ -113,21 +115,15 @@ void EnemyBase::UpdateAttack(void)
 {
 	animationController_->Play((int)ANIM_TYPE::ATTACK, false);
 
-	//攻撃タイミング
-	if (!isAttack_ && isAttack_P)
-	{
-		isAttack_ = true; //多重ヒット防止用フラグ
-		isAttack_P = false;
-	}
-
 	const auto& anim = animationController_->GetPlayAnim();
 	if (anim.step > 15.0f && isAttack_ == true)
 	{
 		isAttack_ = false;
 		CheckHitAttackHit();
 	}
-	else if(anim.step > 30.0f && enemyType_ == TYPE::BOSS)
+	else if(anim.step > 30.0f && enemyType_ == TYPE::BOSS && isAttack_P)
 	{
+		isAttack_P = false;
 		CheckHitAttackHit();
 		return;
 	}
@@ -215,8 +211,19 @@ void EnemyBase::ChasePlayer(void)
 		animationController_->Play((int)ANIM_TYPE::RUN, true);
 	}
 
+	//ボスはプレイヤーを追いかける
+	if (enemyType_ == TYPE::BOSS)
+	{
+		VECTOR dirToPlayer = VNorm(toPlayer);
+		VECTOR moveVec = VScale(dirToPlayer, speed_);
+
+		transform_.pos = VAdd(transform_.pos, moveVec);
+
+		//方向からクォータニオンに変換
+		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+	}
 	//エネミーの視野内に入ったら追いかける
-	if (distance <= VIEW_RANGE
+	else if (distance <= VIEW_RANGE
 		&& state_ == STATE::PLAY
 		&& player_->pstate_ == Player::PlayerState::NORMAL)
 	{
@@ -230,7 +237,39 @@ void EnemyBase::ChasePlayer(void)
 	}
 	else
 	{
+		//タイマー
+		changeDirTimer_ += scnMng_.GetDeltaTime();
 
+		//出現位置を基準にする
+		float maxRange = MAX_RANGE;
+
+		//現在の出現位置からの距離
+		float distanceStart = VSize(VSub(transform_.pos, startPos_));
+
+		//2秒ごとに方向変更
+		if (changeDirTimer_ >= WANDER_CHANGE_TIME || distanceStart > maxRange)
+		{
+			changeDirTimer_ = 0.0f;
+
+			VECTOR toStart = VSub(startPos_, transform_.pos);
+
+			if (distanceStart > maxRange)
+			{
+				//範囲外ならスタート地点へ
+				wanderDir_ = VNorm(toStart);
+			}
+			else
+			{
+				//ランダム方向
+				float angle = GetRand(360) * DX_PI_F / 180.0f;
+				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
+			}
+		}
+
+		//徘徊
+		VECTOR moveVec = VScale(wanderDir_, speed_ * WANDER_SPEED_SCALE);
+		transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.quaRot = Quaternion::LookRotation(wanderDir_);
 	}
 	
 }
@@ -469,6 +508,7 @@ void EnemyBase::EnemyToPlayer(void)
 	if (AsoUtility::IsHitSpheres(attackCollisionPos_, attackCollisionRadius_, playerCenter_, playerRadius_)
 		&& player_->pstate_ != Player::PlayerState::DOWN)
 	{
+		isAttack_ = true;
 		isAttack_P = true;
 		ChangeState(STATE::ATTACK);
 	}

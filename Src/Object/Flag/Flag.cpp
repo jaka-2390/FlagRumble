@@ -27,7 +27,7 @@ void Flag::Init(void)
 	clearGauge_ = 0.0f;
 	clearGaugeMax_ = 100.0f;
 	flagRadius_ = 100.0f;
-	enemyCheckRadius_ = 200.0f;
+	enemyCheckRadius_ = 500.0f;
 }
 
 void Flag::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)

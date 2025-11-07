@@ -64,12 +64,18 @@ public:
 
 	//アニメーション関係
 	static constexpr float ANIM_SPEED = 20.0f;
+
 	//アニメーション番号
 	static constexpr int   ANIM_IDLE_INDEX = 0;
 	static constexpr int   ANIM_RUN_INDEX = 1;
 	static constexpr int   ANIM_ATTACK_INDEX = 2;
 	static constexpr int   ANIM_DAMAGE_INDEX = 3;
 	static constexpr int   ANIM_DEATH_INDEX = 4;
+
+	static constexpr float WANDER_CHANGE_TIME = 2.0f;		//徘徊時の方向変更間隔(秒)
+	static constexpr float WANDER_SPEED_SCALE = 0.3f;		//徘徊時の移動速度倍率
+	static constexpr float FRAME_DELTATIME = 1.0f / 60.0f;	//タイマーのフレーム基準(60fps想定)
+	static constexpr float MAX_RANGE = 500.0f;				//徘徊の最大範囲
 
 	//色
 	int white = 0xffffff; //白
@@ -216,6 +222,10 @@ protected:
 	VECTOR p_Diff_;			//プレイヤーの位置差分
 	float p_Dis_;			//プレイヤーまでの距離
 	float p_RadiusSum_;		//プレイヤーとの衝突半径の合計
+
+	VECTOR startPos_;							//出現時の位置
+	float changeDirTimer_ = 0.0f;				//向き変更タイマー
+	VECTOR wanderDir_ = { 1.0f, 0.0f, 0.0f };	//現在の移動方向
 
 	//更新系
 	void UpdateNone(void) {};		//更新ステップ
