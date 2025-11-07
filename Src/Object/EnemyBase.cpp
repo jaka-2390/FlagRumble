@@ -612,10 +612,14 @@ void EnemyBase::DrawDebug(void)
 	DrawSphere3D(a, attackCollisionRadius_, 8, yellow, yellow, false);
 
 #endif //DEBUG
+
 }
 
 void EnemyBase::DrawDebugSearchRange(void)
 {
+
+#ifdef _DEBUG
+
 	VECTOR centerPos = transform_.pos;
 	float radius = VIEW_RANGE;
 	int segments = 60;
@@ -654,4 +658,7 @@ void EnemyBase::DrawDebugSearchRange(void)
 		DrawTriangle3D(centerPos, p1, p2, color, false);
 	}
 	DrawSphere3D(centerPos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
+
+#endif //DEBUG
+
 }
