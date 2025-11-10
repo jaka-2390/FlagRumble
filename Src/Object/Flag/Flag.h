@@ -13,6 +13,10 @@ public:
 	void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);	//更新処理
 	void Draw(void);												//描画処理
 
+	bool IsFlagClear() const;
+
+	VECTOR GetPosition() const;
+
 	bool SpawnEnemies(const VECTOR& playerPos) const; // 敵を出すべきか判定
 
 	void SetEnemySpawned(bool spawned); // 出現済みをセット
@@ -24,6 +28,11 @@ private:
 
 	//円との距離
 	float DistanceSqXZ(const VECTOR& a, const VECTOR& b) const;
+
+	//円のデバッグ
+	void DrawCircleOnMap(VECTOR center, float radius, int color);
+	
+	void DrawGauge3D(VECTOR center, float gaugeRate);
 
 	int modelIdB_;		//モデルの格納(苗木)
 
