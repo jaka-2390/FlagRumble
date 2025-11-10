@@ -6,7 +6,7 @@
 #include "MiniMap.h"
 
 MiniMap::MiniMap(float worldSize, int screenSize, int mapPosX, int mapPosY)
-    : mapPixelSize(screenSize), mapPosX(mapPosX), mapPosY(mapPosY), imgMapTree_()
+    : mapPixelSize(screenSize), mapPosX(mapPosX), mapPosY(mapPosY)
 {
     worldHalfSize = worldSize / HALF_DIVISOR_F;
     scale = static_cast<float>(mapPixelSize) / worldSize;
@@ -14,8 +14,6 @@ MiniMap::MiniMap(float worldSize, int screenSize, int mapPosX, int mapPosY)
 
 void MiniMap::Init(void)
 {
-    //âÊëúì«Ç›çûÇ›
-    imgMapTree_ = LoadGraph("Data/Image/MapTree.png");
 }
 
 void MiniMap::Draw(const MapVector2& playerPos, float playerAngleRad,
@@ -46,10 +44,6 @@ void MiniMap::DrawBackground()
 
     //íÜêgÇóŒÇ≈ìhÇÈ
     DrawCircle(centerX, centerY, innerRadius, GREEN, TRUE);
-
-    //TreeâÊëú
-    DrawRotaGraph(centerX, centerY, MAP_TREE_SCALE, 0.0f, imgMapTree_, true);
-
 }
 
 void MiniMap::DrawCameraViewCone(const MapVector2& playerPos, float cameraAngleRad)

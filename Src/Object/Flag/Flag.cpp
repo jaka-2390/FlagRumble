@@ -18,7 +18,6 @@ void Flag::Init(void)
 	scl_ = { 3.0f, 2.5f, 3.0f };							//大きさ
 	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
 
-	circleVisible_ = true;
 	flagVisible_ = false;
 	flagClear_ = false;
 	enemySpawned_ = false;
@@ -38,12 +37,8 @@ void Flag::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<Ene
 void Flag::Draw(void)
 {
 	// 円を表示
-	if (circleVisible_)
-	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
-		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
-	}
-
+	DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
+		
 	// フラッグを表示
 	if (flagVisible_)
 	{
@@ -52,6 +47,10 @@ void Flag::Draw(void)
 		MV1SetRotationXYZ(modelIdB_, rot_);
 		MV1SetPosition(modelIdB_, pos_);
 		MV1DrawModel(modelIdB_);*/
+	}
+	else if(!enemyNear_)
+	{
+		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
 	}
 }
 

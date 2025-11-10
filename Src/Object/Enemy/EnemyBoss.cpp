@@ -38,6 +38,7 @@ void EnemyBoss::SetParam(void)
 	isAlive_ = true;	// ‰Šú‚Í¶‘¶ó‘Ô
 
 	hp_ = BOSS_MAX_HP;	// HP‚Ìİ’è
+	maxHp_ = BOSS_MAX_HP;
 
 	attackPow_ = ATTACK_POW;	//UŒ‚—Í
 

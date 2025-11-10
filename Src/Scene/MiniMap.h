@@ -82,9 +82,6 @@ private:
     int mapPosX, mapPosY;     //ミニマップの画面上の描画位置（左上）
     float scale;              //ワールド座標からミニマップ座標へのスケーリング係数
 
-    //画像
-    int imgMapTree_;
-
     //Map背景描画
     void DrawBackground();
 

@@ -201,6 +201,7 @@ protected:
 	VECTOR attackCollisionPos_; //紫の球体の移動後座標
 
 	int hp_;	// 体力
+	int maxHp_;	//最大体力
 	int attackPow_; //攻撃力
 
 	bool isAlive_;	//生存判定
@@ -222,6 +223,7 @@ protected:
 	VECTOR p_Diff_;			//プレイヤーの位置差分
 	float p_Dis_;			//プレイヤーまでの距離
 	float p_RadiusSum_;		//プレイヤーとの衝突半径の合計
+	bool encounter_;		//プレイヤーと接敵
 
 	VECTOR startPos_;							//出現時の位置
 	float changeDirTimer_ = 0.0f;				//向き変更タイマー
@@ -238,6 +240,7 @@ protected:
 	void ChasePlayer(void);	//プレイヤーを追いかける
 
 	void DrawDamage();	//ダメージ画像の描画
+	void DrawHpGauge3D(VECTOR center, float gaugeRate);	//HPバー
 
 	//攻撃関係
 	void AttackCollisionPos(void);	//攻撃用関数

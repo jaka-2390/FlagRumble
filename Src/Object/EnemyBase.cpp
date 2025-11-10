@@ -53,6 +53,8 @@ void EnemyBase::Init(void)
 
 	startPos_ = transform_.pos;
 
+	encounter_ = false;
+
 	damageCnt_ = 0;
 
 	damage1img_ = LoadGraph("Data/Image/1.png");
@@ -221,6 +223,8 @@ void EnemyBase::ChasePlayer(void)
 
 		//方向からクォータニオンに変換
 		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+
+		encounter_ = false;
 	}
 	//エネミーの視野内に入ったら追いかける
 	else if (distance <= VIEW_RANGE
@@ -234,6 +238,9 @@ void EnemyBase::ChasePlayer(void)
 
 		//方向からクォータニオンに変換
 		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+
+		//プレイヤーと接敵
+		encounter_ = true;
 	}
 	else
 	{
@@ -266,6 +273,9 @@ void EnemyBase::ChasePlayer(void)
 			}
 		}
 
+		//プレイヤーから離れた
+		encounter_ = false;
+
 		//徘徊
 		VECTOR moveVec = VScale(wanderDir_, speed_ * WANDER_SPEED_SCALE);
 		transform_.pos = VAdd(transform_.pos, moveVec);
@@ -289,6 +299,14 @@ void EnemyBase::Draw(void)
 
 	MV1DrawModel(transform_.modelId);
 	DrawDamage();
+
+	//HPバー描画
+	if (encounter_)
+	{
+		float gaugeRate = static_cast<float>(hp_) / static_cast<float>(maxHp_);
+		gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f); //範囲制限
+		DrawHpGauge3D(transform_.pos, gaugeRate);
+	}
 
 	//デッバグ
 	DrawDebug();
@@ -453,6 +471,26 @@ void EnemyBase::DrawDamage()
 			damageCnt_++;
 		}
 	}
+}
+
+void EnemyBase::DrawHpGauge3D(VECTOR center, float gaugeRate)
+{
+	//HPバーを敵の上(少し高い位置)に表示
+	VECTOR gaugePos = VAdd(center, VGet(0.0f, 80.0f, 0.0f));
+	VECTOR screenPos = ConvWorldPosToScreenPos(gaugePos);
+
+	int barWidth = 80;
+	int barHeight = 8;
+
+	int x = (int)screenPos.x - barWidth / 2;
+	int y = (int)screenPos.y - 200; //少し上にオフセット
+
+	//外枠
+	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, GetColor(255, 255, 255), FALSE);
+
+	//中身
+	int fillWidth = (int)(barWidth * gaugeRate);
+	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(255, 0, 0), TRUE);
 }
 
 

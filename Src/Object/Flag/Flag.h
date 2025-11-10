@@ -41,7 +41,6 @@ private:
 	VECTOR rot_;	//‰ñ“]
 	VECTOR dir_;	//ˆÚ“®—p
 
-	bool circleVisible_;	//‰~‚Ì•`‰æ
 	bool flagVisible_;		//flag‚Ì•`‰æ
 	bool flagClear_;		//’DŠÒ‚µ‚½‚©
 	bool enemySpawned_;		//“G‚ğ‚·‚Å‚Éo‚µ‚½‚©

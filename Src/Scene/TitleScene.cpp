@@ -218,10 +218,10 @@ void TitleScene::Draw(void)
 	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, black, true);
 
 	// タイトルロゴ表示
-	int titleW, titleH;
+	/*int titleW, titleH;
 	GetGraphSize(imgTitle_, &titleW, &titleH);
 	DrawRotaGraph((Application::SCREEN_SIZE_X / 2), IMG_TITLE_HEIGHT, IMG_TITLE_SIZE, 0, imgTitle_, true);
-	DrawRotaGraph(IMG_3D_WIDTH, cnt_3D - IMG_3D_HEIGHT, IMG_3D_SIZE, 0, img3D_, true);
+	DrawRotaGraph(IMG_3D_WIDTH, cnt_3D - IMG_3D_HEIGHT, IMG_3D_SIZE, 0, img3D_, true);*/
 
 #pragma region		ボタン設定
 	const int yGame = BASE_Y;
