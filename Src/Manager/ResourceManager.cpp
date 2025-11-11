@@ -40,10 +40,6 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "BackTitle.png");
 	resourcesMap_.emplace(SRC::BACK_TITLE, std::move(res));
 
-	// ゲーム画面のUI
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "GameUI1.png");
-	resourcesMap_.emplace(SRC::GAMEUI_1, std::move(res));
-
 	// タイトルに戻る
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "GoTitle.png");
 	resourcesMap_.emplace(SRC::GOTITLE, std::move(res));

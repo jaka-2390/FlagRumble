@@ -23,6 +23,7 @@
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
+#include "../Object/Flag/Flag.h"
 #include "MiniMap.h"
 #include "GameScene.h"
 
@@ -33,7 +34,6 @@ GameScene::GameScene(void)
 	player_ = nullptr;
 	skyDome_ = nullptr;
 	stage_ = nullptr;
-	imgGameUi1_ = -1;
 	imgOpeGear_ = -1;
 }
 
@@ -74,7 +74,6 @@ void GameScene::Init(void)
 	flagManager_->Init();
 
 	//画像
-	imgGameUi1_ = resMng_.Load(ResourceManager::SRC::GAMEUI_1).handleId_;
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
 
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
@@ -139,10 +138,26 @@ void GameScene::Update(void)
 	{
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			VECTOR flagPos = flagManager_->GetFlagPosition(i);
-			EnemyCreateAt(flagPos, 1); //各旗の周囲に1体
+			Flag* flag = flagManager_->GetFlag(i);
+			if (!flag) continue;
+
+			// FlagのEnemyTypeをEnemyBase::TYPEに変換
+			EnemyBase::TYPE type;
+			switch (flag->GetEnemyType())
+			{
+			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
+			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
+			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
+			default:                      type = EnemyBase::TYPE::DOG; break;
+			}
+
+			// 敵生成
+			VECTOR flagPos = flag->GetPosition();
+			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
 		}
 	}
+
+	SpawnCactus();
 
 	// フラッグでクリアしたらシーン遷移
 	int cleared = flagManager_->GetClearedFlagCount();
@@ -190,18 +205,6 @@ void GameScene::Draw(void)
 			uiFadeStart_ = true;
 			uiFadeFrame_ = 0;
 		}
-	}
-	if (!uiFadeStart_)
-	{
-		//フェード前（通常表示）
-		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
-	}
-	else if (uiFadeFrame_ < ONE_SECOND_FRAME)
-	{
-		//フェード中（60フレームで徐々に消す）
-		int alpha = static_cast<int>(255 * (ONE_SECOND_FRAME - uiFadeFrame_) / ONE_SECOND_FRAME);
-		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
-		uiFadeFrame_++;
 	}
 
 	if (isPaused_)
@@ -330,7 +333,7 @@ void GameScene::EnemyCreate(int count)
 	}
 }
 
-void GameScene::EnemyCreateAt(VECTOR flagPos, int count)
+void GameScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
 {
 	for (int i = 0; i < count; ++i)
 	{
@@ -338,7 +341,26 @@ void GameScene::EnemyCreateAt(VECTOR flagPos, int count)
 		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
 		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
 
-		auto enemy = std::make_shared<EnemyDog>();
+		std::shared_ptr<EnemyBase> enemy;
+
+		switch (type)
+		{
+		case EnemyBase::TYPE::SABO:
+		{
+			auto cactus = std::make_shared<EnemyCactus>();
+			cactus->SetFlagManager(flagManager_.get());
+			enemy = cactus;  // EnemyBase型に代入
+			break;
+		}
+			
+		case EnemyBase::TYPE::DOG:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		default:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		}
+
 		enemy->SetGameScene(this);
 		enemy->SetPos(randPos);
 		enemy->SetPlayer(player_);
@@ -370,6 +392,41 @@ void GameScene::SpawnBoss(void)
 
 	// 敵リストに追加
 	enemys_.emplace_back(std::move(boss));
+}
+
+void GameScene::SpawnCactus(void)
+{
+	cactusSpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+
+	if (cactusSpawnTimer_ >= CACTUS_SPAWN_INTERVAL)
+	{
+		cactusSpawnTimer_ = 0.0f; // リセット
+
+		// ENEMY状態の旗を探す
+		std::vector<Flag*> enemyFlags;
+		int flagCount = flagManager_->GetFlagMax();
+		for (int i = 0; i < flagCount; ++i)
+		{
+			Flag* flag = flagManager_->GetFlag(i);
+			if (flag && flag->GetState() == Flag::STATE::ENEMY)
+			{
+				enemyFlags.push_back(flag);
+			}
+		}
+
+		if (!enemyFlags.empty())
+		{
+			// ランダムで1つ選ぶ
+			int randomIndex = GetRand((int)enemyFlags.size() - 1);
+			Flag* targetFlag = enemyFlags[randomIndex];
+
+			if (targetFlag)
+			{
+				VECTOR flagPos = targetFlag->GetPosition();
+				EnemyCreateAt(flagPos, 1, EnemyBase::TYPE::SABO);
+			}
+		}
+	}
 }
 
 bool GameScene::PauseMenu(void)

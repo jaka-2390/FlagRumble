@@ -13,7 +13,6 @@ public:
     virtual void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies) = 0;
     virtual void Draw() = 0;
 
-    bool IsFlagClear() const;
     VECTOR GetPosition() const;
 
 protected:
@@ -24,7 +23,6 @@ protected:
 
     bool circleVisible_ = false;
     bool flagVisible_ = false;
-    bool flagClear_ = false;
     float clearGauge_ = 0.0f;
     float clearGaugeMax_ = 100.0f;
     float flagRadius_ = 100.0f;

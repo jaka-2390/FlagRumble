@@ -1,10 +1,12 @@
 #include <DxLib.h>
 #include "EnemyCactus.h"
-#include "../Flag/Flag.h"
 #include "../../Application.h"
 #include "../Common/AnimationController.h"
 #include "../../Manager/ResourceManager.h"
+#include "../../Manager/SceneManager.h"
+#include "../../Manager/FlagManager.h"
 #include "../../Utility/AsoUtility.h"
+#include "../Player.h"
 
 EnemyCactus::EnemyCactus() :EnemyBase()
 {
@@ -52,46 +54,96 @@ void EnemyCactus::SetParam(void)
 	ChangeState(STATE::PLAY);
 }
 
-//void EnemyCactus::ChasePlayer(void)
-//{
-//	if (!flags_ || flags_->empty()) return;
-//
-//	// 一番近いフラッグを探す
-//	float nearestDistSq = 9999999.0f;
-//	std::shared_ptr<Flag> nearestFlag = nullptr;
-//
-//	for (auto& flag : *flags_) {
-//		float distSq = VSize(VSub(flag->GetPosition(), transform_.pos));
-//		if (distSq < nearestDistSq) {
-//			nearestDistSq = distSq;
-//			nearestFlag = flag;
-//		}
-//	}
-//
-//	if (!nearestFlag) return;
-//
-//	VECTOR toFlag = VSub(nearestFlag->GetPosition(), transform_.pos);
-//	toFlag.y = 0.0f;
-//	float dist = VSize(toFlag);
-//
-//	// まだ距離があるなら近づく
-//	if (dist > 50.0f)
-//	{
-//		VECTOR dir = VNorm(toFlag);
-//		transform_.pos = VAdd(transform_.pos, VScale(dir, speed_));
-//		transform_.quaRot = Quaternion::LookRotation(dir);
-//
-//		// アニメーション切替（必要なら）
-//		if (animtype_ != ANIM_TYPE::RUN) {
-//			animationController_->Play((int)ANIM_TYPE::RUN, true);
-//			animtype_ = ANIM_TYPE::RUN;
-//		}
-//	}
-//	else
-//	{
-//		// 到着したら、プレイヤー陣地を敵陣地に変更
-//		if (nearestFlag->GetState() == Flag::State::PLAYER) {
-//			nearestFlag->SetState(Flag::State::ENEMY);
-//		}
-//	}
-//}
+void EnemyCactus::ChasePlayer(void)
+{
+    if (!isAlive_) return;
+
+    //現在のアニメーションと違う場合のみRUNアニメーションを再生する
+    if (animtype_ != ANIM_TYPE::RUN)
+    {
+        animationController_->Play((int)ANIM_TYPE::RUN, true);
+    }
+
+    Flag* targetFlag = nullptr;
+
+    // プレイヤーが持っている旗を探す
+    for (int i = 0; i < flagManager_->GetFlagMax(); ++i)
+    {
+        Flag* f = flagManager_->GetFlag(i);
+        if (f && f->IsOwnedByPlayer())
+        {
+            targetFlag = f;
+            break;
+        }
+    }
+
+    VECTOR targetPos;
+    if (targetFlag)
+    {
+        targetPos = targetFlag->GetPosition();
+
+        // 旗に近づいたら奪う
+        float distSq = VSize(VSub(transform_.pos, targetPos));
+        if (distSq < 100.0f) // 適当な範囲
+        {
+			/*captureTimer_ += scnMng_.GetDeltaTime();
+
+			if (captureTimer_ >= FLAG_CHANGE)
+			{*/
+				targetFlag->SetState(Flag::STATE::ENEMY);
+				captureTimer_ = 0.0f;
+			/*}*/
+        }
+
+		// 移動
+		VECTOR toTarget = VSub(targetPos, transform_.pos);
+		toTarget.y = 0;
+		VECTOR moveVec = VScale(VNorm(toTarget), speed_);
+		transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.quaRot = Quaternion::LookRotation(VNorm(toTarget));
+    }
+    else
+    {
+		//タイマー
+		changeDirTimer_ += scnMng_.GetDeltaTime();
+
+		//出現位置を基準にする
+		float maxRange = MAX_RANGE;
+
+		//現在の出現位置からの距離
+		float distanceStart = VSize(VSub(transform_.pos, startPos_));
+
+		//2秒ごとに方向変更
+		if (changeDirTimer_ >= WANDER_CHANGE_TIME || distanceStart > maxRange)
+		{
+			changeDirTimer_ = 0.0f;
+
+			VECTOR toStart = VSub(startPos_, transform_.pos);
+
+			if (distanceStart > maxRange)
+			{
+				//範囲外ならスタート地点へ
+				wanderDir_ = VNorm(toStart);
+			}
+			else
+			{
+				//ランダム方向
+				float angle = GetRand(360) * DX_PI_F / 180.0f;
+				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
+			}
+		}
+
+		//プレイヤーから離れた
+		encounter_ = false;
+
+		//徘徊
+		VECTOR moveVec = VScale(wanderDir_, speed_ * WANDER_SPEED_SCALE);
+		transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.quaRot = Quaternion::LookRotation(wanderDir_);
+    }
+}
+
+void EnemyCactus::SetFlagManager(FlagManager* manager)
+{
+    flagManager_ = manager;
+}

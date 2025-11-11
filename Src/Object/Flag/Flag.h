@@ -6,20 +6,40 @@ class Flag : public FlagBase
 
 public:
 
-	Flag(VECTOR pos);							//コンストラクタ
+	enum class ENEMY_TYPE
+	{
+		NONE,
+		DOG,
+		SABO,
+		BOSS
+	};
+
+	enum class STATE
+	{
+		PLAYER,     // プレイヤーが所有
+		ENEMY       // 敵が所有
+	};
+
+	Flag(VECTOR pos, ENEMY_TYPE type);	//コンストラクタ
 	~Flag(void);						//デストラクタ
 
 	void Init(void);												//初期化処理
 	void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);	//更新処理
 	void Draw(void);												//描画処理
 
-	bool IsFlagClear() const;
-
 	VECTOR GetPosition() const;
+
+	ENEMY_TYPE GetEnemyType() const { return enemyType_; }
 
 	bool SpawnEnemies(const VECTOR& playerPos) const; // 敵を出すべきか判定
 
 	void SetEnemySpawned(bool spawned); // 出現済みをセット
+
+	void SetState(STATE state) { state_ = state; }
+	STATE GetState() const { return state_; }
+
+	bool IsOwnedByPlayer() const { return state_ == STATE::PLAYER; }
+	bool IsOwnedByEnemy()  const { return state_ == STATE::ENEMY; }
 
 private:
 
@@ -34,6 +54,9 @@ private:
 	
 	void DrawGauge3D(VECTOR center, float gaugeRate);
 
+	STATE state_ = STATE::ENEMY;
+	ENEMY_TYPE enemyType_;
+
 	int modelIdB_;		//モデルの格納(苗木)
 
 	VECTOR scl_;	//おおきさ
@@ -42,7 +65,6 @@ private:
 	VECTOR dir_;	//移動用
 
 	bool flagVisible_;		//flagの描画
-	bool flagClear_;		//奪還したか
 	bool enemySpawned_;		//敵をすでに出したか
 	bool playerInRange_;	//プレイヤーが円内にいるか
 	bool enemyNear_;		//敵がflagの近くにいるか

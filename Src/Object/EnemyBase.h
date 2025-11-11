@@ -134,6 +134,7 @@ public:
 	virtual void Draw(void);			//描画処理(毎フレーム実行)
 	virtual void DrawBossHpBar(void) {};	//ボスのHPバー
 	virtual void Release(void);			//解放処理(最後の１回のみ実行)
+	virtual void ChasePlayer(void);		//プレイヤーを追いかける
 
 	void SetPos(VECTOR pos);	//座標の設定
 	STATE GetState(void);		//状態獲得
@@ -236,8 +237,6 @@ protected:
 	virtual void UpdateAttack(void);//アタック時の更新処理
 	virtual void UpdateDamage(void);//ダメージ時の更新処理
 	virtual void UpdateDeath(void);	//死んだ時の更新処理
-
-	void ChasePlayer(void);	//プレイヤーを追いかける
 
 	void DrawDamage();	//ダメージ画像の描画
 	void DrawHpGauge3D(VECTOR center, float gaugeRate);	//HPバー

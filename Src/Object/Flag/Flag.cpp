@@ -2,7 +2,7 @@
 #include"../../Application.h"
 #include "Flag.h"
 
-Flag::Flag(VECTOR pos):pos_(pos)
+Flag::Flag(VECTOR pos, ENEMY_TYPE type):pos_(pos), enemyType_(type)
 {
 }
 
@@ -19,7 +19,6 @@ void Flag::Init(void)
 	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
 
 	flagVisible_ = false;
-	flagClear_ = false;
 	enemySpawned_ = false;
 	playerInRange_ = false;
 	enemyNear_ = false;
@@ -32,15 +31,25 @@ void Flag::Init(void)
 void Flag::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
 	CheckCircle(playerPos, enemies);
+
+	if (enemyNear_)
+	{
+		state_ = STATE::ENEMY;
+	}
+	else if(!enemyNear_ && IsOwnedByPlayer())
+	{
+		state_ = STATE::PLAYER;
+	}
 }
 
 void Flag::Draw(void)
 {
 	// 円を表示
-	DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
-		
-	// フラッグを表示
-	if (flagVisible_)
+	if (IsOwnedByEnemy())
+	{
+		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
+	}
+	else if (flagVisible_ && IsOwnedByPlayer())
 	{
 		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
 		/*MV1SetScale(modelIdB_, scl_);
@@ -48,7 +57,8 @@ void Flag::Draw(void)
 		MV1SetPosition(modelIdB_, pos_);
 		MV1DrawModel(modelIdB_);*/
 	}
-	else if(!enemyNear_)
+	
+	if(!enemyNear_ && IsOwnedByEnemy())
 	{
 		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
 	}
@@ -56,7 +66,7 @@ void Flag::Draw(void)
 
 void Flag::CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
-	if (flagClear_) return;
+	if (IsOwnedByPlayer()) return;
 
 	// 円の中心とプレイヤーの距離を計算
 	playerInRange_ = false;
@@ -88,8 +98,8 @@ void Flag::CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_pt
 		if (clearGauge_ >= clearGaugeMax_)
 		{
 			clearGauge_ = clearGaugeMax_;
+			state_ = STATE::PLAYER;
 			flagVisible_ = true; //フラッグ登場
-			flagClear_ = true;
 		}
 	}
 	else
@@ -141,11 +151,6 @@ void Flag::DrawGauge3D(VECTOR center, float gaugeRate)
 	// 中身
 	int fillWidth = (int)(barWidth * gaugeRate);
 	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(0, 255, 0), TRUE);
-}
-
-bool Flag::IsFlagClear() const
-{
-	return flagClear_;
 }
 
 VECTOR Flag::GetPosition() const

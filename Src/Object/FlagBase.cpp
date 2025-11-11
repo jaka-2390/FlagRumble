@@ -1,10 +1,5 @@
 #include "FlagBase.h"
 
-bool FlagBase::IsFlagClear() const
-{
-    return flagClear_;
-}
-
 VECTOR FlagBase::GetPosition() const
 {
     return pos_;

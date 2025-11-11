@@ -19,7 +19,6 @@ public:
 		CURSOR,
 		PLAY,
 		RULE,
-		GAMEUI_1,
 		UPDOWN,
 		GOTITLE,
 		GOGAME,

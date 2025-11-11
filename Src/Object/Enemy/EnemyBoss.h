@@ -10,9 +10,9 @@ public:
 	static constexpr  float SPEED = 2.0f;
 
 	//ボスの最大HP
-	static constexpr int BOSS_MAX_HP = 10;
+	static constexpr int BOSS_MAX_HP = 20;
 
-	// HPバー表示
+	//HPバー表示
 	static constexpr int BOSS_HP_BAR_WIDTH = 600;
 	static constexpr int BOSS_HP_BAR_HEIGHT = 20;
 	static constexpr int BOSS_HP_BAR_Y = 80;
