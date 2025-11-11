@@ -130,33 +130,6 @@ void GameScene::Update(void)
 		enemy->Update();
 	}
 
-	/*enCounter++;
-	if (enCounter > ENCOUNT)
-	{
-		enCounter = 0;
-		if (ENEMY_MAX >= enemys_.size())
-		{
-			int spawnCount = 1; //‚Ü‚Æ‚ß‚Äo‚µ‚½‚¢”
-			//EnemyCreate(spawnCount);
-		}
-	}*/
-
-	//“G‘S–Åƒ`ƒFƒbƒN
-	if (!enemys_.empty()) {
-		allEnemyDefeated_ = true;
-		for (auto& enemy : enemys_)
-		{
-			if (enemy->IsAlive()) {
-				allEnemyDefeated_ = false;
-				break;
-			}
-		}
-	}
-	else {
-		//“G‚ª‚Ü‚¾oŒ»‚µ‚Ä‚¢‚È‚¢Žž‚Ífalse‚É‚µ‚Ä‚¨‚­
-		allEnemyDefeated_ = false;
-	}
-	
 	// “G‘S–Åî•ñ‚ðFlag‚É“`‚¦‚é
 	flagManager_->Update(player_->GetTransform().pos, enemys_);
 

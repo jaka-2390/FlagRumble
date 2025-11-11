@@ -137,7 +137,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::SKY_DOME, std::move(res));
 
 	// Å‰‚Ì˜f¯
-	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/testStage.mv1");
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Stage.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, std::move(res));
 
 	// ‘«‰Œ

@@ -1,4 +1,6 @@
+#include <DxLib.h>
 #include "EnemyCactus.h"
+#include "../Flag/Flag.h"
 #include "../../Application.h"
 #include "../Common/AnimationController.h"
 #include "../../Manager/ResourceManager.h"
@@ -49,3 +51,47 @@ void EnemyCactus::SetParam(void)
 	// 初期状態
 	ChangeState(STATE::PLAY);
 }
+
+//void EnemyCactus::ChasePlayer(void)
+//{
+//	if (!flags_ || flags_->empty()) return;
+//
+//	// 一番近いフラッグを探す
+//	float nearestDistSq = 9999999.0f;
+//	std::shared_ptr<Flag> nearestFlag = nullptr;
+//
+//	for (auto& flag : *flags_) {
+//		float distSq = VSize(VSub(flag->GetPosition(), transform_.pos));
+//		if (distSq < nearestDistSq) {
+//			nearestDistSq = distSq;
+//			nearestFlag = flag;
+//		}
+//	}
+//
+//	if (!nearestFlag) return;
+//
+//	VECTOR toFlag = VSub(nearestFlag->GetPosition(), transform_.pos);
+//	toFlag.y = 0.0f;
+//	float dist = VSize(toFlag);
+//
+//	// まだ距離があるなら近づく
+//	if (dist > 50.0f)
+//	{
+//		VECTOR dir = VNorm(toFlag);
+//		transform_.pos = VAdd(transform_.pos, VScale(dir, speed_));
+//		transform_.quaRot = Quaternion::LookRotation(dir);
+//
+//		// アニメーション切替（必要なら）
+//		if (animtype_ != ANIM_TYPE::RUN) {
+//			animationController_->Play((int)ANIM_TYPE::RUN, true);
+//			animtype_ = ANIM_TYPE::RUN;
+//		}
+//	}
+//	else
+//	{
+//		// 到着したら、プレイヤー陣地を敵陣地に変更
+//		if (nearestFlag->GetState() == Flag::State::PLAYER) {
+//			nearestFlag->SetState(Flag::State::ENEMY);
+//		}
+//	}
+//}

@@ -281,7 +281,6 @@ void EnemyBase::ChasePlayer(void)
 		transform_.pos = VAdd(transform_.pos, moveVec);
 		transform_.quaRot = Quaternion::LookRotation(wanderDir_);
 	}
-	
 }
 
 void EnemyBase::Draw(void)

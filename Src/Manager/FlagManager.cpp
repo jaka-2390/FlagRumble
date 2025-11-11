@@ -4,9 +4,9 @@ void FlagManager::Init()
 {
     flags_.clear();
 
-    auto flag1 = std::make_unique<Flag>(VGet(-660.0f, 254.0f, -100.0f));
-    auto flag2 = std::make_unique<Flag>(VGet(400.0f, 254.0f, 2000.0f));
-    auto flag3 = std::make_unique<Flag>(VGet(1400.0f, 254.0f, -3000.0f));
+    auto flag1 = std::make_unique<Flag>(VGet(-2000.0f, 254.0f, 2000.0f));
+    auto flag2 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 4000.0f));
+    auto flag3 = std::make_unique<Flag>(VGet(2300.0f, 254.0f, 2000.0f));
 
     flags_.push_back(std::move(flag1));
     flags_.push_back(std::move(flag2));

@@ -150,7 +150,7 @@ void TitleScene::Update(void)
 			SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
 		}
 		else if (selectedIndex_ == 1) {
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::DEMO);
+			//SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::DEMO);
 			SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
 		}
 		else if (selectedIndex_ == 2) {
@@ -257,7 +257,7 @@ void TitleScene::Draw(void)
 	//テキスト
 	SetFontSize(DEFAULT_FONT_SIZE * 3.75);
 	DrawString(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white);
-	DrawString(TEXT_WIDTH, TEXT_HEIGHT_2, "神様のお告げ", white);
+	DrawString(TEXT_WIDTH, TEXT_HEIGHT_2, "ルールの説明", white);
 	DrawString(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲームを終了", white);
 
 	SetFontSize(DEFAULT_FONT_SIZE);

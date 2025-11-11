@@ -890,9 +890,7 @@ bool Player::IsEndLanding(void)
 	int animType = animationController_->GetPlayType();
 
 	//現在のアニメーションが ATTACK1,2 または EXATTACK のいずれかで、まだ終了していない場合
-	if ((animType != (int)ANIM_TYPE::NORMALATTACK || animType == (int)ANIM_TYPE::SLASHATTACK
-		|| animType == (int)ANIM_TYPE::EXATTACK)
-		&& !animationController_->IsEnd())
+	if (animType != (int)ANIM_TYPE::NORMALATTACK)
 	{
 		return ret;
 	}
