@@ -1,142 +1,457 @@
-#include<DxLib.h>
-#include"../Application.h"
-#include"../Manager/SceneManager.h"
+#include <DxLib.h>
+#include "../Utility/AsoUtility.h"
+#include "../Application.h"
+#include "../Manager/SceneManager.h"
+#include "../Manager/Camera.h"
 #include "../Manager/InputManager.h"
-#include"../Manager/SoundManager.h"
-#include"DemoScene.h"
+#include "../Manager/SoundManager.h"
+#include "../Manager/GravityManager.h"
+#include "../Manager/ResourceManager.h"
+#include "../Manager/FlagManager.h"
+#include "../Object/Common/Capsule.h"
+#include "../Object/Common/Collider.h"
+#include "../Object/SkyDome.h"
+#include "../Object/Stage.h"
+#include "../Object/Player.h"
+#include "../Object/EnemyBase.h"
+#include "../Object/Enemy/EnemyCactus.h"
+#include "../Object/Enemy/EnemyDog.h"
+#include "../Object/Enemy/EnemyMimic.h"
+#include "../Object/Enemy/EnemyMushroom.h"
+#include "../Object/Enemy/EnemyOnion.h"
+#include "../Object/Enemy/EnemyThorn.h"
+#include "../Object/Enemy/EnemyVirus.h"
+#include "../Object/Enemy/EnemyBoss.h"
+#include "../Object/Planet.h"
+#include "../Object/Flag/Flag.h"
+#include "DemoScene.h"
 
 DemoScene::DemoScene(void)
 {
+	player_ = nullptr;
+	skyDome_ = nullptr;
+	stage_ = nullptr;
+	imgOpeGear_ = -1;
 }
+
 DemoScene::~DemoScene(void)
 {
 }
 
 void DemoScene::Init(void)
 {
-	old_ = 0;
-	now_ = 0;
-	demoSound_ = LoadMusicMem("sound/SE/set.mp3");
-	waku_ = LoadGraph("Data/Image/Demo/waku.png");
-	tree_ = LoadGraph("Data/Image/Demo/tree.png");
-	water_ = LoadGraph("Data/Image/Demo/water.png");
-	player_ = LoadGraph("Data/Image/Demo/player.png");
-	god_[FRONT] = LoadGraph("Data/Image/Demo/God/god.png");
-	god_[RIGHT] = LoadGraph("Data/Image/Demo/God/goda.png");
-	god_[LEFT] = LoadGraph("Data/Image/Demo/God/godb.png");
-	god_[UP] = LoadGraph("Data/Image/Demo/God/godc.png");
-	god_[DOWN] = LoadGraph("Data/Image/Demo/God/godd.png");
-	tri_ = LoadGraph("Data/Image/Demo/tri.png");
-	gNo_ = 0;
-	txt_ = TXT;
-	cnt_ = 0;
+	cnt = 0;
+	//プレイヤー
+	player_ = std::make_shared<Player>();
+	GravityManager::GetInstance().SetPlayer(player_);
+	player_->Init();
+
+	//敵のモデル
+	//EnemyCreate(0);
+	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), SPAWN_RADIUS, false });
+	lastSpawnTime_ = GetNowCount();  //開始時の時間を記録
+
+	player_->SetEnemy(&enemys_);
+
+	//ステージ
+	stage_ = std::make_unique<Stage>(*player_);
+	stage_->Init();
+
+	//ステージの初期設定
+	stage_->ChangeStage(Stage::NAME::MAIN_PLANET);
+
+	//スカイドーム
+	skyDome_ = std::make_unique<SkyDome>(player_->GetTransform());
+	skyDome_->Init();
+
+	flagManager_ = std::make_shared<FlagManager>();
+	flagManager_->Init();
+
+	//画像
+	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
+
+	pauseImg_ = LoadGraph("Data/Image/pause.png");
+
+	pauseExplainImgs_[0] = resMng_.Load(ResourceManager::SRC::PAUSEOPE).handleId_;	//操作説明
+	pauseExplainImgs_[1] = resMng_.Load(ResourceManager::SRC::PAUSEITEM).handleId_;	//アイテム概要
+
+	//カウンタ
+	uiFadeStart_ = false;
+	uiFadeFrame_ = 0;
+	uiDisplayFrame_ = 0;
+
+	//ポーズ
+	isPaused_ = false;
+	pauseSelectIndex_ = 0;
+
+	//カメラのポーズ解除
+	camera_ = SceneManager::GetInstance().GetCamera().lock();
+	if (camera_) {
+		camera_->SetPaused(false); //← ここが重要！
+
+		//ミニマップ用カメラ
+		camera_->SetFollow(&player_->GetTransform());
+		camera_->ChangeMode(Camera::MODE::FOLLOW);
+	}
 
 	//音楽
-	SoundManager::GetInstance().Play(SoundManager::SRC::DEMO_BGM, Sound::TIMES::LOOP);
+	SoundManager::GetInstance().Play(SoundManager::SRC::GAME_BGM, Sound::TIMES::LOOP);
+
+	mainCamera->SetFollow(&player_->GetTransform());
+	mainCamera->ChangeMode(Camera::MODE::FOLLOW);
 }
 
 void DemoScene::Update(void)
 {
+	cnt++;
 	InputManager& ins = InputManager::GetInstance();
 
-	old_ = now_;
-	now_ = CheckHitKey(KEY_INPUT_RETURN);
+	if (PauseMenu()) return; //ポーズ中ならここで止める
 
-	if (ins.IsTrgDown(KEY_INPUT_RETURN))
+	//-------------------------
+	//通常時のゲーム進行（ポーズされてないときだけ）
+	//-------------------------
+
+	uiDisplayFrame_++;
+
+	skyDome_->Update();
+	stage_->Update();
+	player_->Update();
+
+	for (auto enemy : enemys_)
 	{
-		SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::FORCE_ONCE);
+		enemy->Update();
 	}
 
-	if (old_ == 0 && now_ == 1)
+	// 敵全滅情報をFlagに伝える
+	flagManager_->Update(player_->GetTransform().pos, enemys_);
+
+	//それぞれの旗に敵を生成
+	int flagCount = flagManager_->GetFlagMax();
+	for (int i = 0; i < flagCount; ++i)
 	{
-		PlayMusicMem(demoSound_, DX_PLAYTYPE_BACK);
-		txt_++;
-	}
-	if (txt_ == static_cast<int>(TXT::MAX) - 1)
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
+		if (ENEMY_MAX >= enemys_.size())
+		{
+			Flag* flag = flagManager_->GetFlag(i);
+			if (!flag) continue;
+
+			// FlagのEnemyTypeをEnemyBase::TYPEに変換
+			EnemyBase::TYPE type;
+			switch (flag->GetEnemyType())
+			{
+			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
+			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
+			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
+			default:                      type = EnemyBase::TYPE::DOG; break;
+			}
+
+			// 敵生成
+			VECTOR flagPos = flag->GetPosition();
+			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
+		}
 	}
 
-#pragma region god eye
-	if (txt_ >= 1)gNo_ = RIGHT;
-	if (txt_ >= 2)gNo_ = FRONT;
-	if (txt_ >= 4)gNo_ = DOWN;
-	if (txt_ >= 5)gNo_ = FRONT;
-	if (txt_ >= 7)gNo_ = LEFT;
-	if (txt_ >= 8)gNo_ = FRONT;
-	if (txt_ >= 9)gNo_ = DOWN;
-	if (txt_ >= 10)gNo_ = FRONT;
-	if (txt_ >= 13)gNo_ = UP;
-	if (txt_ >= 14)gNo_ = FRONT;
-	if (txt_ >= 15)gNo_ = LEFT;
-	if (txt_ >= 16)gNo_ = FRONT;
-#pragma endregion
+	SpawnCactus();
 
+	// フラッグでクリアしたらシーン遷移
+	int cleared = flagManager_->GetClearedFlagCount();
+	int total = flagManager_->GetFlagMax();
+
+	if (!bossSpawned_ && cleared >= total)
+	{
+		SpawnBoss();
+		bossSpawned_ = true;
+	}
+
+	ClearCheck();
 }
 
 void DemoScene::Draw(void)
 {
-	cnt_++;
-	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, black, true);//黒で覆う
+	skyDome_->Draw();
+	stage_->Draw();
+	for (auto enemy : enemys_)
+	{
+		enemy->Draw();
+	}
+	player_->Draw();
 
-#pragma region テキスト
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * -1 - FONT_SIZE * txt_, "使徒諸君おはよう　神だ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 0 - FONT_SIZE * txt_, "私を知っている？何を寝ぼけている。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 1 - FONT_SIZE * txt_, "お前は生まれ堕ちたばかりだろう。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 2 - FONT_SIZE * txt_, "まぁいい うまれてすぐだろうが神託だ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 3 - FONT_SIZE * txt_, "お前にはある使命を与える。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 4 - FONT_SIZE * txt_, "これから生まれる世界の礎となる植物", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 5 - FONT_SIZE * txt_, "「ユグドラシル」の守護と育成だ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 6 - FONT_SIZE * txt_, "植物の生命力を狙うモンスターを倒し、", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 7 - FONT_SIZE * txt_, "その生命力を奪って植物に注ぎ込め。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 8 - FONT_SIZE * txt_, "戦い方がわからない？", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 9 - FONT_SIZE * txt_, "お前には私の力の一部を渡してある。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 10 - FONT_SIZE * txt_, "矢印キーで周囲を見渡して敵を見つけて", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 11 - FONT_SIZE * txt_, "WASDキーで近づいてEキーで攻撃しろ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 12 - FONT_SIZE * txt_, "左Shiftを使えば少しは早く移動できる。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 13 - FONT_SIZE * txt_, "あぁ　それと、", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 14 - FONT_SIZE * txt_, "敵の攻撃で倒れても私の加護で蘇らせる。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 15 - FONT_SIZE * txt_, "だから何があっても成し遂げろ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 16 - FONT_SIZE * txt_, "神の使徒たるお前に失敗は許されない。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 17 - FONT_SIZE * txt_, "しくじれば神罰だ。", white);
-	DrawString(START_TXT_X, START_TXT_Y + FONT_SIZE * 18 - FONT_SIZE * txt_, "頼んだぞ。", white);
+	for (auto enemy : enemys_)
+	{
+		enemy->DrawBossHpBar();
+	}
+
+	flagManager_->Draw();
+
+	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
+
+	//入力チェック or 時間経過でフェード開始
+	if (!uiFadeStart_)
+	{
+		if ((CheckHitKey(KEY_INPUT_W)
+			|| CheckHitKey(KEY_INPUT_A)
+			|| CheckHitKey(KEY_INPUT_S)
+			|| CheckHitKey(KEY_INPUT_D))
+			|| uiDisplayFrame_ >= AUTO_FADE)  //時間経過による自動フェード
+		{
+			uiFadeStart_ = true;
+			uiFadeFrame_ = 0;
+		}
+	}
+
+	if (isPaused_)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+		DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), black, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		if (pauseState_ == PauseState::Menu)
+		{
+			DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
+			SetFontSize(DEFAULT_FONT_SIZE * 5.0);
+
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow);
+
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
+
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 2)
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", yellow);
+
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 3)
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", yellow);
+
+			SetFontSize(DEFAULT_FONT_SIZE);
+		}
+		else if (pauseState_ == PauseState::ShowControls)
+		{
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			DrawGraph(0, 0, pauseExplainImgs_[0], true);
+			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
+			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+			SetFontSize(DEFAULT_FONT_SIZE);
+		}
+		else if (pauseState_ == PauseState::ShowItems)
+		{
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			DrawGraph(0, 0, pauseExplainImgs_[1], true);
+			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
+			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+			SetFontSize(DEFAULT_FONT_SIZE);
+		}
+		return;
+	}
+#pragma region UI
+	SetFontSize(DEFAULT_FONT_SIZE * 2.0);
+	DrawString(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:通常攻撃", white);
+	SetFontSize(DEFAULT_FONT_SIZE);
 #pragma endregion
-
-	DrawBox(0, 0, Application::SCREEN_SIZE_X, UP_BLACK, black, true);
-	DrawBox(0, DOWN_BLACK, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, black, true);
-
-	if (cnt_ % CNT <= CNT / 2)DrawRotaGraph(TRI_POS_X, TRI_POS_DY, TRI_SIZE, 0, tri_, true);
-	else(DrawRotaGraph(TRI_POS_X, TRI_POS_UY, TRI_SIZE, 0, tri_, true));
-
-	DrawRotaGraph(GOD_POS_X, GOD_POS_Y, 1, 0, god_[gNo_], true);
-
-	if (txt_ > 3 && txt_ < 6)
-	{
-		DrawOval(LIGHT_RX, DOWN_LIGHT, DOWN_SHADOW_X, DOWN_SHADOW_Y, gray, true);
-		DrawOval(LIGHT_RX, UP_LIGHT, UP_SHADOW_X, UP_SHADOW_Y, shadow, true);
-		DrawRotaGraph(LIGHT_RX, TREE_POS, TREE_SIZE, 0, tree_, true);
-	}
-	if (txt_ > 6 && txt_ < 8)
-	{
-		DrawOval(LIGHT_LX, DOWN_LIGHT, DOWN_SHADOW_X, DOWN_SHADOW_Y, gray, true);
-		DrawOval(LIGHT_LX, UP_LIGHT, UP_SHADOW_X, UP_SHADOW_Y, shadow, true);
-		DrawRotaGraph(LIGHT_LX, WATER_POS, WATER_SIZE, 0, water_, true);
-	}
-	if (txt_ > 8 && txt_ < 13)
-	{
-		DrawOval(LIGHT_RX, DOWN_LIGHT, DOWN_SHADOW_X, DOWN_SHADOW_Y, gray, true);
-		DrawOval(LIGHT_RX, UP_LIGHT, UP_SHADOW_X, UP_SHADOW_Y, shadow, true);
-		DrawRotaGraph(LIGHT_RX, PLAYER_POS, PLAYER_SIZE, 0, player_, true);
-	}
-	DrawRotaGraph(FRAME_X, FRAME_Y, FRAME_SIZE, 0, waku_, true);
 }
 
 void DemoScene::Release(void)
 {
-	// フォントサイズと種類をデフォルトに戻す
-	SetFontSize(16); // ゲーム内の標準サイズに合わせて変更
-	ChangeFont("ＭＳ ゴシック"); // またはゲーム全体で使う基本フォントに
+	SoundManager::GetInstance().Stop(SoundManager::SRC::GAME_BGM);
+}
 
-	SoundManager::GetInstance().Stop(SoundManager::SRC::DEMO_BGM);
-	SoundManager::GetInstance().Stop(SoundManager::SRC::SET_SE);
+const std::vector<std::shared_ptr<EnemyBase>>& DemoScene::GetEnemies() const
+{
+	return enemys_;
+}
+
+void DemoScene::EnemyCreate(int count)
+{
+	VECTOR flagPos = flagManager_->GetFlagPosition(0);  //Flagの位置を取得
+
+	for (int i = 0; i < count; ++i)
+	{
+		VECTOR randPos = flagPos;
+
+		//出現位置をランダムに設定（エリアの周囲に散らばせる）
+		randPos.x = flagPos.x + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.z = flagPos.z + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+
+		//EnemyDogを生成
+		std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
+
+		//生成された敵の初期化
+		enemy->SetDemoScene(this);
+		enemy->SetPos(randPos);
+		enemy->SetPlayer(player_);
+		enemy->Init();
+
+		//リストに追加
+		enemys_.emplace_back(std::move(enemy));
+	}
+}
+
+void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		VECTOR randPos = flagPos;
+		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+
+		std::shared_ptr<EnemyBase> enemy;
+
+		switch (type)
+		{
+		case EnemyBase::TYPE::SABO:
+		{
+			auto cactus = std::make_shared<EnemyCactus>();
+			cactus->SetFlagManager(flagManager_.get());
+			enemy = cactus;  // EnemyBase型に代入
+			break;
+		}
+
+		case EnemyBase::TYPE::DOG:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		default:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		}
+
+		enemy->SetDemoScene(this);
+		enemy->SetPos(randPos);
+		enemy->SetPlayer(player_);
+		enemy->Init();
+
+		enemys_.emplace_back(std::move(enemy));
+	}
+}
+
+void DemoScene::SpawnBoss(void)
+{
+	// すでにボスが出現しているなら何もしない
+	for (auto& enemy : enemys_) {
+		if (std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			return;
+		}
+	}
+
+	// ボス出現位置を決める（ステージ中央など）
+	VECTOR bossPos = BOSS_POS;
+
+	// EnemyBossを生成
+	std::shared_ptr<EnemyBase> boss = std::make_shared<EnemyBoss>();
+
+	boss->SetDemoScene(this);
+	boss->SetPos(bossPos);
+	boss->SetPlayer(player_);
+	boss->Init();
+
+	// 敵リストに追加
+	enemys_.emplace_back(std::move(boss));
+}
+
+void DemoScene::SpawnCactus(void)
+{
+	cactusSpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+
+	if (cactusSpawnTimer_ >= CACTUS_SPAWN_INTERVAL)
+	{
+		cactusSpawnTimer_ = 0.0f; // リセット
+
+		// ENEMY状態の旗を探す
+		std::vector<Flag*> enemyFlags;
+		int flagCount = flagManager_->GetFlagMax();
+		for (int i = 0; i < flagCount; ++i)
+		{
+			Flag* flag = flagManager_->GetFlag(i);
+			if (flag && flag->GetState() == Flag::STATE::ENEMY)
+			{
+				enemyFlags.push_back(flag);
+			}
+		}
+
+		if (!enemyFlags.empty())
+		{
+			// ランダムで1つ選ぶ
+			int randomIndex = GetRand((int)enemyFlags.size() - 1);
+			Flag* targetFlag = enemyFlags[randomIndex];
+
+			if (targetFlag)
+			{
+				VECTOR flagPos = targetFlag->GetPosition();
+				EnemyCreateAt(flagPos, 1, EnemyBase::TYPE::SABO);
+			}
+		}
+	}
+}
+
+bool DemoScene::PauseMenu(void)
+{
+	InputManager& ins = InputManager::GetInstance();
+
+	//TABキーでポーズのON/OFF切り替え（Menu中のみ）
+	if (ins.IsTrgDown(KEY_INPUT_TAB) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::STRAT) && pauseState_ == PauseState::Menu)
+	{
+		isPaused_ = !isPaused_;
+		pauseSelectIndex_ = 0;
+		mainCamera->SetPaused(isPaused_);
+		return true;
+	}
+
+	if (!isPaused_) return false; //ポーズ中でなければ通常更新
+
+	if (pauseState_ == PauseState::Menu)
+	{
+		if (ins.IsTrgDown(KEY_INPUT_DOWN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
+			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_DOWN) % PAUSE_MENU_ITEM_COUNT;
+
+		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
+			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_UP) % PAUSE_MENU_ITEM_COUNT;
+
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		{
+			switch (pauseSelectIndex_)
+			{
+			case 0:
+				isPaused_ = false;
+				mainCamera->SetPaused(false);
+				break;
+			case 1: pauseState_ = PauseState::ShowControls; break;
+			case 2: pauseState_ = PauseState::ShowItems; break;
+			case 3: SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE); break;
+			}
+		}
+	}
+	else
+	{
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+			pauseState_ = PauseState::Menu;
+	}
+
+	return true;
+}
+
+void DemoScene::ClearCheck(void)
+{
+	//ボスが存在するかチェック
+	bool bossDefeated = true;
+	for (auto& enemy : enemys_) {
+		if (auto boss = std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			if (boss->IsAlive()) {  //isAlive_がtrueならまだ倒されていない
+				bossDefeated = false;
+				break;
+			}
+		}
+	}
+
+	//全旗を奪還済み && ボス倒したらクリア
+	if (bossSpawned_ && bossDefeated) {
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+	}
 }

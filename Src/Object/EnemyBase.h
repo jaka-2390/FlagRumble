@@ -8,6 +8,7 @@
 
 class AnimationController;
 class GameScene;
+class DemoScene;
 class Player;
 
 class EnemyBase : public ActorBase
@@ -156,6 +157,8 @@ public:
 	float GetCollisionRadius(void);		//衝突用の球体半径の取得
 
 	void SetGameScene(GameScene* scene);
+	
+	void SetDemoScene(DemoScene* demoScene);
 
 	void DrawDebug(void);	//デバッグ用
 	void DrawDebugSearchRange(void); //視野内に入ったか見る
@@ -186,6 +189,7 @@ protected:
 
 	std::shared_ptr<Player> player_;
 	GameScene* scene_;
+	DemoScene* demoScene_;
 
 	//アニメーション
 	std::unique_ptr<AnimationController> animationController_;

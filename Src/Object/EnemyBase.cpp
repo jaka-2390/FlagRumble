@@ -578,6 +578,11 @@ void EnemyBase::SetGameScene(GameScene* scene)
 	scene_ = scene;
 }
 
+void EnemyBase::SetDemoScene(DemoScene* demoScene)
+{
+	demoScene_ = demoScene;
+}
+
 #pragma region State‚ÌØ‚è‘Ö‚¦
 
 void EnemyBase::ChangeState(STATE state)

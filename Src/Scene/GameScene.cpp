@@ -27,8 +27,6 @@
 #include "MiniMap.h"
 #include "GameScene.h"
 
-//’S“–‚¢‚¯‚¾
-
 GameScene::GameScene(void)
 {
 	player_ = nullptr;
