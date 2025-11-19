@@ -300,6 +300,7 @@ private:
 	void EffectPower(void);			//パワーアップエフェクト
 	void EffectSpeed(void);			//スピードアップエフェクト
 	void EffectHeal(void);			//回復エフェクト
+	void EffectSword(void);			//攻撃エフェクト
 
 	//移動関連
 	VECTOR moveDir_;				//移動方向
@@ -367,6 +368,11 @@ private:
 	float stepHeal_;
 	int effectHealResId_;
 	int effectHealPleyId_;
+	
+	//攻撃エフェクト
+	float stepSword_;
+	int effectSwordResId_;
+	int effectSwordPleyId_;
 
 	//ポインタ
 	const std::vector<std::shared_ptr<EnemyBase>>* enemy_;

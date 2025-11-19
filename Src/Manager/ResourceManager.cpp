@@ -224,6 +224,10 @@ void ResourceManager::Init(void)
 	//âÒïú
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "HealEffect.efkefc");
 	resourcesMap_.emplace(SRC::EFF_HEAL, std::move(res));
+	
+	//çUåÇ
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "Sword.efkefc");
+	resourcesMap_.emplace(SRC::SWORD, std::move(res));
 }
 
 void ResourceManager::Release(void)

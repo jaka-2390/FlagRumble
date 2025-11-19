@@ -109,6 +109,10 @@ void Player::Init(void)
 	//回復エフェクト
 	effectHealResId_ = ResourceManager::GetInstance().Load(
 		ResourceManager::SRC::EFF_HEAL).handleId_;
+	
+	//攻撃エフェクト
+	effectSwordResId_ = ResourceManager::GetInstance().Load(
+		ResourceManager::SRC::SWORD).handleId_;
 
 	//アニメーションの設定
 	InitAnimation();
@@ -726,8 +730,12 @@ void Player::CollisionAttack(void)
 			//球体同士の当たり判定
 			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
 			{
+				EffectSword();
+
+				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, attackPos.x, attackPos.y + ATTACK2_HEIGHT, attackPos.z);
+
 				enemy->Damage(normalAttack_);
-				//1体のみヒット
+				//複数ヒット
 				continue;
 			}
 		}
@@ -834,7 +842,7 @@ void Player::ProcessAttack(void)
 		{
 			animationController_->Play((int)ANIM_TYPE::NORMALATTACK, false);
 			isAttack_ = true;
-
+			
 			//衝突(攻撃)
 			CollisionAttack();
 
@@ -1088,6 +1096,17 @@ void Player::EffectHeal(void)
 
 	//エフェクトの大きさ
 	SetScalePlayingEffekseer3DEffect(effectHealPleyId_, scale, scale, scale);
+}
+
+void Player::EffectSword(void)
+{
+	float scale = STATUS_EFFECT_SCALE;
+
+	//エフェクト再生
+	effectSwordPleyId_ = PlayEffekseer3DEffect(effectSwordResId_);
+
+	//エフェクトの大きさ
+	SetScalePlayingEffekseer3DEffect(effectSwordPleyId_, scale, scale, scale);
 }
 
 int Player::GetWater(void) const
