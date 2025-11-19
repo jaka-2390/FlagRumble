@@ -38,6 +38,7 @@ public:
 	static constexpr int   ANIM_FAST_RUN_INDEX = 3;
 	static constexpr int   ANIM_SLASHATTACK_INDEX = 4;
 	static constexpr int   ANIM_NORMALATTACK_INDEX = 5;
+	static constexpr int   ANIM_DAMAGE_INDEX = 6;
 	static constexpr int   ANIM_DOWN_INDEX = 7;
 	static constexpr int   ANIM_EXATTACK_INDEX = 8;
 
@@ -175,6 +176,7 @@ public:
 		IDLE,
 		RUN,
 		FAST_RUN,
+		DAMAGE,
 		DOWN,
 		NORMALATTACK,
 		SLASHATTACK,

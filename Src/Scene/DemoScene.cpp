@@ -16,12 +16,6 @@
 #include "../Object/EnemyBase.h"
 #include "../Object/Enemy/EnemyCactus.h"
 #include "../Object/Enemy/EnemyDog.h"
-#include "../Object/Enemy/EnemyMimic.h"
-#include "../Object/Enemy/EnemyMushroom.h"
-#include "../Object/Enemy/EnemyOnion.h"
-#include "../Object/Enemy/EnemyThorn.h"
-#include "../Object/Enemy/EnemyVirus.h"
-#include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
 #include "../Object/Flag/Flag.h"
 #include "DemoScene.h"
@@ -46,11 +40,6 @@ void DemoScene::Init(void)
 	GravityManager::GetInstance().SetPlayer(player_);
 	player_->Init();
 
-	//敵のモデル
-	//EnemyCreate(0);
-	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), SPAWN_RADIUS, false });
-	lastSpawnTime_ = GetNowCount();  //開始時の時間を記録
-
 	player_->SetEnemy(&enemys_);
 
 	//ステージ
@@ -65,7 +54,8 @@ void DemoScene::Init(void)
 	skyDome_->Init();
 
 	flagManager_ = std::make_shared<FlagManager>();
-	flagManager_->Init();
+	flagManager_->Clear();
+	flagManager_->AddFlag(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG);
 
 	//画像
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
@@ -112,6 +102,33 @@ void DemoScene::Update(void)
 	//通常時のゲーム進行（ポーズされてないときだけ）
 	//-------------------------
 
+	if (ins.IsNew(KEY_INPUT_RETURN) )
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+	}
+
+	switch (state_)
+	{
+	case STATE::MOVE:
+		UpdateMove();
+		break;
+	case STATE::ATTACK:
+		UpdateAttack();
+		break;
+	case STATE::FLAG:
+		UpdateFlag();
+		break;
+	case STATE::SABO:
+		UpdateSabo();
+		break;
+	case STATE::FINISH:
+		if (ins.IsNew(KEY_INPUT_RETURN))
+		{
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+		}
+		break;
+	}
+
 	uiDisplayFrame_++;
 
 	skyDome_->Update();
@@ -126,44 +143,9 @@ void DemoScene::Update(void)
 	// 敵全滅情報をFlagに伝える
 	flagManager_->Update(player_->GetTransform().pos, enemys_);
 
-	//それぞれの旗に敵を生成
-	int flagCount = flagManager_->GetFlagMax();
-	for (int i = 0; i < flagCount; ++i)
-	{
-		if (ENEMY_MAX >= enemys_.size())
-		{
-			Flag* flag = flagManager_->GetFlag(i);
-			if (!flag) continue;
-
-			// FlagのEnemyTypeをEnemyBase::TYPEに変換
-			EnemyBase::TYPE type;
-			switch (flag->GetEnemyType())
-			{
-			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
-			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
-			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
-			default:                      type = EnemyBase::TYPE::DOG; break;
-			}
-
-			// 敵生成
-			VECTOR flagPos = flag->GetPosition();
-			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
-		}
-	}
-
-	SpawnCactus();
-
 	// フラッグでクリアしたらシーン遷移
 	int cleared = flagManager_->GetClearedFlagCount();
 	int total = flagManager_->GetFlagMax();
-
-	if (!bossSpawned_ && cleared >= total)
-	{
-		SpawnBoss();
-		bossSpawned_ = true;
-	}
-
-	ClearCheck();
 }
 
 void DemoScene::Draw(void)
@@ -176,12 +158,9 @@ void DemoScene::Draw(void)
 	}
 	player_->Draw();
 
-	for (auto enemy : enemys_)
-	{
-		enemy->DrawBossHpBar();
-	}
-
 	flagManager_->Draw();
+
+	DrawMessage();
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -269,29 +248,94 @@ const std::vector<std::shared_ptr<EnemyBase>>& DemoScene::GetEnemies() const
 	return enemys_;
 }
 
-void DemoScene::EnemyCreate(int count)
+void DemoScene::UpdateMove()
 {
-	VECTOR flagPos = flagManager_->GetFlagPosition(0);  //Flagの位置を取得
+	if (CheckHitKey(KEY_INPUT_W) ||
+		CheckHitKey(KEY_INPUT_A) ||
+		CheckHitKey(KEY_INPUT_S) ||
+		CheckHitKey(KEY_INPUT_D)) {
 
-	for (int i = 0; i < count; ++i)
+		state_ = STATE::ATTACK;
+	}
+}
+
+void DemoScene::UpdateAttack()
+{
+	//Dogがいなかったら生成
+	if (!isDog_)
 	{
-		VECTOR randPos = flagPos;
+		EnemyCreateAt(VGet(-250.0f, 254.0f, 1000.0f), 1, EnemyBase::TYPE::DOG); // 各フラッグの周囲に1体
+		isDog_ = true;
+		return;
+	}
 
-		//出現位置をランダムに設定（エリアの周囲に散らばせる）
-		randPos.x = flagPos.x + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-		randPos.z = flagPos.z + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+	//敵が死んだかどうか
+	bool allDead = true;
+	for (auto& enemy : enemys_)
+	{
+		if (enemy->IsAlive())
+		{
+			allDead = false;
+			break;
+		}
+	}
 
-		//EnemyDogを生成
-		std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
+	//Dogが出て、死んだら
+	if (isDog_ && allDead)
+	{
+		state_ = STATE::FLAG;
+	}
+}
 
-		//生成された敵の初期化
-		enemy->SetDemoScene(this);
-		enemy->SetPos(randPos);
-		enemy->SetPlayer(player_);
-		enemy->Init();
+void DemoScene::UpdateFlag()
+{
+	flagManager_->Update(player_->GetTransform().pos, {}); // 敵なし
 
-		//リストに追加
-		enemys_.emplace_back(std::move(enemy));
+	// 旗ゲージが規定値に達したらクリア
+	if (flagManager_->GetClearedFlagCount() >= 1) {
+		state_ = STATE::SABO;
+	}
+}
+
+void DemoScene::UpdateSabo()
+{
+	SpawnCactus();
+
+	if (CheckHitKey(KEY_INPUT_A)) {
+		state_ = STATE::FINISH;
+	}
+}
+
+void DemoScene::DrawMessage()
+{
+	int x = 50;
+	int y = 600;
+
+	switch (state_) {
+
+	case STATE::MOVE:
+		DrawString(x, y, "WASD で移動してみよう！", white);
+		break;
+
+	case STATE::ATTACK:
+		DrawString(x, y, "黄色い敵は陣地を守っています", white);
+		DrawString(x, y + 40, "E キーで攻撃して倒してみよう！", white);
+		break;
+
+	case STATE::FLAG:
+		DrawString(x, y, "エリアに近づいて陣地を奪還してみよう！", white);
+		DrawString(x, y + 40, "ゲージが100%になると奪還成功です", white);
+		break;
+		
+	case STATE::SABO:
+		DrawString(x, y, "サボテンは、あなたの陣地を奪いに来る敵です", white);
+		//DrawString(x, y + 40, "ゲージが100%になると次へ進みます", white);
+		break;
+
+	case STATE::FINISH:
+		DrawString(x, y, "チュートリアル完了！", white);
+		DrawString(x, y + 40, "Enter でゲーム開始", white);
+		break;
 	}
 }
 
@@ -332,63 +376,18 @@ void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
 	}
 }
 
-void DemoScene::SpawnBoss(void)
+void DemoScene::SpawnCactus(void)
 {
 	// すでにボスが出現しているなら何もしない
 	for (auto& enemy : enemys_) {
-		if (std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+		if (std::dynamic_pointer_cast<EnemyCactus>(enemy)) {
 			return;
 		}
 	}
 
-	// ボス出現位置を決める（ステージ中央など）
-	VECTOR bossPos = BOSS_POS;
-
-	// EnemyBossを生成
-	std::shared_ptr<EnemyBase> boss = std::make_shared<EnemyBoss>();
-
-	boss->SetDemoScene(this);
-	boss->SetPos(bossPos);
-	boss->SetPlayer(player_);
-	boss->Init();
-
-	// 敵リストに追加
-	enemys_.emplace_back(std::move(boss));
-}
-
-void DemoScene::SpawnCactus(void)
-{
-	cactusSpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
-
-	if (cactusSpawnTimer_ >= CACTUS_SPAWN_INTERVAL)
-	{
-		cactusSpawnTimer_ = 0.0f; // リセット
-
-		// ENEMY状態の旗を探す
-		std::vector<Flag*> enemyFlags;
-		int flagCount = flagManager_->GetFlagMax();
-		for (int i = 0; i < flagCount; ++i)
-		{
-			Flag* flag = flagManager_->GetFlag(i);
-			if (flag && flag->GetState() == Flag::STATE::ENEMY)
-			{
-				enemyFlags.push_back(flag);
-			}
-		}
-
-		if (!enemyFlags.empty())
-		{
-			// ランダムで1つ選ぶ
-			int randomIndex = GetRand((int)enemyFlags.size() - 1);
-			Flag* targetFlag = enemyFlags[randomIndex];
-
-			if (targetFlag)
-			{
-				VECTOR flagPos = targetFlag->GetPosition();
-				EnemyCreateAt(flagPos, 1, EnemyBase::TYPE::SABO);
-			}
-		}
-	}
+	// ENEMY状態の旗を探す
+	EnemyCreateAt(VGet(-250.0f, 254.0f, 2000.0f), 1, EnemyBase::TYPE::SABO);
+	
 }
 
 bool DemoScene::PauseMenu(void)
@@ -435,23 +434,4 @@ bool DemoScene::PauseMenu(void)
 	}
 
 	return true;
-}
-
-void DemoScene::ClearCheck(void)
-{
-	//ボスが存在するかチェック
-	bool bossDefeated = true;
-	for (auto& enemy : enemys_) {
-		if (auto boss = std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
-			if (boss->IsAlive()) {  //isAlive_がtrueならまだ倒されていない
-				bossDefeated = false;
-				break;
-			}
-		}
-	}
-
-	//全旗を奪還済み && ボス倒したらクリア
-	if (bossSpawned_ && bossDefeated) {
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-	}
 }

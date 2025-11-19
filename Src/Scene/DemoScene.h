@@ -27,7 +27,8 @@ class DemoScene :public SceneBase
 		MOVE,
 		ATTACK,
 		FLAG,
-		SABO
+		SABO,
+		FINISH
 	};
 
 	public:
@@ -39,7 +40,6 @@ class DemoScene :public SceneBase
 		static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
 		static constexpr int STAGE_LANGE = 10000;	//ステージの幅
 		static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
-		static constexpr VECTOR BOSS_POS = { 80.0f, 254.0f, 2300.0f };
 
 		//UI関係-----------------------------------------------------
 		//-------------------------------------------------------------------
@@ -87,8 +87,8 @@ class DemoScene :public SceneBase
 		static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
 		static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
 
-		//トゲのインターバル
-		const float CACTUS_SPAWN_INTERVAL = 20.0f;
+		//サボテンのインターバル
+		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
 
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
@@ -117,21 +117,22 @@ class DemoScene :public SceneBase
 
 		const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
 
-	private:
+private:
 
 		int cnt;
 
-		void EnemyCreate(int count);
+		void UpdateMove();
+		void UpdateAttack();
+		void UpdateFlag();
+		void UpdateSabo();
+
+		void DrawMessage();
 
 		void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
-
-		void SpawnBoss(void);
 
 		void SpawnCactus(void);
 
 		bool PauseMenu(void);
-
-		void ClearCheck(void);
 
 		std::vector<SpawnArea> spawnAreas_;	//スポーン場所
 		std::unique_ptr<Stage> stage_;		//ステージ
@@ -152,6 +153,8 @@ class DemoScene :public SceneBase
 		std::vector<std::shared_ptr<EnemyBase>> enemys_;
 		int enCounter;//敵の出現頻度
 
+		bool isDog_ = false;
+
 		//ポーズ
 		bool isPaused_;           //ポーズ中かどうか
 		int pauseSelectIndex_;    //ポーズメニューの選択項目（上下選択）
@@ -169,9 +172,10 @@ class DemoScene :public SceneBase
 
 		int lastSpawnTime_;  //最後に敵を出現させた時間
 
-		bool bossSpawned_ = false;
-
 		float cactusSpawnTimer_ = 0.0f;
+
+		STATE state_ = STATE::MOVE;
+		bool stateFinish_ = false;
 
 		PauseState pauseState_ = PauseState::Menu;
 		int  pauseImg_;

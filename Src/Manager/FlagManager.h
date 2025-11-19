@@ -24,6 +24,10 @@ public:
 
     std::vector<Flag*> GetPlayerFlags() const;
 
+    //チュートリアル用flag
+    void Clear();
+    void AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type);
+
 private:
 
     std::vector<std::unique_ptr<Flag>> flags_;

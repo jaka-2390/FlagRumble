@@ -24,7 +24,7 @@
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
 #include "../Object/Flag/Flag.h"
-#include "MiniMap.h"
+//#include "MiniMap.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -65,8 +65,8 @@ void GameScene::Init(void)
 	skyDome_ = std::make_unique<SkyDome>(player_->GetTransform());
 	skyDome_->Init();
 
-	map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
-	map_->Init();
+	/*map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
+	map_->Init();*/
 
 	flagManager_ = std::make_shared<FlagManager>();
 	flagManager_->Init();
@@ -187,7 +187,7 @@ void GameScene::Draw(void)
 
 	flagManager_->Draw();
 
-	DrawMiniMap();
+	//DrawMiniMap();
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -270,35 +270,35 @@ void GameScene::Release(void)
 	SoundManager::GetInstance().Stop(SoundManager::SRC::GAME_BGM);
 }
 
-void GameScene::DrawMiniMap(void)
-{
-	if (!map_) return;
-
-	//プレイヤーの座標
-	MapVector2 playerPos;
-	playerPos.x = player_->GetTransform().pos.x;
-	playerPos.z = player_->GetTransform().pos.z;
-	//Y軸回転角を使用(ラジアン or 度数)
-	float playerAngle = player_->GetTransform().rot.y;
-
-	float cameraAngleRad = 0.0f;
-	if (camera_) {
-		cameraAngleRad = camera_->GetAngles().y;
-	}
-
-	//敵の座標リストを作成
-	std::vector<std::shared_ptr<EnemyBase>> aliveEnemies;
-	for (const auto& enemy : enemys_)
-	{
-		if (enemy->IsAlive())
-		{
-			aliveEnemies.push_back(enemy);
-		}
-	}
-
-	//ミニマップ描画呼び出し
-	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies);
-}
+//void GameScene::DrawMiniMap(void)
+//{
+//	if (!map_) return;
+//
+//	//プレイヤーの座標
+//	MapVector2 playerPos;
+//	playerPos.x = player_->GetTransform().pos.x;
+//	playerPos.z = player_->GetTransform().pos.z;
+//	//Y軸回転角を使用(ラジアン or 度数)
+//	float playerAngle = player_->GetTransform().rot.y;
+//
+//	float cameraAngleRad = 0.0f;
+//	if (camera_) {
+//		cameraAngleRad = camera_->GetAngles().y;
+//	}
+//
+//	//敵の座標リストを作成
+//	std::vector<std::shared_ptr<EnemyBase>> aliveEnemies;
+//	for (const auto& enemy : enemys_)
+//	{
+//		if (enemy->IsAlive())
+//		{
+//			aliveEnemies.push_back(enemy);
+//		}
+//	}
+//
+//	//ミニマップ描画呼び出し
+//	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies);
+//}
 
 const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 {

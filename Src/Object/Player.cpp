@@ -292,6 +292,7 @@ void Player::InitAnimation(void)
 	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "Player.mv1", ANIM_SPEED, ANIM_FAST_RUN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::SLASHATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_SLASHATTACK_INDEX);
 	animationController_->Add((int)ANIM_TYPE::NORMALATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_NORMALATTACK_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DAMAGE, path + "Player.mv1", ANIM_SPEED, ANIM_DAMAGE_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DOWN, path + "Player.mv1", ANIM_SPEED, ANIM_DOWN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::EXATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_EXATTACK_INDEX);
 
@@ -912,6 +913,9 @@ void Player::Damage(int damage)
 {
 	if (pstate_ == PlayerState::DOWN || invincible_) return;  //ダウン中は無敵
 	hp_ -= damage;
+
+	//アニメーション
+	//animationController_->Play((int)ANIM_TYPE::DAMAGE, false);
 
 	//SE
 	SoundManager::GetInstance().Play(SoundManager::SRC::P_DAMAGE_SE, Sound::TIMES::FORCE_ONCE);

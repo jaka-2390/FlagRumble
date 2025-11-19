@@ -98,3 +98,20 @@ std::vector<Flag*> FlagManager::GetPlayerFlags() const
     }
     return playerFlags;
 }
+
+void FlagManager::Clear()
+{
+    flags_.clear();
+    flagMax_ = 0;
+}
+
+void FlagManager::AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type)
+{
+    auto flag = std::make_unique<Flag>(pos, type);
+
+    flag->Init();
+
+    flags_.push_back(std::move(flag));
+
+    flagMax_ = static_cast<int>(flags_.size());
+}
