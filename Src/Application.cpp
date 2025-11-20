@@ -82,7 +82,7 @@ void Application::Run(void)
 
 	isRunning_ = true; // ƒtƒ‰ƒO‰Šú‰»
 
-	while (isRunning_ && ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (isRunning_ && ProcessMessage() == 0 /*&& CheckHitKey(KEY_INPUT_ESCAPE) == 0*/)
 	{
 		inputManager.Update();
 		sceneManager.Update();

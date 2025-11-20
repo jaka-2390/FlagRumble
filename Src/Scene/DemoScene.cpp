@@ -194,9 +194,9 @@ void DemoScene::Draw(void)
 			DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
 			SetFontSize(DEFAULT_FONT_SIZE * 5.0);
 
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white);
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow);
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
 
 			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
@@ -212,23 +212,15 @@ void DemoScene::Draw(void)
 
 			SetFontSize(DEFAULT_FONT_SIZE);
 		}
-		else if (pauseState_ == PauseState::ShowControls)
+		else if (pauseState_ == PauseState::ShowControls || pauseState_ == PauseState::ShowItems)
 		{
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawGraph(0, 0, pauseExplainImgs_[0], true);
-			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
-			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
-			SetFontSize(DEFAULT_FONT_SIZE);
-		}
-		else if (pauseState_ == PauseState::ShowItems)
-		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawGraph(0, 0, pauseExplainImgs_[1], true);
+
+			int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
+			DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
+
 			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
 			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
 			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);

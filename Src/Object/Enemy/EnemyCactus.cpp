@@ -99,7 +99,7 @@ void EnemyCactus::ChasePlayer(void)
 
         // Šø‚É‹ß‚Ã‚¢‚½‚ç’D‚¤
         float distSq = VSize(VSub(transform_.pos, targetPos));
-        if (distSq < 100.0f) // “K“–‚È”ÍˆÍ
+        if (distSq < 100.0f) //ƒGƒŠƒA‚Ì”ÍˆÍ“à
         {
 			captureTimer_ += scnMng_.GetDeltaTime();
 
