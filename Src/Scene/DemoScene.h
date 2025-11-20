@@ -90,6 +90,9 @@ class DemoScene :public SceneBase
 		//サボテンのインターバル
 		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
 
+		//メッセージの表示時間
+		const float MESSAGE_DISPLAY_SEC = 2.0f;
+
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
 		static constexpr int GAUGE_Y = 20;                //左上Y位置
@@ -131,6 +134,8 @@ private:
 		void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
 
 		void SpawnCactus(void);
+
+		void MessageTime(void);
 
 		bool PauseMenu(void);
 
@@ -176,6 +181,10 @@ private:
 
 		STATE state_ = STATE::MOVE;
 		bool stateFinish_ = false;
+		bool spawnCactus_ = false;
+
+		float messageTimer_ = 0.0f;       // メッセージ表示用タイマー
+		bool messageActive_ = true;       // メッセージを表示中かどうか
 
 		PauseState pauseState_ = PauseState::Menu;
 		int  pauseImg_;

@@ -129,6 +129,11 @@ void DemoScene::Update(void)
 		break;
 	}
 
+	if (spawnCactus_)
+	{
+		SpawnCactus();
+	}
+
 	uiDisplayFrame_++;
 
 	skyDome_->Update();
@@ -255,7 +260,13 @@ void DemoScene::UpdateMove()
 		CheckHitKey(KEY_INPUT_S) ||
 		CheckHitKey(KEY_INPUT_D)) {
 
-		state_ = STATE::ATTACK;
+		MessageTime();
+
+		if (!messageActive_)
+		{
+			messageActive_ = true;
+			state_ = STATE::ATTACK;
+		}
 	}
 }
 
@@ -283,7 +294,13 @@ void DemoScene::UpdateAttack()
 	//Dogが出て、死んだら
 	if (isDog_ && allDead)
 	{
-		state_ = STATE::FLAG;
+		MessageTime();
+
+		if (!messageActive_)
+		{
+			messageActive_ = true;
+			state_ = STATE::FLAG;
+		}
 	}
 }
 
@@ -292,18 +309,31 @@ void DemoScene::UpdateFlag()
 	flagManager_->Update(player_->GetTransform().pos, {}); // 敵なし
 
 	// 旗ゲージが規定値に達したらクリア
-	if (flagManager_->GetClearedFlagCount() >= 1) {
-		state_ = STATE::SABO;
+	if (flagManager_->GetClearedFlagCount() >= 1) 
+	{
+		MessageTime();
+
+		if (!messageActive_)
+		{
+			messageActive_ = true;
+			state_ = STATE::SABO;
+		}
 	}
 }
 
 void DemoScene::UpdateSabo()
 {
-	SpawnCactus();
+	spawnCactus_ = true;
+	/*if () 
+	{*/
+		MessageTime();
 
-	if (CheckHitKey(KEY_INPUT_A)) {
-		state_ = STATE::FINISH;
-	}
+		if (!messageActive_)
+		{
+			messageActive_ = true;
+			state_ = STATE::FINISH;
+		}
+	/*}*/
 }
 
 void DemoScene::DrawMessage()
@@ -378,16 +408,39 @@ void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
 
 void DemoScene::SpawnCactus(void)
 {
+
+	bool allDead = true;
+	for (auto& enemy : enemys_)
+	{
+		if (enemy->IsAlive())
+		{
+			allDead = false;
+			break;
+		}
+	}
+
 	// すでにボスが出現しているなら何もしない
 	for (auto& enemy : enemys_) {
-		if (std::dynamic_pointer_cast<EnemyCactus>(enemy)) {
+		if (std::dynamic_pointer_cast<EnemyCactus>(enemy) || !allDead) {
 			return;
 		}
 	}
 
-	// ENEMY状態の旗を探す
 	EnemyCreateAt(VGet(-250.0f, 254.0f, 2000.0f), 1, EnemyBase::TYPE::SABO);
 	
+}
+
+void DemoScene::MessageTime(void)
+{
+	if (messageActive_)
+	{
+		messageTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒
+		if (messageTimer_ >= MESSAGE_DISPLAY_SEC)
+		{
+			messageActive_ = false; // メッセージ終了
+			messageTimer_ = 0.0f;
+		}
+	}
 }
 
 bool DemoScene::PauseMenu(void)

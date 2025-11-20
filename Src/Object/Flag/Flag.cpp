@@ -1,9 +1,17 @@
 #include <DxLib.h>
+#include<EffekseerForDXLib.h>
+#include "../../Manager/ResourceManager.h"
 #include"../../Application.h"
 #include "Flag.h"
 
 Flag::Flag(VECTOR pos, ENEMY_TYPE type):pos_(pos), enemyType_(type)
 {
+	//エフェクト
+	effectEnemyAreaPlayId_ = 0;
+	effectEnemyAreaPlayId_ = 0;
+
+	effectPlayerAreaPlayId_ = 0;
+	effectPlayerAreaPlayId_ = 0;
 }
 
 Flag::~Flag(void)
@@ -26,11 +34,17 @@ void Flag::Init(void)
 	clearGaugeMax_ = 100.0f;
 	flagRadius_ = 100.0f;
 	enemyCheckRadius_ = 500.0f;
+
+	//エフェクト
+	effectEnemyAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::ENEMY_AREA).handleId_;
+	effectPlayerAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER_AREA).handleId_;
 }
 
 void Flag::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
 {
 	CheckCircle(playerPos, enemies);
+
+	EffectAreaRange();
 
 	if (enemyNear_)
 	{
@@ -48,6 +62,7 @@ void Flag::Draw(void)
 	if (IsOwnedByEnemy())
 	{
 		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
+
 	}
 	else if (flagVisible_ && IsOwnedByPlayer())
 	{
@@ -151,6 +166,36 @@ void Flag::DrawGauge3D(VECTOR center, float gaugeRate)
 	// 中身
 	int fillWidth = (int)(barWidth * gaugeRate);
 	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(0, 255, 0), TRUE);
+}
+
+void Flag::EffectAreaRange(void)
+{
+	if (IsOwnedByEnemy())
+	{
+		if (effectEnemyAreaPlayId_ >= 0)
+		{
+			StopEffekseer3DEffect(effectEnemyAreaPlayId_);
+		}
+
+		float scale = 300.0f;  // デフォルト値
+
+		effectEnemyAreaPlayId_ = PlayEffekseer3DEffect(effectEnemyAreaResId_);
+		SetScalePlayingEffekseer3DEffect(effectEnemyAreaPlayId_, scale, scale / 2, scale);
+		SetPosPlayingEffekseer3DEffect(effectEnemyAreaPlayId_, pos_.x, pos_.y, pos_.z);
+	}
+	else if (IsOwnedByPlayer())
+	{
+		if (effectPlayerAreaPlayId_ >= 0)
+		{
+			StopEffekseer3DEffect(effectPlayerAreaPlayId_);
+		}
+
+		float scale = 300.0f;  // デフォルト値
+
+		effectPlayerAreaPlayId_ = PlayEffekseer3DEffect(effectPlayerAreaResId_);
+		SetScalePlayingEffekseer3DEffect(effectPlayerAreaPlayId_, scale, scale / 2, scale);
+		SetPosPlayingEffekseer3DEffect(effectPlayerAreaPlayId_, pos_.x, pos_.y, pos_.z);
+	}
 }
 
 VECTOR Flag::GetPosition() const

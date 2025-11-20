@@ -54,6 +54,9 @@ private:
 	
 	void DrawGauge3D(VECTOR center, float gaugeRate);
 
+	//エリアエフェクト
+	void EffectAreaRange(void);
+
 	STATE state_ = STATE::ENEMY;
 	ENEMY_TYPE enemyType_;
 
@@ -73,4 +76,12 @@ private:
 	float clearGaugeMax_;
 	float flagRadius_;
 	float enemyCheckRadius_;
+
+	//エフェクト
+	int effectEnemyAreaResId_;
+	int effectEnemyAreaPlayId_;
+	
+	int effectPlayerAreaResId_;
+	int effectPlayerAreaPlayId_;
+
 };

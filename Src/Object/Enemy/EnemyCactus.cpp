@@ -77,6 +77,21 @@ void EnemyCactus::ChasePlayer(void)
         }
     }
 
+	VECTOR playerPos = player_->GetTransform().pos;
+
+	VECTOR toPlayer = VSub(playerPos, transform_.pos);
+	toPlayer.y = VALUE_ZERO;  //高さ無視
+
+	float distance = VSize(toPlayer);
+
+	if (distance <= VIEW_RANGE
+		&& state_ == STATE::PLAY
+		&& player_->pstate_ == Player::PlayerState::NORMAL)
+	{
+		//プレイヤーと接敵
+		encounter_ = true;
+	}
+
     VECTOR targetPos;
     if (targetFlag)
     {
@@ -86,21 +101,23 @@ void EnemyCactus::ChasePlayer(void)
         float distSq = VSize(VSub(transform_.pos, targetPos));
         if (distSq < 100.0f) // 適当な範囲
         {
-			/*captureTimer_ += scnMng_.GetDeltaTime();
+			captureTimer_ += scnMng_.GetDeltaTime();
 
 			if (captureTimer_ >= FLAG_CHANGE)
-			{*/
+			{
 				targetFlag->SetState(Flag::STATE::ENEMY);
 				captureTimer_ = 0.0f;
-			/*}*/
+			}
         }
-
-		// 移動
-		VECTOR toTarget = VSub(targetPos, transform_.pos);
-		toTarget.y = 0;
-		VECTOR moveVec = VScale(VNorm(toTarget), speed_);
-		transform_.pos = VAdd(transform_.pos, moveVec);
-		transform_.quaRot = Quaternion::LookRotation(VNorm(toTarget));
+		else
+		{
+			// 移動
+			VECTOR toTarget = VSub(targetPos, transform_.pos);
+			toTarget.y = 0;
+			VECTOR moveVec = VScale(VNorm(toTarget), speed_);
+			transform_.pos = VAdd(transform_.pos, moveVec);
+			transform_.quaRot = Quaternion::LookRotation(VNorm(toTarget));
+		}
     }
     else
     {
