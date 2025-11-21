@@ -91,6 +91,11 @@ void EnemyCactus::ChasePlayer(void)
 		//プレイヤーと接敵
 		encounter_ = true;
 	}
+	else
+	{
+		//プレイヤーから離れた
+		encounter_ = false;
+	}
 
     VECTOR targetPos;
     if (targetFlag)
@@ -149,9 +154,6 @@ void EnemyCactus::ChasePlayer(void)
 				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
 			}
 		}
-
-		//プレイヤーから離れた
-		encounter_ = false;
 
 		//徘徊
 		VECTOR moveVec = VScale(wanderDir_, speed_ * WANDER_SPEED_SCALE);

@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include "../Object/EnemyBase.h"
+#include "../Manager/InputManager.h"
 #include "SceneBase.h"
 
 class Stage;
@@ -69,16 +70,12 @@ class DemoScene :public SceneBase
 		static constexpr int UI_WIDTH_PAUSE_1 = 160;				//UIを調整する
 		static constexpr int UI_WIDTH_PAUSE_2 = 200;				//UIを調整する
 		static constexpr int UI_WIDTH_PAUSE_3 = 240;				//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_4 = 380;				//UIを調整する
 
 		static constexpr int UI_HEIGHT_PAUSE_1 = 350;				//１個目のUIの高さ
 		static constexpr int UI_HEIGHT_PAUSE_2 = 470;				//２個目のUIの高さ
 		static constexpr int UI_HEIGHT_PAUSE_3 = 590;				//３個目のUIの高さ
 		static constexpr int UI_HEIGHT_PAUSE_4 = 710;				//４個目のUIの高さ
-
-		static constexpr int UI_ATTACK_X = 10;						//攻撃の文字のX座標
-		static constexpr int UI_NORMAL_ATTACK_Y = 450;				//通常攻撃のY座標
-		static constexpr int UI_SLASH_ATTACK_Y = 500;				//スラッシュのY座標
-		static constexpr int UI_EX_ATTACK_Y = 550;					//回転斬りのY座標
 
 		static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
 		static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
@@ -91,7 +88,7 @@ class DemoScene :public SceneBase
 		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
 
 		//メッセージの表示時間
-		const float MESSAGE_DISPLAY_SEC = 2.0f;
+		const float MESSAGE_DISPLAY_SEC = 1.5f;
 
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
@@ -189,4 +186,6 @@ private:
 		PauseState pauseState_ = PauseState::Menu;
 		int  pauseImg_;
 
-	};
+		InputManager& ins = InputManager::GetInstance();
+
+};

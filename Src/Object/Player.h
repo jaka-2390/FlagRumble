@@ -106,7 +106,7 @@ public:
 	static constexpr int FRAME_START_X = 47;								//枠の最初X
 	static constexpr int FRAME_START_Y = Application::SCREEN_SIZE_Y - 78;	//枠の最初Y
 	static constexpr int FRAME_END_X = 653;									//枠の最後X
-	static constexpr int FRAME_END_Y = Application::SCREEN_SIZE_Y - 37;		//枠の最後Y
+	static constexpr int FRAME_END_Y = Application::SCREEN_SIZE_Y - 52;		//枠の最後Y
 	static constexpr int BAR_START_X = 50;									//バーの最初X
 	static constexpr int BAR_START_HY = Application::SCREEN_SIZE_Y - 75;	//バーの最初体力Y
 	static constexpr int BAR_START_WY = Application::SCREEN_SIZE_Y - 50;	//バーの最初水Y

@@ -34,7 +34,9 @@ DemoScene::~DemoScene(void)
 
 void DemoScene::Init(void)
 {
+	//Enterの点滅用
 	cnt = 0;
+
 	//プレイヤー
 	player_ = std::make_shared<Player>();
 	GravityManager::GetInstance().SetPlayer(player_);
@@ -122,7 +124,7 @@ void DemoScene::Update(void)
 		UpdateSabo();
 		break;
 	case STATE::FINISH:
-		if (ins.IsNew(KEY_INPUT_RETURN))
+		if (ins.IsNew(KEY_INPUT_RETURN) || ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 		}
@@ -194,9 +196,9 @@ void DemoScene::Draw(void)
 			DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
 			SetFontSize(DEFAULT_FONT_SIZE * 5.0);
 
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
+				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
 
 			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
@@ -214,13 +216,16 @@ void DemoScene::Draw(void)
 		}
 		else if (pauseState_ == PauseState::ShowControls || pauseState_ == PauseState::ShowItems)
 		{
+			//白い背景
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+			//操作説明かどうか
 			int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
 			DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
 
+			//文字を黄色に点滅
 			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
 			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
 			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
@@ -228,11 +233,6 @@ void DemoScene::Draw(void)
 		}
 		return;
 	}
-#pragma region UI
-	SetFontSize(DEFAULT_FONT_SIZE * 2.0);
-	DrawString(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:通常攻撃", white);
-	SetFontSize(DEFAULT_FONT_SIZE);
-#pragma endregion
 }
 
 void DemoScene::Release(void)
@@ -247,11 +247,35 @@ const std::vector<std::shared_ptr<EnemyBase>>& DemoScene::GetEnemies() const
 
 void DemoScene::UpdateMove()
 {
-	if (CheckHitKey(KEY_INPUT_W) ||
-		CheckHitKey(KEY_INPUT_A) ||
-		CheckHitKey(KEY_INPUT_S) ||
-		CheckHitKey(KEY_INPUT_D)) {
+	// 入力があれば進むフラグ
+	bool moved = false;
 
+	if (GetJoypadNum() > 0)
+	{
+		// ゲームパッド操作
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+		// スティックが一定以上動いていたら移動入力と判定
+		if (fabs(padState.AKeyLX) > 0.2f || fabs(padState.AKeyLY) > 0.2f)
+		{
+			moved = true;
+		}
+	}
+	else
+	{
+		if (CheckHitKey(KEY_INPUT_W) ||
+			CheckHitKey(KEY_INPUT_A) ||
+			CheckHitKey(KEY_INPUT_S) ||
+			CheckHitKey(KEY_INPUT_D)) {
+
+			moved = true;
+		}
+	}
+
+	// 何か入力があったら次へ
+	if (moved)
+	{
 		MessageTime();
 
 		if (!messageActive_)
@@ -330,18 +354,28 @@ void DemoScene::UpdateSabo()
 
 void DemoScene::DrawMessage()
 {
+	bool isPad = (GetJoypadNum() > 0);
+
 	int x = 50;
 	int y = 600;
 
+#pragma region UI
+	SetFontSize(DEFAULT_FONT_SIZE * 2.0);
 	switch (state_) {
 
 	case STATE::MOVE:
-		DrawString(x, y, "WASD で移動してみよう！", white);
+		if (isPad)
+			DrawString(x, y, "左スティックで移動してみよう！", white);
+		else
+			DrawString(x, y, "WASD で移動してみよう！", white);
 		break;
 
 	case STATE::ATTACK:
 		DrawString(x, y, "黄色い敵は陣地を守っています", white);
-		DrawString(x, y + 40, "E キーで攻撃して倒してみよう！", white);
+		if (isPad)
+			DrawString(x, y + 40, "Y ボタンで攻撃して倒してみよう！", white);
+		else
+			DrawString(x, y + 40, "E キーで攻撃して倒してみよう！", white);
 		break;
 
 	case STATE::FLAG:
@@ -350,15 +384,20 @@ void DemoScene::DrawMessage()
 		break;
 		
 	case STATE::SABO:
-		DrawString(x, y, "サボテンは、あなたの陣地を奪いに来る敵です", white);
-		//DrawString(x, y + 40, "ゲージが100%になると次へ進みます", white);
+		DrawString(x, y, "緑の敵は、あなたの陣地を奪いに来る敵です", white);
+		DrawString(x, y + 40, "奪われないように気を付けましょう！", white);
 		break;
 
 	case STATE::FINISH:
 		DrawString(x, y, "チュートリアル完了！", white);
-		DrawString(x, y + 40, "Enter でゲーム開始", white);
+		if (isPad)
+			DrawString(x, y + 40, "A ボタンでゲーム開始", white);
+		else
+			DrawString(x, y + 40, "Enter でゲーム開始", white);
 		break;
 	}
+	SetFontSize(DEFAULT_FONT_SIZE);
+#pragma endregion
 }
 
 void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
@@ -400,20 +439,9 @@ void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
 
 void DemoScene::SpawnCactus(void)
 {
-
-	bool allDead = true;
-	for (auto& enemy : enemys_)
-	{
-		if (enemy->IsAlive())
-		{
-			allDead = false;
-			break;
-		}
-	}
-
 	// すでにボスが出現しているなら何もしない
 	for (auto& enemy : enemys_) {
-		if (std::dynamic_pointer_cast<EnemyCactus>(enemy) || !allDead) {
+		if (std::dynamic_pointer_cast<EnemyCactus>(enemy)) {
 			return;
 		}
 	}

@@ -184,9 +184,7 @@ void Player::Draw(void)
 
 	DrawBox(BAR_START_X, BAR_START_HY, BAR_END_X, BAR_END_HY, black, true);
 	if (hp_ != 0)DrawBox(BAR_START_X, BAR_START_HY, hp_ * BAR_POINT + BAR_START_X, BAR_END_HY, green, true);
-	if (hp_ == 0)DrawBox(BAR_START_X, BAR_START_HY, static_cast<int>(revivalTimer_) + BAR_START_X, BAR_END_HY, red, true);
-	DrawBox(BAR_START_X, BAR_START_WY, BAR_END_X, BAR_END_WY, black, true);
-	DrawBox(BAR_START_X, BAR_START_WY, water_ * BAR_POINT + BAR_START_X, BAR_END_WY, blue, true);
+	
 
 	if (powerUpFlag_)
 	{
