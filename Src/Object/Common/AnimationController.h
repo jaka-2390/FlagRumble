@@ -40,6 +40,9 @@ public :
 	// 再生中のアニメーション
 	int GetPlayType(void) const;
 
+	//play中のアニメーションを返す
+	const Animation& GetPlayAnim(void) const { return playAnim_; }
+
 	// 再生終了
 	bool IsEnd(void) const;
 

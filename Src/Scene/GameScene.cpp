@@ -7,6 +7,7 @@
 #include "../Manager/SoundManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/ResourceManager.h"
+#include "../Manager/FlagManager.h"
 #include "../Object/Common/Capsule.h"
 #include "../Object/Common/Collider.h"
 #include "../Object/SkyDome.h"
@@ -22,18 +23,15 @@
 #include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
-#include "../Object/Flag.h"
-#include "MiniMap.h"
+#include "../Object/Flag/Flag.h"
+//#include "MiniMap.h"
 #include "GameScene.h"
-
-//担当いけだ
 
 GameScene::GameScene(void)
 {
 	player_ = nullptr;
 	skyDome_ = nullptr;
 	stage_ = nullptr;
-	imgGameUi1_ = -1;
 	imgOpeGear_ = -1;
 }
 
@@ -67,14 +65,13 @@ void GameScene::Init(void)
 	skyDome_ = std::make_unique<SkyDome>(player_->GetTransform());
 	skyDome_->Init();
 
-	map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
-	map_->Init();
+	/*map_ = std::make_unique<MiniMap>(MINIMAP_RANGE, MINIMAP_SIZE);
+	map_->Init();*/
 
-	flag_ = std::make_shared<Flag>();
-	flag_->Init();
+	flagManager_ = std::make_shared<FlagManager>();
+	flagManager_->Init();
 
 	//画像
-	imgGameUi1_ = resMng_.Load(ResourceManager::SRC::GAMEUI_1).handleId_;
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
 
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
@@ -106,8 +103,6 @@ void GameScene::Init(void)
 
 	mainCamera->SetFollow(&player_->GetTransform());
 	mainCamera->ChangeMode(Camera::MODE::FOLLOW);
-
-	isB_ = BOSS_WAIT;
 }
 
 void GameScene::Update(void)
@@ -132,64 +127,47 @@ void GameScene::Update(void)
 		enemy->Update();
 	}
 
-	flag_->Update();
+	// 敵全滅情報をFlagに伝える
+	flagManager_->Update(player_->GetTransform().pos, enemys_);
 
-	//敵のエンカウント処理
-	/*enCounter++;
-	if (enCounter > ENCOUNT)
+	//それぞれの旗に敵を生成
+	int flagCount = flagManager_->GetFlagMax();
+	for (int i = 0; i < flagCount; ++i)
 	{
-		enCounter = 0;
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			EnemyCreate(1);
-		}
-	}*/
+			Flag* flag = flagManager_->GetFlag(i);
+			if (!flag) continue;
 
-	enCounter++;
-	if (enCounter > ENCOUNT)
-	{
-		enCounter = 0;
-		if (ENEMY_MAX >= enemys_.size())
-		{
-			int spawnCount = 1; //まとめて出したい数
-			EnemyCreate(spawnCount);
-		}
-	}
-
-	//敵全滅チェック
-	allEnemyDefeated_ = true;
-	for (auto& enemy : enemys_)
-	{
-		if (enemy->IsAlive()) { //EnemyBase に IsAlive() を用意すると便利
-			allEnemyDefeated_ = false;
-			break;
-		}
-	}
-
-	//フラッグとの距離チェック
-	VECTOR playerPos = player_->GetTransform().pos;
-	VECTOR flagPos = flag_->GetPosition();
-
-	float dx = playerPos.x - flagPos.x;
-	float dz = playerPos.z - flagPos.z;
-	float distSq = dx * dx + dz * dz;
-
-	bool inRange = (distSq < flagRadius_* flagRadius_);
-
-	//ゲージ処理
-	if (allEnemyDefeated_ && !gameClear_)
-	{
-		if (inRange)
-		{
-			clearGauge_ += GAUGE_INCREMENT; //フレームごとに加算
-			if (clearGauge_ >= clearGaugeMax_)
+			// FlagのEnemyTypeをEnemyBase::TYPEに変換
+			EnemyBase::TYPE type;
+			switch (flag->GetEnemyType())
 			{
-				clearGauge_ = clearGaugeMax_;
-				gameClear_ = true;
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
+			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
+			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
+			default:                      type = EnemyBase::TYPE::DOG; break;
 			}
+
+			// 敵生成
+			VECTOR flagPos = flag->GetPosition();
+			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
 		}
 	}
+
+	SpawnCactus();
+
+	// フラッグでクリアしたらシーン遷移
+	int cleared = flagManager_->GetClearedFlagCount();
+	int total = flagManager_->GetFlagMax();
+
+	if (!bossSpawned_ && cleared >= total)
+	{
+		SpawnBoss();
+		bossSpawned_ = true;
+	}
+
+	ClearCheck();
 }
 
 void GameScene::Draw(void)
@@ -207,20 +185,9 @@ void GameScene::Draw(void)
 		enemy->DrawBossHpBar();
 	}
 
-	flag_->Draw();
+	flagManager_->Draw();
 
-	DrawMiniMap();
-
-	if (allEnemyDefeated_)
-	{
-		//フラッグの位置を中心に半径100の円を描画
-		flag_->DrawCircleOnMap(flag_->GetPosition(), 100.0f, green);
-	}
-
-	//ゲージ描画（仮に画面左上に描画）
-	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + GAUGE_WIDTH, GAUGE_X + GAUGE_HEIGHT, white, TRUE); //背景
-	int gaugeWidth = static_cast<int>((clearGauge_ / clearGaugeMax_) * 200);
-	DrawBox(GAUGE_X, GAUGE_Y, GAUGE_X + gaugeWidth, GAUGE_X + GAUGE_HEIGHT, green, TRUE);
+	//DrawMiniMap();
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -236,18 +203,6 @@ void GameScene::Draw(void)
 			uiFadeStart_ = true;
 			uiFadeFrame_ = 0;
 		}
-	}
-	if (!uiFadeStart_)
-	{
-		//フェード前（通常表示）
-		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
-	}
-	else if (uiFadeFrame_ < ONE_SECOND_FRAME)
-	{
-		//フェード中（60フレームで徐々に消す）
-		int alpha = static_cast<int>(255 * (ONE_SECOND_FRAME - uiFadeFrame_) / ONE_SECOND_FRAME);
-		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), GAME_HEIGHT_1, IMG_GAME_UI_1_SIZE, 0, imgGameUi1_, true);
-		uiFadeFrame_++;
 	}
 
 	if (isPaused_)
@@ -315,35 +270,35 @@ void GameScene::Release(void)
 	SoundManager::GetInstance().Stop(SoundManager::SRC::GAME_BGM);
 }
 
-void GameScene::DrawMiniMap(void)
-{
-	if (!map_) return;
-
-	//プレイヤーの座標
-	MapVector2 playerPos;
-	playerPos.x = player_->GetTransform().pos.x;
-	playerPos.z = player_->GetTransform().pos.z;
-	//Y軸回転角を使用(ラジアン or 度数)
-	float playerAngle = player_->GetTransform().rot.y;
-
-	float cameraAngleRad = 0.0f;
-	if (camera_) {
-		cameraAngleRad = camera_->GetAngles().y;
-	}
-
-	//敵の座標リストを作成
-	std::vector<std::shared_ptr<EnemyBase>> aliveEnemies;
-	for (const auto& enemy : enemys_)
-	{
-		if (enemy->IsAlive())
-		{
-			aliveEnemies.push_back(enemy);
-		}
-	}
-
-	//ミニマップ描画呼び出し
-	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies);
-}
+//void GameScene::DrawMiniMap(void)
+//{
+//	if (!map_) return;
+//
+//	//プレイヤーの座標
+//	MapVector2 playerPos;
+//	playerPos.x = player_->GetTransform().pos.x;
+//	playerPos.z = player_->GetTransform().pos.z;
+//	//Y軸回転角を使用(ラジアン or 度数)
+//	float playerAngle = player_->GetTransform().rot.y;
+//
+//	float cameraAngleRad = 0.0f;
+//	if (camera_) {
+//		cameraAngleRad = camera_->GetAngles().y;
+//	}
+//
+//	//敵の座標リストを作成
+//	std::vector<std::shared_ptr<EnemyBase>> aliveEnemies;
+//	for (const auto& enemy : enemys_)
+//	{
+//		if (enemy->IsAlive())
+//		{
+//			aliveEnemies.push_back(enemy);
+//		}
+//	}
+//
+//	//ミニマップ描画呼び出し
+//	map_->Draw(playerPos, playerAngle, cameraAngleRad, aliveEnemies);
+//}
 
 const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 {
@@ -352,7 +307,7 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 
 void GameScene::EnemyCreate(int count)
 {
-	VECTOR flagPos = flag_->GetPosition();  //Flagの位置を取得
+	VECTOR flagPos = flagManager_->GetFlagPosition(0);  //Flagの位置を取得
 
 	for (int i = 0; i < count; ++i)
 	{
@@ -376,12 +331,108 @@ void GameScene::EnemyCreate(int count)
 	}
 }
 
+void GameScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		VECTOR randPos = flagPos;
+		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+
+		std::shared_ptr<EnemyBase> enemy;
+
+		switch (type)
+		{
+		case EnemyBase::TYPE::SABO:
+		{
+			auto cactus = std::make_shared<EnemyCactus>();
+			cactus->SetFlagManager(flagManager_.get());
+			enemy = cactus;  // EnemyBase型に代入
+			break;
+		}
+			
+		case EnemyBase::TYPE::DOG:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		default:
+			enemy = std::make_shared<EnemyDog>();
+			break;
+		}
+
+		enemy->SetGameScene(this);
+		enemy->SetPos(randPos);
+		enemy->SetPlayer(player_);
+		enemy->Init();
+
+		enemys_.emplace_back(std::move(enemy));
+	}
+}
+
+void GameScene::SpawnBoss(void)
+{
+	// すでにボスが出現しているなら何もしない
+	for (auto& enemy : enemys_) {
+		if (std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			return;
+		}
+	}
+
+	// ボス出現位置を決める（ステージ中央など）
+	VECTOR bossPos = BOSS_POS;
+
+	// EnemyBossを生成
+	std::shared_ptr<EnemyBase> boss = std::make_shared<EnemyBoss>();
+
+	boss->SetGameScene(this);
+	boss->SetPos(bossPos);
+	boss->SetPlayer(player_);
+	boss->Init();
+
+	// 敵リストに追加
+	enemys_.emplace_back(std::move(boss));
+}
+
+void GameScene::SpawnCactus(void)
+{
+	cactusSpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+
+	if (cactusSpawnTimer_ >= CACTUS_SPAWN_INTERVAL)
+	{
+		cactusSpawnTimer_ = 0.0f; // リセット
+
+		// ENEMY状態の旗を探す
+		std::vector<Flag*> enemyFlags;
+		int flagCount = flagManager_->GetFlagMax();
+		for (int i = 0; i < flagCount; ++i)
+		{
+			Flag* flag = flagManager_->GetFlag(i);
+			if (flag && flag->GetState() == Flag::STATE::ENEMY)
+			{
+				enemyFlags.push_back(flag);
+			}
+		}
+
+		if (!enemyFlags.empty())
+		{
+			// ランダムで1つ選ぶ
+			int randomIndex = GetRand((int)enemyFlags.size() - 1);
+			Flag* targetFlag = enemyFlags[randomIndex];
+
+			if (targetFlag)
+			{
+				VECTOR flagPos = targetFlag->GetPosition();
+				EnemyCreateAt(flagPos, 1, EnemyBase::TYPE::SABO);
+			}
+		}
+	}
+}
+
 bool GameScene::PauseMenu(void)
 {
 	InputManager& ins = InputManager::GetInstance();
 
 	//TABキーでポーズのON/OFF切り替え（Menu中のみ）
-	if (ins.IsTrgDown(KEY_INPUT_TAB) && pauseState_ == PauseState::Menu)
+	if (ins.IsTrgDown(KEY_INPUT_TAB) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::STRAT) && pauseState_ == PauseState::Menu)
 	{
 		isPaused_ = !isPaused_;
 		pauseSelectIndex_ = 0;
@@ -393,13 +444,13 @@ bool GameScene::PauseMenu(void)
 
 	if (pauseState_ == PauseState::Menu)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_DOWN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_DOWN) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_UP))
+		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_UP) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
 			switch (pauseSelectIndex_)
 			{
@@ -415,9 +466,28 @@ bool GameScene::PauseMenu(void)
 	}
 	else
 	{
-		if (ins.IsTrgDown(KEY_INPUT_RETURN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 			pauseState_ = PauseState::Menu;
 	}
 
 	return true;
+}
+
+void GameScene::ClearCheck(void)
+{
+	//ボスが存在するかチェック
+	bool bossDefeated = true;
+	for (auto& enemy : enemys_) {
+		if (auto boss = std::dynamic_pointer_cast<EnemyBoss>(enemy)) {
+			if (boss->IsAlive()) {  //isAlive_がtrueならまだ倒されていない
+				bossDefeated = false;
+				break;
+			}
+		}
+	}
+
+	//全旗を奪還済み && ボス倒したらクリア
+	if (bossSpawned_ && bossDefeated) {
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+	}
 }

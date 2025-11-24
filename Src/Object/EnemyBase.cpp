@@ -51,6 +51,10 @@ void EnemyBase::Init(void)
 	SetParam();
 	InitAnimation();
 
+	startPos_ = transform_.pos;
+
+	encounter_ = false;
+
 	damageCnt_ = 0;
 
 	damage1img_ = LoadGraph("Data/Image/1.png");
@@ -113,22 +117,21 @@ void EnemyBase::UpdateAttack(void)
 {
 	animationController_->Play((int)ANIM_TYPE::ATTACK, false);
 
-	//攻撃タイミング
-	if (!isAttack_ && isAttack_P)
+	const auto& anim = animationController_->GetPlayAnim();
+	if (anim.step > 15.0f && isAttack_ == true)
 	{
-		isAttack_ = true; //多重ヒット防止用フラグ
-		isAttack_P = false;
+		isAttack_ = false;
+		CheckHitAttackHit();
 	}
-	else if (!isAttack_ && isAttack_T)
+	else if(anim.step > 30.0f && enemyType_ == TYPE::BOSS && isAttack_P)
 	{
-		isAttack_ = true;
-		isAttack_T = false;
+		isAttack_P = false;
+		CheckHitAttackHit();
+		return;
 	}
 
 	//アニメーション終了で次の状態に遷移
 	if (animationController_->IsEnd() || state_ != STATE::ATTACK) {
-		isAttack_ = false;
-		CheckHitAttackHit();
 		ChangeState(STATE::IDLE);
 	}
 }
@@ -210,15 +213,74 @@ void EnemyBase::ChasePlayer(void)
 		animationController_->Play((int)ANIM_TYPE::RUN, true);
 	}
 
+	//ボスはプレイヤーを追いかける
+	if (enemyType_ == TYPE::BOSS)
+	{
+		VECTOR dirToPlayer = VNorm(toPlayer);
+		VECTOR moveVec = VScale(dirToPlayer, speed_);
+
+		transform_.pos = VAdd(transform_.pos, moveVec);
+
+		//方向からクォータニオンに変換
+		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+
+		encounter_ = false;
+	}
 	//エネミーの視野内に入ったら追いかける
-	VECTOR dirToPlayer = VNorm(toPlayer);
-	VECTOR moveVec = VScale(dirToPlayer, speed_);
+	else if (distance <= VIEW_RANGE
+		&& state_ == STATE::PLAY
+		&& player_->pstate_ == Player::PlayerState::NORMAL)
+	{
+		VECTOR dirToPlayer = VNorm(toPlayer);
+		VECTOR moveVec = VScale(dirToPlayer, speed_);
 
-	transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.pos = VAdd(transform_.pos, moveVec);
 
-	//方向からクォータニオンに変換
-	transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
-	
+		//方向からクォータニオンに変換
+		transform_.quaRot = Quaternion::LookRotation(dirToPlayer);
+
+		//プレイヤーと接敵
+		encounter_ = true;
+	}
+	else
+	{
+		//タイマー
+		changeDirTimer_ += scnMng_.GetDeltaTime();
+
+		//出現位置を基準にする
+		float maxRange = MAX_RANGE;
+
+		//現在の出現位置からの距離
+		float distanceStart = VSize(VSub(transform_.pos, startPos_));
+
+		//2秒ごとに方向変更
+		if (changeDirTimer_ >= WANDER_CHANGE_TIME || distanceStart > maxRange)
+		{
+			changeDirTimer_ = 0.0f;
+
+			VECTOR toStart = VSub(startPos_, transform_.pos);
+
+			if (distanceStart > maxRange)
+			{
+				//範囲外ならスタート地点へ
+				wanderDir_ = VNorm(toStart);
+			}
+			else
+			{
+				//ランダム方向
+				float angle = GetRand(360) * DX_PI_F / 180.0f;
+				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
+			}
+		}
+
+		//プレイヤーから離れた
+		encounter_ = false;
+
+		//徘徊
+		VECTOR moveVec = VScale(wanderDir_, speed_ * WANDER_SPEED_SCALE);
+		transform_.pos = VAdd(transform_.pos, moveVec);
+		transform_.quaRot = Quaternion::LookRotation(wanderDir_);
+	}
 }
 
 void EnemyBase::Draw(void)
@@ -237,11 +299,19 @@ void EnemyBase::Draw(void)
 	MV1DrawModel(transform_.modelId);
 	DrawDamage();
 
+	//HPバー描画
+	if (encounter_)
+	{
+		float gaugeRate = static_cast<float>(hp_) / static_cast<float>(maxHp_);
+		gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f); //範囲制限
+		DrawHpGauge3D(transform_.pos, gaugeRate);
+	}
+
 	//デッバグ
 	DrawDebug();
 
 	//視野範囲の描画
-	//DrawDebugSearchRange();
+	DrawDebugSearchRange();
 }
 
 void EnemyBase::Release(void)
@@ -402,6 +472,26 @@ void EnemyBase::DrawDamage()
 	}
 }
 
+void EnemyBase::DrawHpGauge3D(VECTOR center, float gaugeRate)
+{
+	//HPバーを敵の上(少し高い位置)に表示
+	VECTOR gaugePos = VAdd(center, VGet(0.0f, 80.0f, 0.0f));
+	VECTOR screenPos = ConvWorldPosToScreenPos(gaugePos);
+
+	int barWidth = 80;
+	int barHeight = 8;
+
+	int x = (int)screenPos.x - barWidth / 2;
+	int y = (int)screenPos.y - 200; //少し上にオフセット
+
+	//外枠
+	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, GetColor(255, 255, 255), FALSE);
+
+	//中身
+	int fillWidth = (int)(barWidth * gaugeRate);
+	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(255, 0, 0), TRUE);
+}
+
 
 #pragma region コリジョン
 
@@ -455,6 +545,7 @@ void EnemyBase::EnemyToPlayer(void)
 	if (AsoUtility::IsHitSpheres(attackCollisionPos_, attackCollisionRadius_, playerCenter_, playerRadius_)
 		&& player_->pstate_ != Player::PlayerState::DOWN)
 	{
+		isAttack_ = true;
 		isAttack_P = true;
 		ChangeState(STATE::ATTACK);
 	}
@@ -485,6 +576,11 @@ void EnemyBase::CheckHitAttackHit(void)
 void EnemyBase::SetGameScene(GameScene* scene)
 {
 	scene_ = scene;
+}
+
+void EnemyBase::SetDemoScene(DemoScene* demoScene)
+{
+	demoScene_ = demoScene;
 }
 
 #pragma region Stateの切り替え
@@ -558,39 +654,53 @@ void EnemyBase::DrawDebug(void)
 	DrawSphere3D(a, attackCollisionRadius_, 8, yellow, yellow, false);
 
 #endif //DEBUG
+
 }
 
 void EnemyBase::DrawDebugSearchRange(void)
 {
-	VECTOR centerPos = transform_.pos;
 
-	//プレイヤーの座標
+#ifdef _DEBUG
+
+	VECTOR centerPos = transform_.pos;
+	float radius = VIEW_RANGE;
+	int segments = 60;
+
+	// プレイヤーの座標
 	VECTOR playerPos = player_->GetTransform().pos; // プレイヤーオブジェクトの参照を持っている想定
 
-	//プレイヤーと敵の距離（XZ平面）
+	// プレイヤーと敵の距離（XZ平面）
 	float dx = playerPos.x - centerPos.x;
 	float dz = playerPos.z - centerPos.z;
 	float distance = sqrtf(dx * dx + dz * dz);
 
-	//範囲内か判定
-	bool inRange = (distance <= VIEW_RANGE);
+	// 範囲内か判定
+	bool inRange = (distance <= radius);
 
-	float angleStep = AsoUtility::FULL_ROTATION_RAD / VALUE_SIXTY;
+	// 色を決定（範囲内なら赤、範囲外は元の色）
+	unsigned int color = inRange ? 0xff0000 : 0xffdead;
 
-	for (int i = static_cast<int>(VALUE_ZERO); i < VALUE_SIXTY; ++i)
+	float angleStep = DX_PI * 2.0f / segments;
+
+	for (int i = 0; i < segments; ++i)
 	{
 		float angle1 = angleStep * i;
-		float angle2 = angleStep * (i + VALUE_ONE);
+		float angle2 = angleStep * (i + 1);
 
 		VECTOR p1 = {
-			centerPos.x + VIEW_RANGE * sinf(angle1),
+			centerPos.x + radius * sinf(angle1),
 			centerPos.y,
-			centerPos.z + VIEW_RANGE * cosf(angle1)
+			centerPos.z + radius * cosf(angle1)
 		};
 		VECTOR p2 = {
-			centerPos.x + VIEW_RANGE * sinf(angle2),
+			centerPos.x + radius * sinf(angle2),
 			centerPos.y,
-			centerPos.z + VIEW_RANGE * cosf(angle2)
+			centerPos.z + radius * cosf(angle2)
 		};
+		DrawTriangle3D(centerPos, p1, p2, color, false);
 	}
+	DrawSphere3D(centerPos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
+
+#endif //DEBUG
+
 }

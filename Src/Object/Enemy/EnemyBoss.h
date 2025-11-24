@@ -6,12 +6,13 @@ class EnemyBoss : public EnemyBase
 
 public:
 
+	static constexpr VECTOR BOSS_SCALE = { 0.5f,0.5f,0.5f };
 	static constexpr  float SPEED = 2.0f;
 
 	//ボスの最大HP
-	static constexpr int BOSS_MAX_HP = 30;
+	static constexpr int BOSS_MAX_HP = 20;
 
-	// HPバー表示
+	//HPバー表示
 	static constexpr int BOSS_HP_BAR_WIDTH = 600;
 	static constexpr int BOSS_HP_BAR_HEIGHT = 20;
 	static constexpr int BOSS_HP_BAR_Y = 80;

@@ -3,6 +3,7 @@
 #include <map>
 #include <functional>
 #include <DxLib.h>
+#include "../Manager/InputManager.h"
 #include "../Application.h"
 #include "EnemyBase.h"
 
@@ -16,7 +17,7 @@ class Player : public ActorBase
 public:
 
 	//プレイヤー
-	static constexpr VECTOR PLAYER_POS = { 0.0f, 300.0f, -600.0f };	//初期位置
+	static constexpr VECTOR PLAYER_POS = { -800.0f, 300.0f, -100.0f };	//初期位置
 	static constexpr VECTOR CAPSULE_TOP = { 0.0f, 110.0f, 0.0f };	//カプセルの頂点
 	static constexpr VECTOR CAPSULE_BOTTOM = { 0.0f,  30.0f, 0.0f };//カプセルの足元
 	static constexpr float PLAYER_ROT_Y = 180.0f;					//Y軸回転(度数)
@@ -37,6 +38,7 @@ public:
 	static constexpr int   ANIM_FAST_RUN_INDEX = 3;
 	static constexpr int   ANIM_SLASHATTACK_INDEX = 4;
 	static constexpr int   ANIM_NORMALATTACK_INDEX = 5;
+	static constexpr int   ANIM_DAMAGE_INDEX = 6;
 	static constexpr int   ANIM_DOWN_INDEX = 7;
 	static constexpr int   ANIM_EXATTACK_INDEX = 8;
 
@@ -104,7 +106,7 @@ public:
 	static constexpr int FRAME_START_X = 47;								//枠の最初X
 	static constexpr int FRAME_START_Y = Application::SCREEN_SIZE_Y - 78;	//枠の最初Y
 	static constexpr int FRAME_END_X = 653;									//枠の最後X
-	static constexpr int FRAME_END_Y = Application::SCREEN_SIZE_Y - 37;		//枠の最後Y
+	static constexpr int FRAME_END_Y = Application::SCREEN_SIZE_Y - 52;		//枠の最後Y
 	static constexpr int BAR_START_X = 50;									//バーの最初X
 	static constexpr int BAR_START_HY = Application::SCREEN_SIZE_Y - 75;	//バーの最初体力Y
 	static constexpr int BAR_START_WY = Application::SCREEN_SIZE_Y - 50;	//バーの最初水Y
@@ -174,6 +176,7 @@ public:
 		IDLE,
 		RUN,
 		FAST_RUN,
+		DAMAGE,
 		DOWN,
 		NORMALATTACK,
 		SLASHATTACK,
@@ -297,6 +300,7 @@ private:
 	void EffectPower(void);			//パワーアップエフェクト
 	void EffectSpeed(void);			//スピードアップエフェクト
 	void EffectHeal(void);			//回復エフェクト
+	void EffectSword(void);			//攻撃エフェクト
 
 	//移動関連
 	VECTOR moveDir_;				//移動方向
@@ -364,6 +368,11 @@ private:
 	float stepHeal_;
 	int effectHealResId_;
 	int effectHealPleyId_;
+	
+	//攻撃エフェクト
+	float stepSword_;
+	int effectSwordResId_;
+	int effectSwordPleyId_;
 
 	//ポインタ
 	const std::vector<std::shared_ptr<EnemyBase>>* enemy_;
@@ -373,5 +382,7 @@ private:
 
 	//デバッグ処理
 	void DrawDebug(void);
+
+	InputManager& ins = InputManager::GetInstance();
 
 };

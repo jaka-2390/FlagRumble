@@ -40,10 +40,6 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "BackTitle.png");
 	resourcesMap_.emplace(SRC::BACK_TITLE, std::move(res));
 
-	// ゲーム画面のUI
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "GameUI1.png");
-	resourcesMap_.emplace(SRC::GAMEUI_1, std::move(res));
-
 	// タイトルに戻る
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "GoTitle.png");
 	resourcesMap_.emplace(SRC::GOTITLE, std::move(res));
@@ -137,7 +133,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::SKY_DOME, std::move(res));
 
 	// 最初の惑星
-	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Stage1.mv1");
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Stage.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, std::move(res));
 
 	// 足煙
@@ -208,8 +204,14 @@ void ResourceManager::Init(void)
 	//-------------------------
 
 	//木の視野
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "TreeRange.efkefc");
-	resourcesMap_.emplace(SRC::TREE_RANGE, std::move(res));
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "NoneArea.efkefc");
+	resourcesMap_.emplace(SRC::NONE_AREA, std::move(res));
+	
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PlayerArea.efkefc");
+	resourcesMap_.emplace(SRC::PLAYER_AREA, std::move(res));
+	
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "EnemyArea.efkefc");
+	resourcesMap_.emplace(SRC::ENEMY_AREA, std::move(res));
 	
 	//パワーアップ
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PowerUp.efkefc");
@@ -222,6 +224,10 @@ void ResourceManager::Init(void)
 	//回復
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "HealEffect.efkefc");
 	resourcesMap_.emplace(SRC::EFF_HEAL, std::move(res));
+	
+	//攻撃
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "Sword.efkefc");
+	resourcesMap_.emplace(SRC::SWORD, std::move(res));
 }
 
 void ResourceManager::Release(void)

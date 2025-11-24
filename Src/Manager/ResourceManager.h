@@ -19,7 +19,6 @@ public:
 		CURSOR,
 		PLAY,
 		RULE,
-		GAMEUI_1,
 		UPDOWN,
 		GOTITLE,
 		GOGAME,
@@ -82,10 +81,13 @@ public:
 		VIRUS,
 		BOSS,
 		//エフェクト
-		TREE_RANGE,
+		NONE_AREA,
+		PLAYER_AREA,
+		ENEMY_AREA,
 		EFF_POWER,
 		EFF_SPEED,
-		EFF_HEAL
+		EFF_HEAL,
+		SWORD
 	};
 
 	// 明示的にインステンスを生成する

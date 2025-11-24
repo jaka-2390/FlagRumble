@@ -219,7 +219,7 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	{
 	case SCENE_ID::TITLE:
 		scene_ = std::make_unique<TitleScene>();
-		ChangeFont("PixelMplus10");
+		//ChangeFont("PixelMplus10");
 		SetFontSize(16);
 		break;
 	case SCENE_ID::DEMO:

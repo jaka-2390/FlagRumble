@@ -7,7 +7,6 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/SoundManager.h"
-#include "../Manager/InputManager.h"
 #include "../Manager/Camera.h"
 #include "Common/AnimationController.h"
 #include "Common/Capsule.h"
@@ -110,6 +109,10 @@ void Player::Init(void)
 	//回復エフェクト
 	effectHealResId_ = ResourceManager::GetInstance().Load(
 		ResourceManager::SRC::EFF_HEAL).handleId_;
+	
+	//攻撃エフェクト
+	effectSwordResId_ = ResourceManager::GetInstance().Load(
+		ResourceManager::SRC::SWORD).handleId_;
 
 	//アニメーションの設定
 	InitAnimation();
@@ -172,7 +175,7 @@ void Player::Draw(void)
 {
 	MV1DrawModel(transform_.modelId);	//モデルの描画
 	DrawShadow();						//丸影描画
-	//DrawDebug();						//デバッグ用描画
+	DrawDebug();						//デバッグ用描画
 
 #pragma region ステータス
 	DrawFormatString(NAME_X, NAME_Y, black, "PLAYER");
@@ -181,9 +184,7 @@ void Player::Draw(void)
 
 	DrawBox(BAR_START_X, BAR_START_HY, BAR_END_X, BAR_END_HY, black, true);
 	if (hp_ != 0)DrawBox(BAR_START_X, BAR_START_HY, hp_ * BAR_POINT + BAR_START_X, BAR_END_HY, green, true);
-	if (hp_ == 0)DrawBox(BAR_START_X, BAR_START_HY, static_cast<int>(revivalTimer_) + BAR_START_X, BAR_END_HY, red, true);
-	DrawBox(BAR_START_X, BAR_START_WY, BAR_END_X, BAR_END_WY, black, true);
-	DrawBox(BAR_START_X, BAR_START_WY, water_ * BAR_POINT + BAR_START_X, BAR_END_WY, blue, true);
+	
 
 	if (powerUpFlag_)
 	{
@@ -293,6 +294,7 @@ void Player::InitAnimation(void)
 	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "Player.mv1", ANIM_SPEED, ANIM_FAST_RUN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::SLASHATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_SLASHATTACK_INDEX);
 	animationController_->Add((int)ANIM_TYPE::NORMALATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_NORMALATTACK_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DAMAGE, path + "Player.mv1", ANIM_SPEED, ANIM_DAMAGE_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DOWN, path + "Player.mv1", ANIM_SPEED, ANIM_DOWN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::EXATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_EXATTACK_INDEX);
 
@@ -480,8 +482,6 @@ void Player::DrawDebug(void)
 
 void Player::ProcessMove(void)
 {
-	auto& ins = InputManager::GetInstance();
-
 	//方向量をゼロ
 	movePow_ = AsoUtility::VECTOR_ZERO;
 
@@ -536,9 +536,18 @@ void Player::ProcessMove(void)
 		{
 			//移動量
 			speed_ = SPEED_MOVE;
-			if (ins.IsNew(KEY_INPUT_LSHIFT))
+			if (ins.IsNew(KEY_INPUT_LSHIFT) || 
+				ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,InputManager::JOYPAD_BTN::RB))
 			{
 				speed_ = SPEED_RUN;
+
+				//アニメーション
+				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
+			}
+			else
+			{
+				//アニメーション
+				animationController_->Play((int)ANIM_TYPE::RUN);
 			}
 
 			//アイテム獲得時のスピード
@@ -553,16 +562,6 @@ void Player::ProcessMove(void)
 
 			//回転処理IDLE
 			SetGoalRotate(rotRad);
-
-			//アニメーション
-			if (ins.IsNew(KEY_INPUT_LSHIFT))
-			{
-				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
-			}
-			else
-			{
-				animationController_->Play((int)ANIM_TYPE::RUN);
-			}
 		}
 		else
 		{
@@ -729,8 +728,12 @@ void Player::CollisionAttack(void)
 			//球体同士の当たり判定
 			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
 			{
+				EffectSword();
+
+				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, attackPos.x, attackPos.y + ATTACK2_HEIGHT, attackPos.z);
+
 				enemy->Damage(normalAttack_);
-				//1体のみヒット
+				//複数ヒット
 				continue;
 			}
 		}
@@ -825,7 +828,8 @@ void Player::CalcGravityPow(void)
 
 void Player::ProcessAttack(void)
 {
-	bool isHit = CheckHitKey(KEY_INPUT_E);
+	bool isHit = CheckHitKey(KEY_INPUT_E) ||
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP);
 	bool isHit_N = CheckHitKey(KEY_INPUT_Q);
 	bool isHit_E = CheckHitKey(KEY_INPUT_R);
 
@@ -836,7 +840,7 @@ void Player::ProcessAttack(void)
 		{
 			animationController_->Play((int)ANIM_TYPE::NORMALATTACK, false);
 			isAttack_ = true;
-
+			
 			//衝突(攻撃)
 			CollisionAttack();
 
@@ -893,9 +897,7 @@ bool Player::IsEndLanding(void)
 	int animType = animationController_->GetPlayType();
 
 	//現在のアニメーションが ATTACK1,2 または EXATTACK のいずれかで、まだ終了していない場合
-	if ((animType != (int)ANIM_TYPE::NORMALATTACK || animType == (int)ANIM_TYPE::SLASHATTACK
-		|| animType == (int)ANIM_TYPE::EXATTACK)
-		&& !animationController_->IsEnd())
+	if (animType != (int)ANIM_TYPE::NORMALATTACK)
 	{
 		return ret;
 	}
@@ -918,11 +920,16 @@ void Player::Damage(int damage)
 	if (pstate_ == PlayerState::DOWN || invincible_) return;  //ダウン中は無敵
 	hp_ -= damage;
 
+	//アニメーション
+	//animationController_->Play((int)ANIM_TYPE::DAMAGE, false);
+
 	//SE
 	SoundManager::GetInstance().Play(SoundManager::SRC::P_DAMAGE_SE, Sound::TIMES::FORCE_ONCE);
 
 	if (hp_ <= 0) {
 		hp_ = 0;
+
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
 
 		//SE
 		SoundManager::GetInstance().Play(SoundManager::SRC::P_DOWN_SE, Sound::TIMES::ONCE);
@@ -1087,6 +1094,17 @@ void Player::EffectHeal(void)
 
 	//エフェクトの大きさ
 	SetScalePlayingEffekseer3DEffect(effectHealPleyId_, scale, scale, scale);
+}
+
+void Player::EffectSword(void)
+{
+	float scale = STATUS_EFFECT_SCALE;
+
+	//エフェクト再生
+	effectSwordPleyId_ = PlayEffekseer3DEffect(effectSwordResId_);
+
+	//エフェクトの大きさ
+	SetScalePlayingEffekseer3DEffect(effectSwordPleyId_, scale, scale, scale);
 }
 
 int Player::GetWater(void) const

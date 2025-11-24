@@ -1,113 +1,191 @@
 #pragma once
 #include <memory>
-#include "..//Application.h"
+#include <vector>
+#include "../Object/EnemyBase.h"
+#include "../Manager/InputManager.h"
 #include "SceneBase.h"
-#include "string"
 
-class SceneManager;
+class Stage;
+class SkyDome;
+class Player;
+class Camera;
+class FlagManager;
 
 class DemoScene :public SceneBase
 {
 
-public:
-
-	//色
-	int white = 0xffffff; //白
-	int black = 0x000000; //黒
-	int gray = 0xaaaaaa; //灰
-	int shadow = 0x888888; //影
-
-	//テキスト関連
-	static constexpr int TXT = -2;									//テキストの初期化
-	static constexpr int FONT_SIZE = 38;							//文字のサイズ
-	static constexpr int START_TXT_X = 385;							//テキストの最初X
-	static constexpr int START_TXT_Y = 900;							//テキストの最初Y
-	static constexpr int FRAME_X = Application::SCREEN_SIZE_X / 2;	//枠のX
-	static constexpr int FRAME_Y = Application::SCREEN_SIZE_Y - 175;	//枠のY
-	static constexpr int FRAME_SIZE = 0.8f;							//枠の大きさ
-	static constexpr int UP_BLACK = 800;							//幕の位置
-	static constexpr int DOWN_BLACK = 980;							//幕の位置
-	static constexpr int CNT = 90;									//カウントの最大
-	static constexpr int TRI_SIZE = 1.2f;							//三角の大きさ
-	static constexpr int TRI_POS_X = 1490;							//三角の位置
-	static constexpr int TRI_POS_UY = 985;							//三角の位置
-	static constexpr int TRI_POS_DY = 975;							//三角の位置
-
-	//スポットライト関連
-	static constexpr int LIGHT_RX = 1300;		//右の光
-	static constexpr int LIGHT_LX = 500;		//左の光
-	static constexpr int UP_LIGHT = 695;		//上の光
-	static constexpr int DOWN_LIGHT = 700;		//下の光
-	static constexpr int UP_SHADOW_X = 90;		//上の影　半径X
-	static constexpr int UP_SHADOW_Y = 30;		//上の影　半径Y
-	static constexpr int DOWN_SHADOW_X = 150;	//下の影　半径X
-	static constexpr int DOWN_SHADOW_Y = 40;	//下の影　半径Y
-	static constexpr int TREE_POS = 630;		//木の位置
-	static constexpr int WATER_POS = 655;		//水の位置
-	static constexpr int PLAYER_POS = 650;		//自の位置
-	static constexpr int TREE_SIZE = 0.35f;		//木の大きさ
-	static constexpr int WATER_SIZE = 7.0f;		//水の大きさ
-	static constexpr int PLAYER_SIZE = 3.5f;	//自の大きさ
-
-	//案内役関連
-	static constexpr int FRONT = 0;											//前向き
-	static constexpr int RIGHT = 1;											//右向き
-	static constexpr int LEFT = 2;											//左向き
-	static constexpr int UP = 3;											//上向き
-	static constexpr int DOWN = 4;											//下向き
-	static constexpr int GOD_POS_X = Application::SCREEN_SIZE_X / 2;		//案内人の位置X
-	static constexpr int GOD_POS_Y = Application::SCREEN_SIZE_Y / 2 - 200;	//案内人の位置Y
-
-	enum class TXT
+	//スポーン場所
+	struct SpawnArea
 	{
-		T1,
-		T2,
-		T3,
-		T4,
-		T5,
-		T6,
-		T7,
-		T8,
-		T9,
-		T10,
-		T11,
-		T12,
-		T13,
-		T14,
-		T15,
-		T16,
-		T17,
-		T18,
-		T19,
-		T20,
-		T21,
-		MAX
+		VECTOR center;     //中心座標
+		float radius;      //半径
+		bool triggered;    //もうスポーン済みか（1回きりの場合）
 	};
 
-	DemoScene(void);     //コンストラクタ
-	~DemoScene(void);    //デストラクタ
+	enum class STATE
+	{
+		NONE,
+		MOVE,
+		ATTACK,
+		FLAG,
+		SABO,
+		FINISH
+	};
 
-	void Init(void)override;      //初期化処理
-	void Update(void)override;    //更新処理
-	void Draw(void)override;      //描画処理
-	void Release(void)override;
+	public:
+
+		static constexpr int ENCOUNT = 60;			//エンカウンタ
+		static constexpr int ENEMY_MAX = 3;			//最大出現数
+		static constexpr int ENE_ENC = 30;			//最大許容量
+		static constexpr int BORN_DIR = 3;			//敵の出現方向
+		static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
+		static constexpr int STAGE_LANGE = 10000;	//ステージの幅
+		static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
+
+		//UI関係-----------------------------------------------------
+		//-------------------------------------------------------------------
+
+		static constexpr int GAME_HEIGHT_1 = 80;			//ゲーム開始時の注意書き
+
+		//画像サイズ
+		static constexpr float IMG_GAME_UI_1_SIZE = 0.5;	//imgGameUi1_のサイズ
+		static constexpr float IMG_OPEGEAR_UI_SIZE = 0.8;	//imgOpeGear_のサイズ
+		static constexpr float PAUSE_IMG_UI_SIZE = 0.65;	//pauseImg_のサイズ
+
+		//ポーズメニュー関連
+		static constexpr int PAUSE_MENU_ITEM_COUNT = 4;						//ポーズメニューの数
+		static constexpr int PAUSE_MENU_DOWN = 1;							//下に移動
+		static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動（+3 の代わり）
+
+		//フェード系
+		static constexpr int AUTO_FADE = 240;				//自動フェード
+		static constexpr int FLASH = 45;					//点滅
+		static constexpr int ONE_SECOND_FRAME = 60;			//1秒
+
+		//設定系
+		static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
+
+		static constexpr int UI_PAUSE_IMG_HEIGHT = 150;				//pauseImg_の高さ
+
+		static constexpr int UI_WIDTH_PAUSE_1 = 160;				//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_2 = 200;				//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_3 = 240;				//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_4 = 380;				//UIを調整する
+
+		static constexpr int UI_HEIGHT_PAUSE_1 = 350;				//１個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_2 = 470;				//２個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_3 = 590;				//３個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_4 = 710;				//４個目のUIの高さ
+
+		static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
+		static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
+
+		//フラッグ
+		static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
+		static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
+
+		//サボテンのインターバル
+		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
+
+		//メッセージの表示時間
+		const float MESSAGE_DISPLAY_SEC = 1.5f;
+
+		//クリアゲージ
+		static constexpr int GAUGE_X = 20;                //左上X位置
+		static constexpr int GAUGE_Y = 20;                //左上Y位置
+		static constexpr int GAUGE_WIDTH = 200;           //ゲージの全幅
+		static constexpr int GAUGE_HEIGHT = 20;           //ゲージの高さ
+
+		//-------------------------------------------------------------------
+
+		//色
+		int white = 0xffffff; //白
+		int black = 0x000000; //黒
+		int red = 0xff0000;	  //赤
+		int green = 0x00ff00; //緑
+		int blue = 0x0000ff;  //青
+		int yellow = 0xffff00;//黄
+		int purpl = 0x800080; //紫
+
+		DemoScene(void);	//コンストラクタ
+		~DemoScene(void);	//デストラクタ
+
+		void Init(void) override;
+		void Update(void) override;
+		void Draw(void) override;
+		void Release(void) override;
+
+		const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
 
 private:
 
-	SceneManager* sceneManager_;   //シーンマネジャーのポインタ格納領域
-	int demoSound_;
+		int cnt;
 
-	int tree_;
-	int player_;
-	int water_;
-	int god_[5];
-	int gNo_;
-	int waku_;
-	int tri_;
+		void UpdateMove();
+		void UpdateAttack();
+		void UpdateFlag();
+		void UpdateSabo();
 
-	int txt_;
-	int cnt_;
-	int now_;
-	int old_;
+		void DrawMessage();
+
+		void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
+
+		void SpawnCactus(void);
+
+		void MessageTime(void);
+
+		bool PauseMenu(void);
+
+		std::vector<SpawnArea> spawnAreas_;	//スポーン場所
+		std::unique_ptr<Stage> stage_;		//ステージ
+		std::unique_ptr<SkyDome> skyDome_;	//スカイドーム
+		std::shared_ptr<Player> player_;	//プレイヤー
+		std::shared_ptr<Camera> camera_;	//カメラ
+		std::shared_ptr<FlagManager> flagManager_;		//フラッグ
+
+		int enemyModelId_;
+		int uiDisplayFrame_;	//カウンタ
+
+		bool uiFadeStart_ = false;
+		int uiFadeFrame_ = 0;
+
+		//設定開く
+		int imgOpeGear_;
+
+		std::vector<std::shared_ptr<EnemyBase>> enemys_;
+		int enCounter;//敵の出現頻度
+
+		bool isDog_ = false;
+
+		//ポーズ
+		bool isPaused_;           //ポーズ中かどうか
+		int pauseSelectIndex_;    //ポーズメニューの選択項目（上下選択）
+		int pauseExplainImgs_[2];
+
+		enum class PauseState
+		{
+			Menu,        //通常のポーズメニュー
+			ShowControls,//操作説明画面
+			ShowItems    //アイテム概要画面
+		};
+
+		//旗関連
+		float flagRadius_ = 100.0f;       //接近判定の距離
+
+		int lastSpawnTime_;  //最後に敵を出現させた時間
+
+		float cactusSpawnTimer_ = 0.0f;
+
+		STATE state_ = STATE::MOVE;
+		bool stateFinish_ = false;
+		bool spawnCactus_ = false;
+
+		float messageTimer_ = 0.0f;       // メッセージ表示用タイマー
+		bool messageActive_ = true;       // メッセージを表示中かどうか
+
+		PauseState pauseState_ = PauseState::Menu;
+		int  pauseImg_;
+
+		InputManager& ins = InputManager::GetInstance();
 
 };

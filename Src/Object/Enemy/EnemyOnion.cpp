@@ -38,6 +38,7 @@ void EnemyOnion::SetParam(void)
 	isAlive_ = true;	// 初期は生存状態
 
 	hp_ = HP;	// HPの設定
+	maxHp_ = HP;
 
 	collisionRadius_ = 100.0f;	// 衝突判定用の球体半径
 	collisionLocalPos_ = COLLISION_POS;	// 衝突判定用の球体中心の調整座標

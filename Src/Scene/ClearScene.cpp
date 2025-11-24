@@ -111,7 +111,7 @@ void ClearScene::Update(void)
 	}
 
 	// 入力受付（アニメーション後）
-	if (isAnimEnd_ && CheckHitKeyAll() > 0) {
+	if (isAnimEnd_ && CheckHitKeyAll() > 0 || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 		// 音楽
 		SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
