@@ -80,6 +80,8 @@ public:
 		TOGE,
 		VIRUS,
 		BOSS,
+		//旗
+		FLAG,
 		//エフェクト
 		NONE_AREA,
 		PLAYER_AREA,

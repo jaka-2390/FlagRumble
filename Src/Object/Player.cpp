@@ -337,6 +337,9 @@ void Player::UpdatePlay(void)
 	//重力による移動量
 	CalcGravityPow();
 
+	//落下処理
+	ProcessFall();
+
 	//衝突判定
 	Collision();
 
@@ -823,6 +826,15 @@ void Player::CalcGravityPow(void)
 	{
 		//重力方向と反対方向(マイナス)でなければ、ジャンプ力を無くす
 		jumpPow_ = gravity;
+	}
+}
+
+void Player::ProcessFall(void)
+{
+	if (transform_.pos.y <= -300.0f)
+	{
+		transform_.pos = PLAYER_POS;
+		Damage(3);
 	}
 }
 

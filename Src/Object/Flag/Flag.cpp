@@ -1,11 +1,15 @@
 #include <DxLib.h>
 #include<EffekseerForDXLib.h>
 #include "../../Manager/ResourceManager.h"
+#include "../../Utility/AsoUtility.h"
 #include"../../Application.h"
 #include "Flag.h"
 
-Flag::Flag(VECTOR pos, ENEMY_TYPE type):pos_(pos), enemyType_(type)
+Flag::Flag(VECTOR pos, ENEMY_TYPE type):pos_(pos), enemyType_(type), resMng_(ResourceManager::GetInstance())
 {
+	//ResourceManagerから複製モデルを取得
+	flag_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::FLAG));
+
 	//エフェクト
 	effectEnemyAreaPlayId_ = 0;
 	effectEnemyAreaPlayId_ = 0;
@@ -16,15 +20,17 @@ Flag::Flag(VECTOR pos, ENEMY_TYPE type):pos_(pos), enemyType_(type)
 
 Flag::~Flag(void)
 {
+	//モデルの削除
+	MV1DeleteModel(flag_.modelId);
 }
 
 void Flag::Init(void)
 {
-	//モデルの読込
-	modelIdB_ = MV1LoadModel((Application::PATH_MODEL + "wood/Baby.mv1").c_str());
-
-	scl_ = { 3.0f, 2.5f, 3.0f };							//大きさ
-	rot_ = { 0.0f, 0.0f * DX_PI_F / 180.0f, 0.0f };			//回転
+	//旗
+	flag_.pos = { pos_.x, pos_.y, pos_.z };
+	flag_.scl = { 2.0f, 2.0f, 2.0f };
+	flag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
+	flag_.Update();
 
 	flagVisible_ = false;
 	enemySpawned_ = false;
@@ -67,10 +73,11 @@ void Flag::Draw(void)
 	else if (flagVisible_ && IsOwnedByPlayer())
 	{
 		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
-		/*MV1SetScale(modelIdB_, scl_);
-		MV1SetRotationXYZ(modelIdB_, rot_);
-		MV1SetPosition(modelIdB_, pos_);
-		MV1DrawModel(modelIdB_);*/
+
+		MV1SetScale(flag_.modelId, scl_);
+		MV1SetRotationXYZ(flag_.modelId, rot_);
+		MV1SetPosition(flag_.modelId, pos_);
+		MV1DrawModel(flag_.modelId);
 	}
 	
 	if(!enemyNear_ && IsOwnedByEnemy())

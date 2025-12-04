@@ -165,6 +165,10 @@ void ResourceManager::Init(void)
 	//全部
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Item/all.mv1");
 	resourcesMap_.emplace(SRC::ALL, std::move(res));
+	
+	//旗
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Flag.mv1");
+	resourcesMap_.emplace(SRC::FLAG, std::move(res));
 
 	//エネミー
 	//----------------------------------

@@ -277,6 +277,7 @@ private:
 	//プレイヤーの動き
 	void ProcessMove(void);			//移動
 	void ProcessAttack(void);		//攻撃モーション
+	void ProcessFall(void);			//落下処理
 
 	//回転
 	void SetGoalRotate(double rotRad);

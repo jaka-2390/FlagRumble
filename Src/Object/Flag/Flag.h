@@ -60,7 +60,7 @@ private:
 	STATE state_ = STATE::ENEMY;
 	ENEMY_TYPE enemyType_;
 
-	int modelIdB_;		//モデルの格納(苗木)
+	Transform flag_;	//旗のモデル
 
 	VECTOR scl_;	//おおきさ
 	VECTOR pos_;	//位置
@@ -83,5 +83,8 @@ private:
 	
 	int effectPlayerAreaResId_;
 	int effectPlayerAreaPlayId_;
+	
+	// リソース管理
+	ResourceManager& resMng_;
 
 };

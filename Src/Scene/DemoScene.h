@@ -65,30 +65,33 @@ class DemoScene :public SceneBase
 		//設定系
 		static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
 
-		static constexpr int UI_PAUSE_IMG_HEIGHT = 150;				//pauseImg_の高さ
+		static constexpr int UI_PAUSE_IMG_HEIGHT = 150;		//pauseImg_の高さ
 
-		static constexpr int UI_WIDTH_PAUSE_1 = 160;				//UIを調整する
-		static constexpr int UI_WIDTH_PAUSE_2 = 200;				//UIを調整する
-		static constexpr int UI_WIDTH_PAUSE_3 = 240;				//UIを調整する
-		static constexpr int UI_WIDTH_PAUSE_4 = 380;				//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_1 = 160;		//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_2 = 200;		//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_3 = 240;		//UIを調整する
+		static constexpr int UI_WIDTH_PAUSE_4 = 380;		//UIを調整する
 
-		static constexpr int UI_HEIGHT_PAUSE_1 = 350;				//１個目のUIの高さ
-		static constexpr int UI_HEIGHT_PAUSE_2 = 470;				//２個目のUIの高さ
-		static constexpr int UI_HEIGHT_PAUSE_3 = 590;				//３個目のUIの高さ
-		static constexpr int UI_HEIGHT_PAUSE_4 = 710;				//４個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_1 = 350;		//１個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_2 = 470;		//２個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_3 = 590;		//３個目のUIの高さ
+		static constexpr int UI_HEIGHT_PAUSE_4 = 710;		//４個目のUIの高さ
 
-		static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
-		static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
+		static constexpr int BACK_PAUSE_WIDTH = 1600;		//ポーズに戻るときのENTERのX
+		static constexpr int BACK_PAUSE_HEIGHT = 1020;		//ポーズに戻るときのENTERのY
 
 		//フラッグ
-		static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
-		static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
+		static constexpr float GAUGE_INCREMENT = 0.5f;		//flagゲージの上昇速度(フレーム単位)
+		static constexpr float FLAG_RADIUS = 100.0f;		//フラッグ範囲円の半径
 
 		//サボテンのインターバル
 		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
 
 		//メッセージの表示時間
-		const float MESSAGE_DISPLAY_SEC = 1.5f;
+		static constexpr float MESSAGE_DISPLAY_SEC = 1.5f;
+
+		//スキップ
+		static constexpr float SKIP_TIME = 3.0f;
 
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
@@ -125,6 +128,9 @@ private:
 		void UpdateAttack();
 		void UpdateFlag();
 		void UpdateSabo();
+		void UpdateFinish();
+
+		void DrawPause();
 
 		void DrawMessage();
 
@@ -170,9 +176,9 @@ private:
 		};
 
 		//旗関連
-		float flagRadius_ = 100.0f;       //接近判定の距離
+		float flagRadius_ = 100.0f;		//接近判定の距離
 
-		int lastSpawnTime_;  //最後に敵を出現させた時間
+		int lastSpawnTime_;				//最後に敵を出現させた時間
 
 		float cactusSpawnTimer_ = 0.0f;
 
@@ -180,8 +186,10 @@ private:
 		bool stateFinish_ = false;
 		bool spawnCactus_ = false;
 
-		float messageTimer_ = 0.0f;       // メッセージ表示用タイマー
-		bool messageActive_ = true;       // メッセージを表示中かどうか
+		float messageTimer_ = 0.0f;		//メッセージ表示用タイマー
+		bool messageActive_ = true;		//メッセージを表示中かどうか
+
+		float skipSecond_ = 0.0f;		//スキップまでの時間
 
 		PauseState pauseState_ = PauseState::Menu;
 		int  pauseImg_;

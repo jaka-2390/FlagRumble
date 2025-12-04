@@ -106,6 +106,7 @@ void DemoScene::Update(void)
 
 	if (ins.IsNew(KEY_INPUT_RETURN) )
 	{
+
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
 
@@ -124,10 +125,7 @@ void DemoScene::Update(void)
 		UpdateSabo();
 		break;
 	case STATE::FINISH:
-		if (ins.IsNew(KEY_INPUT_RETURN) || ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
-		{
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
-		}
+		UpdateFinish();
 		break;
 	}
 
@@ -187,51 +185,7 @@ void DemoScene::Draw(void)
 
 	if (isPaused_)
 	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
-		DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), black, TRUE);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-		if (pauseState_ == PauseState::Menu)
-		{
-			DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
-			SetFontSize(DEFAULT_FONT_SIZE * 5.0);
-
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
-
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
-
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 2)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", yellow);
-
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 3)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", yellow);
-
-			SetFontSize(DEFAULT_FONT_SIZE);
-		}
-		else if (pauseState_ == PauseState::ShowControls || pauseState_ == PauseState::ShowItems)
-		{
-			//白い背景
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-			//操作説明かどうか
-			int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
-			DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
-
-			//文字を黄色に点滅
-			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
-			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
-			SetFontSize(DEFAULT_FONT_SIZE);
-		}
-		return;
+		DrawPause();
 	}
 }
 
@@ -350,6 +304,64 @@ void DemoScene::UpdateSabo()
 			state_ = STATE::FINISH;
 		}
 	/*}*/
+}
+
+void DemoScene::UpdateFinish()
+{
+	if (ins.IsNew(KEY_INPUT_RETURN) || 
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+	}
+}
+
+void DemoScene::DrawPause()
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+	DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), black, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	if (pauseState_ == PauseState::Menu)
+	{
+		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
+		SetFontSize(DEFAULT_FONT_SIZE * 5.0);
+
+		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
+
+		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
+
+		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 2)
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", yellow);
+
+		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 3)
+			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", yellow);
+
+		SetFontSize(DEFAULT_FONT_SIZE);
+	}
+	else if (pauseState_ == PauseState::ShowControls || pauseState_ == PauseState::ShowItems)
+	{
+		//白い背景
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+		DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//操作説明かどうか
+		int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
+		DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
+
+		//文字を黄色に点滅
+		SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+		DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
+		if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+		SetFontSize(DEFAULT_FONT_SIZE);
+	}
+	return;
 }
 
 void DemoScene::DrawMessage()
