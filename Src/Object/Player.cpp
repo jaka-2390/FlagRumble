@@ -159,6 +159,11 @@ void Player::UpdateDown(float deltaTime)
 {
 	auto& ins = InputManager::GetInstance();
 
+	if (pstate_ == PlayerState::DOWN && animationController_->IsEnd())
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
+	}
+
 	if (pstate_ == PlayerState::DOWN) {
 		isAttack_ = false;
 		isAttack2_ = false;
@@ -940,8 +945,6 @@ void Player::Damage(int damage)
 
 	if (hp_ <= 0) {
 		hp_ = 0;
-
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
 
 		//SE
 		SoundManager::GetInstance().Play(SoundManager::SRC::P_DOWN_SE, Sound::TIMES::ONCE);

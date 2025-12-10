@@ -17,10 +17,11 @@ public:
 	enum class STATE
 	{
 		PLAYER,     // プレイヤーが所有
-		ENEMY       // 敵が所有
+		ENEMY,      // 敵が所有
+		NEUTRAL
 	};
 
-	Flag(VECTOR pos, ENEMY_TYPE type);	//コンストラクタ
+	Flag(VECTOR pos, ENEMY_TYPE type, STATE state);	//コンストラクタ
 	~Flag(void);						//デストラクタ
 
 	void Init(void);												//初期化処理
@@ -39,7 +40,7 @@ public:
 	STATE GetState() const { return state_; }
 
 	bool IsOwnedByPlayer() const { return state_ == STATE::PLAYER; }
-	bool IsOwnedByEnemy()  const { return state_ == STATE::ENEMY; }
+	bool IsOwnedByEnemy() const { return state_ == STATE::ENEMY; }
 
 private:
 
@@ -49,15 +50,10 @@ private:
 	//円との距離
 	float DistanceSqXZ(const VECTOR& a, const VECTOR& b) const;
 
-	//円のデバッグ
-	void DrawCircleOnMap(VECTOR center, float radius, int color);
-	
-	void DrawGauge3D(VECTOR center, float gaugeRate);
-
 	//エリアエフェクト
 	void EffectAreaRange(void);
 
-	STATE state_ = STATE::ENEMY;
+	STATE state_;
 	ENEMY_TYPE enemyType_;
 
 	Transform flag_;	//旗のモデル
@@ -67,7 +63,6 @@ private:
 	VECTOR rot_;	//回転
 	VECTOR dir_;	//移動用
 
-	bool flagVisible_;		//flagの描画
 	bool enemySpawned_;		//敵をすでに出したか
 	bool playerInRange_;	//プレイヤーが円内にいるか
 	bool enemyNear_;		//敵がflagの近くにいるか

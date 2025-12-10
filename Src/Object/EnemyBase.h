@@ -120,8 +120,11 @@ public:
 		IDLE,
 		RUN,
 		ATTACK,
+		KICK,
 		DAMAGE,
 		DEATH,
+		DEFENSE,
+		DEFENSE_HIT,
 		MAX
 	};
 

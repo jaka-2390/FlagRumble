@@ -26,7 +26,7 @@ public:
 
     //チュートリアル用flag
     void Clear();
-    void AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type);
+    void AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type, Flag::STATE state);
 
 private:
 

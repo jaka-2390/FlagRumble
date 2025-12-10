@@ -17,8 +17,11 @@ void EnemyDog::InitAnimation(void)
 	animationController_->Add((int)ANIM_TYPE::IDLE, path, ANIM_SPEED, ANIM_IDLE_INDEX);
 	animationController_->Add((int)ANIM_TYPE::RUN, path, ANIM_SPEED, ANIM_RUN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::ATTACK, path, ANIM_SPEED, ANIM_ATTACK_INDEX);
+	animationController_->Add((int)ANIM_TYPE::KICK, path, ANIM_SPEED, ANIM_KICK_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DAMAGE, path, ANIM_SPEED, ANIM_DAMAGE_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DEATH, path, ANIM_SPEED, ANIM_DEATH_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DEFENSE, path, ANIM_SPEED, ANIM_DEFENSE_INDEX);
+	animationController_->Add((int)ANIM_TYPE::DEFENSE_HIT, path, ANIM_SPEED, ANIM_DEFENSE_HIT_INDEX);
 
 	animationController_->Play((int)ANIM_TYPE::RUN);
 }

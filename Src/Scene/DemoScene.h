@@ -91,7 +91,7 @@ class DemoScene :public SceneBase
 		static constexpr float MESSAGE_DISPLAY_SEC = 1.5f;
 
 		//スキップ
-		static constexpr float SKIP_TIME = 3.0f;
+		static constexpr float SKIP_TIME = 2.0f;
 
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
@@ -133,6 +133,8 @@ private:
 		void DrawPause();
 
 		void DrawMessage();
+
+		void DrawSkip(int cx, int cy, float rate, int rOuter, int rInner, int color);
 
 		void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
 
@@ -190,6 +192,7 @@ private:
 		bool messageActive_ = true;		//メッセージを表示中かどうか
 
 		float skipSecond_ = 0.0f;		//スキップまでの時間
+		bool skipActive_ = false;		//スキップ中かどうか
 
 		PauseState pauseState_ = PauseState::Menu;
 		int  pauseImg_;

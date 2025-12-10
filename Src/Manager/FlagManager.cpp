@@ -4,15 +4,21 @@ void FlagManager::Init()
 {
     flags_.clear();
 
-    auto flag1 = std::make_unique<Flag>(VGet(-2000.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG);
-    auto flag2 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 4000.0f), Flag::ENEMY_TYPE::SABO);
-    auto flag3 = std::make_unique<Flag>(VGet(2300.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG);
-    auto flag4 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG);
+    auto flag1 = std::make_unique<Flag>(VGet(-2000.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
+    auto flag2 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 4000.0f), Flag::ENEMY_TYPE::SABO, Flag::STATE::ENEMY);
+    auto flag3 = std::make_unique<Flag>(VGet(2300.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
+    auto flag4 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
+
+    auto flag5 = std::make_unique<Flag>(VGet(-2500.0f, 254.0f, 0.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::PLAYER);
+    auto flag6 = std::make_unique<Flag>(VGet(2500.0f, 254.0f, 4700.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
     flags_.push_back(std::move(flag1));
     flags_.push_back(std::move(flag2));
     flags_.push_back(std::move(flag3));
     flags_.push_back(std::move(flag4));
+
+    flags_.push_back(std::move(flag5)); //ÉvÉåÉCÉÑÅ[êwín(é©ï™ÇÃãíì_)
+    flags_.push_back(std::move(flag6)); //ìGêwín(ìGÇÃãíì_)
 
     for (auto& flag : flags_)
     {
@@ -105,9 +111,9 @@ void FlagManager::Clear()
     flagMax_ = 0;
 }
 
-void FlagManager::AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type)
+void FlagManager::AddFlag(const VECTOR pos, Flag::ENEMY_TYPE type, Flag::STATE state)
 {
-    auto flag = std::make_unique<Flag>(pos, type);
+    auto flag = std::make_unique<Flag>(pos, type, state);
 
     flag->Init();
 

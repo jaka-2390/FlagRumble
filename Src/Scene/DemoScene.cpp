@@ -57,7 +57,7 @@ void DemoScene::Init(void)
 
 	flagManager_ = std::make_shared<FlagManager>();
 	flagManager_->Clear();
-	flagManager_->AddFlag(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG);
+	flagManager_->AddFlag(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
 	//画像
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
@@ -104,10 +104,21 @@ void DemoScene::Update(void)
 	//通常時のゲーム進行（ポーズされてないときだけ）
 	//-------------------------
 
-	if (ins.IsNew(KEY_INPUT_RETURN) )
+	if (ins.IsNew(KEY_INPUT_RETURN) ||
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		skipSecond_ += 1.0f / 60.0f;	//1フレーム = 1/60秒
+		skipActive_ = true;
 
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+		if (skipSecond_ >= SKIP_TIME)
+		{
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+		}
+	}
+	else
+	{
+		skipSecond_ = 0.0f;		//離したらリセット
+		skipActive_ = false;
 	}
 
 	switch (state_)
@@ -166,6 +177,16 @@ void DemoScene::Draw(void)
 	flagManager_->Draw();
 
 	DrawMessage();
+
+	if (skipActive_)
+	{
+		float gaugeRate = skipSecond_ / SKIP_TIME;
+		DrawSkip(Application::SCREEN_SIZE_X - 50, Application::SCREEN_SIZE_Y - 50, 1.0f, 20, 35, GetColor(100, 100, 100));
+
+		DrawSkip(Application::SCREEN_SIZE_X - 50, Application::SCREEN_SIZE_Y - 50, gaugeRate, 20, 35, GetColor(255, 0, 0));
+
+		DrawString(Application::SCREEN_SIZE_X - 67, Application::SCREEN_SIZE_Y - 25, "Skip", white);
+	}
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -294,8 +315,20 @@ void DemoScene::UpdateFlag()
 void DemoScene::UpdateSabo()
 {
 	spawnCactus_ = true;
-	/*if () 
-	{*/
+
+	//敵が死んだかどうか
+	bool allDead = true;
+	for (auto& enemy : enemys_)
+	{
+		if (enemy->IsAlive())
+		{
+			allDead = false;
+			break;
+		}
+	}
+
+	if (spawnCactus_ && allDead) 
+	{
 		MessageTime();
 
 		if (!messageActive_)
@@ -303,7 +336,7 @@ void DemoScene::UpdateSabo()
 			messageActive_ = true;
 			state_ = STATE::FINISH;
 		}
-	/*}*/
+	}
 }
 
 void DemoScene::UpdateFinish()
@@ -410,6 +443,34 @@ void DemoScene::DrawMessage()
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 #pragma endregion
+}
+
+void DemoScene::DrawSkip(int cx, int cy, float rate, int rOuter, int rInner, int color)
+{
+	const int segments = 64; // 円を分割する数
+	const float angleMax = rate * DX_TWO_PI_F; //0から2πの角度計算
+
+	for (int i = 0; i < segments; i++)
+	{
+		float a1 = angleMax * (float)i / segments;
+		float a2 = angleMax * (float)(i + 1) / segments;
+
+		// 外側円弧の2点
+		float x1o = cx + sinf(a1) * rOuter;
+		float y1o = cy - cosf(a1) * rOuter;
+		float x2o = cx + sinf(a2) * rOuter;
+		float y2o = cy - cosf(a2) * rOuter;
+
+		// 内側円弧の2点
+		float x1i = cx + sinf(a1) * rInner;
+		float y1i = cy - cosf(a1) * rInner;
+		float x2i = cx + sinf(a2) * rInner;
+		float y2i = cy - cosf(a2) * rInner;
+
+		// 四角形（外円弧と内円弧の間）を三角形２つで描画
+		DrawTriangle(x1i, y1i, x2i, y2i, x1o, y1o, color, TRUE);
+		DrawTriangle(x2i, y2i, x2o, y2o, x1o, y1o, color, TRUE);
+	}
 }
 
 void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
