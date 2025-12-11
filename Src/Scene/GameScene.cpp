@@ -136,7 +136,7 @@ void GameScene::Update(void)
 	{
 		if (ENEMY_MAX >= enemys_.size())
 		{
-			Flag* flag = flagManager_->GetFlag(i);
+			FlagBase* flag = flagManager_->GetFlag(i);
 			if (!flag) continue;
 
 			// FlagのEnemyTypeをEnemyBase::TYPEに変換
@@ -401,11 +401,11 @@ void GameScene::SpawnCactus(void)
 		cactusSpawnTimer_ = 0.0f; // リセット
 
 		// ENEMY状態の旗を探す
-		std::vector<Flag*> enemyFlags;
+		std::vector<FlagBase*> enemyFlags;
 		int flagCount = flagManager_->GetFlagMax();
 		for (int i = 0; i < flagCount; ++i)
 		{
-			Flag* flag = flagManager_->GetFlag(i);
+			FlagBase* flag = flagManager_->GetFlag(i);
 			if (flag && flag->GetState() == Flag::STATE::ENEMY)
 			{
 				enemyFlags.push_back(flag);
@@ -416,7 +416,7 @@ void GameScene::SpawnCactus(void)
 		{
 			// ランダムで1つ選ぶ
 			int randomIndex = GetRand((int)enemyFlags.size() - 1);
-			Flag* targetFlag = enemyFlags[randomIndex];
+			FlagBase* targetFlag = enemyFlags[randomIndex];
 
 			if (targetFlag)
 			{

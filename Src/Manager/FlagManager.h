@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include "..//Object/Flag/Flag.h"
+#include "..//Object/Flag/PlayerFlag.h"
+#include "..//Object/FlagBase.h"
 
 class FlagManager 
 {
@@ -14,7 +16,7 @@ public:
 
     VECTOR GetFlagPosition(int index) const;
 
-    Flag* GetFlag(int index) const;
+    FlagBase* GetFlag(int index) const;
 
     int GetClearedFlagCount() const;
 
@@ -22,7 +24,7 @@ public:
 
     int GetFlagMax() const;
 
-    std::vector<Flag*> GetPlayerFlags() const;
+    std::vector<FlagBase*> GetPlayerFlags() const;
 
     //チュートリアル用flag
     void Clear();
@@ -30,7 +32,7 @@ public:
 
 private:
 
-    std::vector<std::unique_ptr<Flag>> flags_;
+    std::vector<std::unique_ptr<FlagBase>> flags_;
 
     int nextFlagIndex_ = 0;
 

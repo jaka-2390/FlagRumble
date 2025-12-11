@@ -9,7 +9,7 @@ void FlagManager::Init()
     auto flag3 = std::make_unique<Flag>(VGet(2300.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
     auto flag4 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
-    auto flag5 = std::make_unique<Flag>(VGet(-2500.0f, 254.0f, 0.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::PLAYER);
+    auto flag5 = std::make_unique<PlayerFlag>(VGet(-2500.0f, 254.0f, 0.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::PLAYER);
     auto flag6 = std::make_unique<Flag>(VGet(2500.0f, 254.0f, 4700.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
     flags_.push_back(std::move(flag1));
@@ -52,7 +52,7 @@ VECTOR FlagManager::GetFlagPosition(int index) const
     return flags_[index]->GetPosition();
 }
 
-Flag* FlagManager::GetFlag(int index) const
+FlagBase* FlagManager::GetFlag(int index) const
 {
     if (index < 0 || index >= static_cast<int>(flags_.size()))
         return nullptr;
@@ -92,9 +92,9 @@ int FlagManager::GetFlagMax() const
     return flagMax_;
 }
 
-std::vector<Flag*> FlagManager::GetPlayerFlags() const
+std::vector<FlagBase*> FlagManager::GetPlayerFlags() const
 {
-    std::vector<Flag*> playerFlags;
+    std::vector<FlagBase*> playerFlags;
     for (auto& flag : flags_)
     {
         if (flag->IsOwnedByPlayer() && flag->GetEnemyType() != Flag::ENEMY_TYPE::SABO)

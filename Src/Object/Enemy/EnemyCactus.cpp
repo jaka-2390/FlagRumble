@@ -64,12 +64,12 @@ void EnemyCactus::ChasePlayer(void)
         animationController_->Play((int)ANIM_TYPE::RUN, true);
     }
 
-    Flag* targetFlag = nullptr;
+    FlagBase* targetFlag = nullptr;
 
     // ƒvƒŒƒCƒ„[‚ª‚Á‚Ä‚¢‚éŠø‚ğ’T‚·
     for (int i = 0; i < flagManager_->GetFlagMax(); ++i)
     {
-        Flag* f = flagManager_->GetFlag(i);
+        FlagBase* f = flagManager_->GetFlag(i);
         if (f && f->IsOwnedByPlayer())
         {
             targetFlag = f;
