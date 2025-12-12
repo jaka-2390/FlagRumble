@@ -70,7 +70,7 @@ void EnemyCactus::ChasePlayer(void)
     for (int i = 0; i < flagManager_->GetFlagMax(); ++i)
     {
         FlagBase* f = flagManager_->GetFlag(i);
-        if (f && f->IsOwnedByPlayer())
+        if (f && f->IsOwnedByPlayer() || f && f->IsNeutral())
         {
             targetFlag = f;
             break;

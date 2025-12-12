@@ -39,10 +39,15 @@ public:
     bool SpawnEnemies(const VECTOR& playerPos) const; // 敵を出すべきか判定
     void SetEnemySpawned(bool spawned); // 出現済みをセット
 
+    bool IsEnemySpawned() const { return enemySpawned_; }
+
     bool IsOwnedByPlayer() const { return state_ == STATE::PLAYER; }
     bool IsOwnedByEnemy() const { return state_ == STATE::ENEMY; }
+    bool IsNeutral() const { return state_ == STATE::NEUTRAL; }
 
 protected:
+
+    SceneManager& scnMng_;
 
     VECTOR pos_;
     VECTOR scl_;
@@ -70,6 +75,9 @@ protected:
 
     int effectPlayerAreaResId_;
     int effectPlayerAreaPlayId_;
+    
+    int effectNeutralAreaResId_;
+    int effectNeutralAreaPlayId_;
 
     //旗を立てる処理
     void CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);

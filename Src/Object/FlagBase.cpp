@@ -1,9 +1,11 @@
 #include<EffekseerForDXLib.h>
 #include "../Manager/ResourceManager.h"
+#include "../Manager/SceneManager.h"
 #include "../Utility/AsoUtility.h"
 #include "FlagBase.h"
 
-FlagBase::FlagBase(VECTOR pos, ENEMY_TYPE type, STATE state) : pos_(pos), enemyType_(type), state_(state)
+FlagBase::FlagBase(VECTOR pos, ENEMY_TYPE type, STATE state) : 
+	pos_(pos), enemyType_(type), state_(state), scnMng_(SceneManager::GetInstance())
 {
 	//ResourceManagerから複製モデルを取得
 	flag_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::FLAG));
@@ -14,6 +16,9 @@ FlagBase::FlagBase(VECTOR pos, ENEMY_TYPE type, STATE state) : pos_(pos), enemyT
 
 	effectPlayerAreaPlayId_ = 0;
 	effectPlayerAreaPlayId_ = 0;
+
+	effectNeutralAreaPlayId_ = 0;
+	effectNeutralAreaPlayId_ = 0;
 }
 
 void FlagBase::Init()
@@ -35,6 +40,7 @@ void FlagBase::Init()
 	//エフェクト
 	effectEnemyAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::ENEMY_AREA).handleId_;
 	effectPlayerAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER_AREA).handleId_;
+	effectNeutralAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::NONE_AREA).handleId_;
 }
 
 void FlagBase::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies)
@@ -43,13 +49,17 @@ void FlagBase::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr
 
 	EffectAreaRange();
 
-	if (enemyNear_)
+	if (IsOwnedByEnemy())
 	{
 		state_ = STATE::ENEMY;
 	}
 	else if (!enemyNear_ && IsOwnedByPlayer())
 	{
 		state_ = STATE::PLAYER;
+	}
+	else
+	{
+		state_ = STATE::NEUTRAL;
 	}
 }
 
@@ -59,7 +69,6 @@ void FlagBase::Draw()
 	if (IsOwnedByEnemy())
 	{
 		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
-
 	}
 	else if (IsOwnedByPlayer())
 	{
@@ -70,8 +79,12 @@ void FlagBase::Draw()
 		MV1SetPosition(flag_.modelId, pos_);
 		MV1DrawModel(flag_.modelId);
 	}
+	else
+	{
+		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 255, 255));
+	}
 
-	if (!enemyNear_ && IsOwnedByEnemy())
+	if (!enemyNear_ && IsOwnedByEnemy() || IsNeutral())
 	{
 		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
 	}
@@ -213,5 +226,18 @@ void FlagBase::EffectAreaRange(void)
 		effectPlayerAreaPlayId_ = PlayEffekseer3DEffect(effectPlayerAreaResId_);
 		SetScalePlayingEffekseer3DEffect(effectPlayerAreaPlayId_, scale, scale / 2, scale);
 		SetPosPlayingEffekseer3DEffect(effectPlayerAreaPlayId_, pos_.x, pos_.y, pos_.z);
+	}
+	else
+	{
+		if (effectNeutralAreaPlayId_ >= 0)
+		{
+			StopEffekseer3DEffect(effectNeutralAreaPlayId_);
+		}
+
+		float scale = 300.0f;  // デフォルト値
+
+		effectNeutralAreaPlayId_ = PlayEffekseer3DEffect(effectNeutralAreaResId_);
+		SetScalePlayingEffekseer3DEffect(effectNeutralAreaPlayId_, scale, scale / 2, scale);
+		SetPosPlayingEffekseer3DEffect(effectNeutralAreaPlayId_, pos_.x, pos_.y, pos_.z);
 	}
 }

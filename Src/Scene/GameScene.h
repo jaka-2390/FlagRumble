@@ -7,7 +7,7 @@
 class Stage;
 class SkyDome;
 class Player;
-//class MiniMap;
+class MiniMap;
 class Camera;
 class FlagManager;
 
@@ -39,8 +39,8 @@ public:
 	static constexpr int GAME_HEIGHT_1 = 80;			//ゲーム開始時の注意書き
 
 	//ミニマップ
-	//static constexpr float MINIMAP_RANGE = 30000.0f;	//描画するマップの範囲
-	//static constexpr int   MINIMAP_SIZE = 300;			//マップのサイズ
+	static constexpr float MINIMAP_RANGE = 30000.0f;	//描画するマップの範囲
+	static constexpr int   MINIMAP_SIZE = 300;			//マップのサイズ
 
 	//画像サイズ
 	static constexpr float IMG_GAME_UI_1_SIZE = 0.5;	//imgGameUi1_のサイズ
@@ -111,7 +111,7 @@ public:
 	void Draw(void) override;
 	void Release(void) override;
 
-	//void DrawMiniMap(void);
+	void DrawMiniMap(void);
 
 	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemies() const;	//enemyの情報(pos)を見る
 
@@ -135,7 +135,7 @@ private:
 	std::unique_ptr<Stage> stage_;		//ステージ
 	std::unique_ptr<SkyDome> skyDome_;	//スカイドーム
 	std::shared_ptr<Player> player_;	//プレイヤー
-	//std::unique_ptr<MiniMap> map_;		//ミニマップ
+	std::unique_ptr<MiniMap> map_;		//ミニマップ
 	std::shared_ptr<Camera> camera_;	//カメラ
 	std::shared_ptr<FlagManager> flagManager_;		//フラッグ
 

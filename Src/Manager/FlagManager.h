@@ -3,6 +3,7 @@
 #include <memory>
 #include "..//Object/Flag/Flag.h"
 #include "..//Object/Flag/PlayerFlag.h"
+#include "..//Object/Flag/EnemyFlag.h"
 #include "..//Object/FlagBase.h"
 
 class FlagManager 
