@@ -9,6 +9,8 @@ FlagBase::FlagBase(VECTOR pos, ENEMY_TYPE type, STATE state) :
 {
 	//ResourceManagerから複製モデルを取得
 	flag_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::FLAG));
+	pflag_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::PFLAG));
+	nflag_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::NFLAG));
 
 	//エフェクト
 	effectEnemyAreaPlayId_ = 0;
@@ -29,6 +31,16 @@ void FlagBase::Init()
 	flag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
 	flag_.Update();
 
+	pflag_.pos = { pos_.x, pos_.y, pos_.z };
+	pflag_.scl = { 2.0f, 2.0f, 2.0f };
+	pflag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
+	pflag_.Update();
+	
+	nflag_.pos = { pos_.x, pos_.y, pos_.z };
+	nflag_.scl = { 2.0f, 2.0f, 2.0f };
+	nflag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
+	nflag_.Update();
+
 	enemySpawned_ = false;
 	playerInRange_ = false;
 	enemyNear_ = false;
@@ -47,7 +59,7 @@ void FlagBase::Update(const VECTOR& playerPos, const std::vector<std::shared_ptr
 {
 	CheckCircle(playerPos, enemies);
 
-	EffectAreaRange();
+	//EffectAreaRange();
 
 	if (IsOwnedByEnemy())
 	{
@@ -68,23 +80,33 @@ void FlagBase::Draw()
 	// 円を表示
 	if (IsOwnedByEnemy())
 	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
-	}
-	else if (IsOwnedByPlayer())
-	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
+		//DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
 
 		MV1SetScale(flag_.modelId, scl_);
 		MV1SetRotationXYZ(flag_.modelId, rot_);
 		MV1SetPosition(flag_.modelId, pos_);
 		MV1DrawModel(flag_.modelId);
 	}
+	else if (IsOwnedByPlayer())
+	{
+		//DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
+
+		MV1SetScale(pflag_.modelId, scl_);
+		MV1SetRotationXYZ(pflag_.modelId, rot_);
+		MV1SetPosition(pflag_.modelId, pos_);
+		MV1DrawModel(pflag_.modelId);
+	}
 	else
 	{
-		DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 255, 255));
+		//DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 255, 255));
+
+		MV1SetScale(nflag_.modelId, scl_);
+		MV1SetRotationXYZ(nflag_.modelId, rot_);
+		MV1SetPosition(nflag_.modelId, pos_);
+		MV1DrawModel(nflag_.modelId);
 	}
 
-	if (!enemyNear_ && IsOwnedByEnemy() || IsNeutral())
+	if (!enemyNear_ && playerInRange_ && !IsOwnedByPlayer())
 	{
 		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
 	}

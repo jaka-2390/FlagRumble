@@ -13,7 +13,7 @@ void EnemyFlag::Update(const VECTOR& playerPos, const std::vector<std::shared_pt
     //“G‚ð5•b‚²‚Æ‚É‚Ð‚Æ‚è¶¬
     spawnTimer_ += scnMng_.GetDeltaTime();  //Œo‰ß•b‚ðŽæ“¾
 
-    if (spawnTimer_ >= 5.0f)
+    if (spawnTimer_ >= 10.0f)
     {
         spawnTimer_ = 0.0f;
 

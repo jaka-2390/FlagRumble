@@ -82,6 +82,8 @@ public:
 		BOSS,
 		//旗
 		FLAG,
+		PFLAG,
+		NFLAG,
 		//エフェクト
 		NONE_AREA,
 		PLAYER_AREA,

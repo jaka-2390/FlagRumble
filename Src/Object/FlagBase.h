@@ -64,6 +64,8 @@ protected:
     ENEMY_TYPE enemyType_;
 
     Transform flag_;	//旗のモデル
+    Transform pflag_;	//player旗のモデル
+    Transform nflag_;	//neutral旗のモデル
 
     bool enemySpawned_;		//敵をすでに出したか
     bool playerInRange_;	//プレイヤーが円内にいるか

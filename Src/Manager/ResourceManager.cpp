@@ -169,6 +169,14 @@ void ResourceManager::Init(void)
 	//旗
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Flag.mv1");
 	resourcesMap_.emplace(SRC::FLAG, std::move(res));
+	
+	//player旗
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Pflag.mv1");
+	resourcesMap_.emplace(SRC::PFLAG, std::move(res));
+	
+	//neutral旗
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Nflag.mv1");
+	resourcesMap_.emplace(SRC::NFLAG, std::move(res));
 
 	//エネミー
 	//----------------------------------
