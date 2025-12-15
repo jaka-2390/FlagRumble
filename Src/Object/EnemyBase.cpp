@@ -308,10 +308,10 @@ void EnemyBase::Draw(void)
 	}
 
 	//デッバグ
-	DrawDebug();
+	//DrawDebug();
 
 	//視野範囲の描画
-	DrawDebugSearchRange();
+	//DrawDebugSearchRange();
 }
 
 void EnemyBase::Release(void)

@@ -8,6 +8,11 @@
 #include "../../Utility/AsoUtility.h"
 #include "../Player.h"
 
+// 2点間の距離の2乗を返す関数を追加
+inline float VSizeSq(const VECTOR& v) {
+	return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
 EnemyCactus::EnemyCactus() :EnemyBase()
 {
 }
@@ -64,18 +69,31 @@ void EnemyCactus::ChasePlayer(void)
         animationController_->Play((int)ANIM_TYPE::RUN, true);
     }
 
-    FlagBase* targetFlag = nullptr;
+	FlagBase* targetFlag = nullptr;
+	float nearestDistSq = FLT_MAX;
 
-    // プレイヤーが持っている旗を探す
-    for (int i = 0; i < flagManager_->GetFlagMax(); ++i)
-    {
-        FlagBase* f = flagManager_->GetFlag(i);
-        if (f && f->IsOwnedByPlayer() || f && f->IsNeutral())
-        {
-            targetFlag = f;
-            break;
-        }
-    }
+	VECTOR myPos = transform_.pos;
+
+	for (int i = 0; i < flagManager_->GetFlagMax(); ++i)
+	{
+		FlagBase* f = flagManager_->GetFlag(i);
+		if (!f) continue;
+
+		// プレイヤー or 中立の旗だけ対象
+		if (!(f->IsOwnedByPlayer() || f->IsNeutral()))
+			continue;
+
+		VECTOR diff = VSub(f->GetPosition(), myPos);
+		diff.y = 0.0f;
+
+		float distSq = VSizeSq(diff);   // ★ sqrtしない（軽い）
+
+		if (distSq < nearestDistSq)
+		{
+			nearestDistSq = distSq;
+			targetFlag = f;
+		}
+	}
 
 	VECTOR playerPos = player_->GetTransform().pos;
 

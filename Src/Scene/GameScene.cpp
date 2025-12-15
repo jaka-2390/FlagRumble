@@ -49,7 +49,6 @@ void GameScene::Init(void)
 	player_->Init();
 
 	//敵のモデル
-	//EnemyCreate(0);
 	spawnAreas_.push_back({ VGet(0.0f, 0.0f, 0.0f), SPAWN_RADIUS, false });
 	lastSpawnTime_ = GetNowCount();  //開始時の時間を記録
 
@@ -104,6 +103,8 @@ void GameScene::Init(void)
 
 	mainCamera->SetFollow(&player_->GetTransform());
 	mainCamera->ChangeMode(Camera::MODE::FOLLOW);
+
+	EnemyCreate(1);
 }
 
 void GameScene::Update(void)
@@ -132,10 +133,10 @@ void GameScene::Update(void)
 	flagManager_->Update(player_->GetTransform().pos, enemys_);
 
 	//それぞれの旗に敵を生成
-	int flagCount = flagManager_->GetFlagMax();
+	/*int flagCount = flagManager_->GetFlagMax();
 	for (int i = 0; i < flagCount; ++i)
 	{
-		/*if (ENEMY_MAX >= enemys_.size())
+		if (ENEMY_MAX >= enemys_.size())
 		{
 			FlagBase* flag = flagManager_->GetFlag(i);
 			if (!flag) continue;
@@ -153,7 +154,8 @@ void GameScene::Update(void)
 			// 敵生成
 			VECTOR flagPos = flag->GetPosition();
 			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
-		}*/
+		}
+
 		FlagBase* flag = flagManager_->GetFlag(i);
 		if (!flag) continue;
 
@@ -179,7 +181,52 @@ void GameScene::Update(void)
 			// 5秒ごとに Cactus を1体ずつ生成
 			EnemyCreateAt(flag->GetPosition(), 1, type);
 		}
+	}*/
+
+	SpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+
+	if (SpawnTimer_ >= SPAWN_INTERVAL)
+	{
+		SpawnTimer_ = 0.0f; // リセット
+
+		// ENEMY状態の旗を探す
+		std::vector<FlagBase*> enemyFlags;
+		int flagCount = flagManager_->GetFlagMax();
+		for (int i = 0; i < flagCount; ++i)
+		{
+			FlagBase* flag = flagManager_->GetFlag(i);
+			if (flag && flag->GetState() == Flag::STATE::ENEMY)
+			{
+				enemyFlags.push_back(flag);
+			}
+		}
+
+		if (!enemyFlags.empty())
+		{
+			// ランダムで1つ選ぶ
+			int randomIndex = GetRand((int)enemyFlags.size() - 1);
+			FlagBase* targetFlag = enemyFlags[randomIndex];
+
+			if (targetFlag)
+			{
+				VECTOR flagPos = targetFlag->GetPosition();
+				
+				// FlagのEnemyTypeをEnemyBase::TYPEに変換
+				EnemyBase::TYPE type;
+				switch (targetFlag->GetEnemyType())
+				{
+				case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
+				case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
+				case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
+				default:                      type = EnemyBase::TYPE::DOG; break;
+				}
+
+				// 5秒ごとに Cactus を1体ずつ生成
+				EnemyCreateAt(targetFlag->GetPosition(), 1, type);
+			}
+		}
 	}
+
 
 	SpawnCactus();
 
@@ -213,7 +260,7 @@ void GameScene::Draw(void)
 
 	flagManager_->Draw();
 
-	DrawMiniMap();
+	//DrawMiniMap();
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
@@ -333,23 +380,18 @@ const std::vector<std::shared_ptr<EnemyBase>>& GameScene::GetEnemies() const
 
 void GameScene::EnemyCreate(int count)
 {
-	VECTOR flagPos = flagManager_->GetFlagPosition(0);  //Flagの位置を取得
-
 	for (int i = 0; i < count; ++i)
 	{
-		VECTOR randPos = flagPos;
-
-		//出現位置をランダムに設定（エリアの周囲に散らばせる）
-		randPos.x = flagPos.x + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-		randPos.z = flagPos.z + GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		VECTOR randPos = VGet(2500.0f, 254.0f, 4700.0f);
 
 		//EnemyDogを生成
-		std::shared_ptr<EnemyBase> enemy = std::make_shared<EnemyDog>();
+		auto enemy = std::make_shared<EnemyCactus>();
 
 		//生成された敵の初期化
 		enemy->SetGameScene(this);
 		enemy->SetPos(randPos);
 		enemy->SetPlayer(player_);
+		enemy->SetFlagManager(flagManager_.get());
 		enemy->Init();
 
 		//リストに追加

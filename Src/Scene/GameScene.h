@@ -60,31 +60,31 @@ public:
 	//設定系
 	static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
 
-	static constexpr int UI_PAUSE_IMG_HEIGHT = 150;				//pauseImg_の高さ
+	static constexpr int UI_PAUSE_IMG_HEIGHT = 150;		//pauseImg_の高さ
 
-	static constexpr int UI_WIDTH_PAUSE_1 = 160;				//UIを調整する
-	static constexpr int UI_WIDTH_PAUSE_2 = 200;				//UIを調整する
-	static constexpr int UI_WIDTH_PAUSE_3 = 240;				//UIを調整する
+	static constexpr int UI_WIDTH_PAUSE_1 = 160;		//UIを調整する
+	static constexpr int UI_WIDTH_PAUSE_2 = 200;		//UIを調整する
+	static constexpr int UI_WIDTH_PAUSE_3 = 240;		//UIを調整する
 
-	static constexpr int UI_HEIGHT_PAUSE_1 = 350;				//１個目のUIの高さ
-	static constexpr int UI_HEIGHT_PAUSE_2 = 470;				//２個目のUIの高さ
-	static constexpr int UI_HEIGHT_PAUSE_3 = 590;				//３個目のUIの高さ
-	static constexpr int UI_HEIGHT_PAUSE_4 = 710;				//４個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_1 = 350;		//１個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_2 = 470;		//２個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_3 = 590;		//３個目のUIの高さ
+	static constexpr int UI_HEIGHT_PAUSE_4 = 710;		//４個目のUIの高さ
 
-	static constexpr int UI_ATTACK_X = 10;						//攻撃の文字のX座標
-	static constexpr int UI_NORMAL_ATTACK_Y = 450;				//通常攻撃のY座標
-	static constexpr int UI_SLASH_ATTACK_Y = 500;				//スラッシュのY座標
-	static constexpr int UI_EX_ATTACK_Y = 550;					//回転斬りのY座標
+	static constexpr int UI_ATTACK_X = 10;				//攻撃の文字のX座標
+	static constexpr int UI_NORMAL_ATTACK_Y = 450;		//通常攻撃のY座標
+	static constexpr int UI_SLASH_ATTACK_Y = 500;		//スラッシュのY座標
+	static constexpr int UI_EX_ATTACK_Y = 550;			//回転斬りのY座標
 
-	static constexpr int BACK_PAUSE_WIDTH = 1600;				//ポーズに戻るときのENTERのX
-	static constexpr int BACK_PAUSE_HEIGHT = 1020;				//ポーズに戻るときのENTERのY
+	static constexpr int BACK_PAUSE_WIDTH = 1600;		//ポーズに戻るときのENTERのX
+	static constexpr int BACK_PAUSE_HEIGHT = 1020;		//ポーズに戻るときのENTERのY
 
 	//フラッグ
-	static constexpr float GAUGE_INCREMENT = 0.5f;				//flagゲージの上昇速度(フレーム単位)
-	static constexpr float FLAG_RADIUS = 100.0f;				//フラッグ範囲円の半径
+	static constexpr float GAUGE_INCREMENT = 0.5f;		//flagゲージの上昇速度(フレーム単位)
+	static constexpr float FLAG_RADIUS = 100.0f;		//フラッグ範囲円の半径
 
-	//トゲのインターバル
-	const float CACTUS_SPAWN_INTERVAL = 20.0f;
+	const float CACTUS_SPAWN_INTERVAL = 15.0f;			//SABOのインターバル
+	const float SPAWN_INTERVAL = 11.0f;					//敵のインターバル
 
 	//クリアゲージ
 	static constexpr int GAUGE_X = 20;                //左上X位置
@@ -170,6 +170,7 @@ private:
 
 	bool bossSpawned_ = false;
 
+	float SpawnTimer_ = 0.0f;
 	float cactusSpawnTimer_ = 0.0f;
 
 	PauseState pauseState_ = PauseState::Menu;

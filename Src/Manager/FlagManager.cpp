@@ -10,7 +10,7 @@ void FlagManager::Init()
     auto flag4 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
 
     auto flag5 = std::make_unique<PlayerFlag>(VGet(-2500.0f, 254.0f, 0.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::PLAYER);
-    auto flag6 = std::make_unique<EnemyFlag>(VGet(2500.0f, 254.0f, 4700.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
+    auto flag6 = std::make_unique<EnemyFlag>(VGet(2500.0f, 254.0f, 4700.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
     flags_.push_back(std::move(flag1));
     flags_.push_back(std::move(flag2));
