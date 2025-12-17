@@ -11,6 +11,9 @@ class FlagManager
 
 public:
 
+    static constexpr VECTOR PLAYER_FLAG_POS = { -2500.0f, 254.0f, 0.0f };
+    static constexpr VECTOR ENEMY_FLAG_POS = { 2500.0f, 254.0f, 4700.0f };
+
     void Init();
     void Update(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);
     void Draw();

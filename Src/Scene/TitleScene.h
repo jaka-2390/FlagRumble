@@ -57,7 +57,6 @@ public:
 	static constexpr int BUTTON_OFFSET = 120;
 
 	static constexpr int CURSOR_1_WIDTH = 720;
-	static constexpr int CURSOR_2_WIDTH = 1200;
 	static constexpr int CURSOR_HEIGHT = 450;
 
 	static constexpr int INDEX = 110;

@@ -83,8 +83,8 @@ public:
 	static constexpr float GAUGE_INCREMENT = 0.5f;		//flagゲージの上昇速度(フレーム単位)
 	static constexpr float FLAG_RADIUS = 100.0f;		//フラッグ範囲円の半径
 
-	const float CACTUS_SPAWN_INTERVAL = 15.0f;			//SABOのインターバル
-	const float SPAWN_INTERVAL = 11.0f;					//敵のインターバル
+	const float CACTUS_SPAWN_INTERVAL = 17.0f;			//SABOのインターバル
+	const float SPAWN_INTERVAL = 12.0f;					//敵のインターバル
 
 	//クリアゲージ
 	static constexpr int GAUGE_X = 20;                //左上X位置

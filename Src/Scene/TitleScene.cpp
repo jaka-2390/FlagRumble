@@ -42,12 +42,6 @@ void TitleScene::Init(void)
 	imgYesSel_ = resMng_.Load(ResourceManager::SRC::SELECT_YES).handleId_;		//選択中はい画像
 	imgNoSel_ = resMng_.Load(ResourceManager::SRC::SELECT_NO).handleId_;		//選択中いいえ画像
 
-	img3D_ = LoadGraph("Data/Image/Title/3D.png");
-	imgP1_[0] = LoadGraph("Data/Image/Title/1player1.png");
-	imgP1_[1] = LoadGraph("Data/Image/Title/1player2.png");
-	imgP2_[0] = LoadGraph("Data/Image/Title/2player1.png");
-	imgP2_[1] = LoadGraph("Data/Image/Title/2player2.png");
-
 	selectedIndex_ = 0;
 
 	SetUseASyncLoadFlag(true);
@@ -250,9 +244,6 @@ void TitleScene::Draw(void)
 	// カーソル描画
 	DrawRotaGraph(CURSOR_1_WIDTH, CURSOR_HEIGHT +
 		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % 2], true);
-
-	DrawRotaGraph(CURSOR_2_WIDTH, CURSOR_HEIGHT +
-		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP2_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % 2], true);
 
 	//テキスト
 	SetFontSize(DEFAULT_FONT_SIZE * 3.75);
