@@ -424,13 +424,13 @@ void DemoScene::DrawMessage()
 		break;
 
 	case STATE::FLAG:
-		DrawString(x, y, "エリアに近づいて陣地を奪還してみよう！", white);
-		DrawString(x, y + 40, "ゲージが100%になると奪還成功です", white);
+		DrawString(x, y, "旗に近づいて陣地を奪還してみよう！", white);
+		DrawString(x, y + 40, "ゲージが溜まり旗が青になると奪還成功です", white);
 		break;
 		
 	case STATE::SABO:
 		DrawString(x, y, "緑の敵は、あなたの陣地を奪いに来る敵です", white);
-		DrawString(x, y + 40, "奪われないように気を付けましょう！", white);
+		DrawString(x, y + 40, "奪われないように倒しましょう！", white);
 		break;
 
 	case STATE::FINISH:

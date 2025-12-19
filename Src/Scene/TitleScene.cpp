@@ -5,6 +5,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/FontManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/SoundManager.h"
 #include "../Manager/Camera.h"
@@ -41,6 +42,10 @@ void TitleScene::Init(void)
 	imgNo_ = resMng_.Load(ResourceManager::SRC::NO).handleId_;					//いいえ画像
 	imgYesSel_ = resMng_.Load(ResourceManager::SRC::SELECT_YES).handleId_;		//選択中はい画像
 	imgNoSel_ = resMng_.Load(ResourceManager::SRC::SELECT_NO).handleId_;		//選択中いいえ画像
+
+	img3D_ = LoadGraph("Data/Image/Title/3D.png");
+	imgP1_[0] = LoadGraph("Data/Image/Title/1player1.png");
+	imgP1_[1] = LoadGraph("Data/Image/Title/1player2.png");
 
 	selectedIndex_ = 0;
 
@@ -246,12 +251,35 @@ void TitleScene::Draw(void)
 		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % 2], true);
 
 	//テキスト
-	SetFontSize(DEFAULT_FONT_SIZE * 3.75);
-	DrawString(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white);
-	DrawString(TEXT_WIDTH, TEXT_HEIGHT_2, "ルールの説明", white);
-	DrawString(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲームを終了", white);
+	//SetFontSize(DEFAULT_FONT_SIZE * 3.75);
+	if (selectedIndex_ == 0)
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 60);
+	}
+	else
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 50);
+	}
 
-	SetFontSize(DEFAULT_FONT_SIZE);
+	if (selectedIndex_ == 1)
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 60);
+	}
+	else
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 50);
+	}
+
+	if (selectedIndex_ == 3)
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 60);
+	}
+	else
+	{
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 50);
+	}
+
+	//SetFontSize(DEFAULT_FONT_SIZE);
 	if (GetASyncLoadNum() != 0)
 	{
 		return;

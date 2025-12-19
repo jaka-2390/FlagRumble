@@ -115,7 +115,6 @@ private:
 	int imgYesSel_;
 	int imgNoSel_;
 	int imgP1_[2];
-	int imgP2_[2];
 
 	int selectedIndex_;
 

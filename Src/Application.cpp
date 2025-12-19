@@ -5,6 +5,7 @@
 #include "Manager/SoundManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/GravityManager.h"
+#include "Manager/FontManager.h"
 #include "Application.h"
 
 // staticƒƒ“ƒo•Ï”‚ÌÀ‘Ì
@@ -52,6 +53,8 @@ void Application::Init(void)
 		isInitFail_ = true;
 		return;
 	}
+
+	FontManager::Init();
 
 	// Effekseer‰Šú‰»
 	InitEffekseer();

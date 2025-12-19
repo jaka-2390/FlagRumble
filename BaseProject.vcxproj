@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Manager\FontManager.cpp" />
     <ClCompile Include="Src\Object\Flag\EnemyFlag.cpp" />
     <ClCompile Include="Src\Object\Flag\PlayerFlag.cpp" />
     <ClCompile Include="Src\Object\FlagBase.cpp" />
@@ -66,6 +67,7 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Manager\FontManager.h" />
     <ClInclude Include="Src\Object\Flag\EnemyFlag.h" />
     <ClInclude Include="Src\Object\Flag\PlayerFlag.h" />
     <ClInclude Include="Src\Object\FlagBase.h" />
