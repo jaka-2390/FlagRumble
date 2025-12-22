@@ -43,9 +43,9 @@ void TitleScene::Init(void)
 	imgYesSel_ = resMng_.Load(ResourceManager::SRC::SELECT_YES).handleId_;		//選択中はい画像
 	imgNoSel_ = resMng_.Load(ResourceManager::SRC::SELECT_NO).handleId_;		//選択中いいえ画像
 
-	img3D_ = LoadGraph("Data/Image/Title/3D.png");
 	imgP1_[0] = LoadGraph("Data/Image/Title/1player1.png");
 	imgP1_[1] = LoadGraph("Data/Image/Title/1player2.png");
+	imgFlag_ = LoadGraph("Data/Image/Title/Flag.png");
 
 	selectedIndex_ = 0;
 
@@ -94,8 +94,6 @@ void TitleScene::NewFunction()
 void TitleScene::Update(void)
 {
 	cnt++;
-	cnt_3D = cnt * IMAGE_3D_SPEAD;
-	if (cnt_3D >= MAX_CONUT_3D)cnt_3D = MAX_CONUT_3D;
 	InputManager& ins = InputManager::GetInstance();
 
 	// === 終了確認中の入力処理 ===
@@ -217,10 +215,9 @@ void TitleScene::Draw(void)
 	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, black, true);
 
 	// タイトルロゴ表示
-	/*int titleW, titleH;
+	int titleW, titleH;
 	GetGraphSize(imgTitle_, &titleW, &titleH);
 	DrawRotaGraph((Application::SCREEN_SIZE_X / 2), IMG_TITLE_HEIGHT, IMG_TITLE_SIZE, 0, imgTitle_, true);
-	DrawRotaGraph(IMG_3D_WIDTH, cnt_3D - IMG_3D_HEIGHT, IMG_3D_SIZE, 0, img3D_, true);*/
 
 #pragma region		ボタン設定
 	const int yGame = BASE_Y;
@@ -251,14 +248,13 @@ void TitleScene::Draw(void)
 		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % 2], true);
 
 	//テキスト
-	//SetFontSize(DEFAULT_FONT_SIZE * 3.75);
 	if (selectedIndex_ == 0)
 	{
 		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 60);
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 50);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 55);
 	}
 
 	if (selectedIndex_ == 1)
@@ -267,19 +263,18 @@ void TitleScene::Draw(void)
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 50);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 55);
 	}
 
-	if (selectedIndex_ == 3)
+	if (selectedIndex_ == 2)
 	{
 		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 60);
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 50);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 55);
 	}
 
-	//SetFontSize(DEFAULT_FONT_SIZE);
 	if (GetASyncLoadNum() != 0)
 	{
 		return;

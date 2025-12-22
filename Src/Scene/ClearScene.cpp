@@ -34,7 +34,6 @@ void ClearScene::Init(void)
 	// âÊëúì«Ç›çûÇ›
 	imgClear_ = resMng_.Load(ResourceManager::SRC::GAMECLEAR).handleId_;
 	imgBackGameClaer_ = resMng_.Load(ResourceManager::SRC::BACK_GAMECLEAR).handleId_;
-	imgClearWolrd_ = resMng_.Load(ResourceManager::SRC::CLEARWOLEDBORN).handleId_;
 	imgReplay_ = resMng_.Load(ResourceManager::SRC::REPLAY).handleId_;
 	imgReturn_ = resMng_.Load(ResourceManager::SRC::GOTITLE).handleId_;
 	imgPressKey_ = resMng_.Load(ResourceManager::SRC::PRESS_KEY).handleId_;

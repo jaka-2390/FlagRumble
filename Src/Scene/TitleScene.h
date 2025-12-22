@@ -38,15 +38,8 @@ public:
 
 	static constexpr float INVERSION = 90.0f;
 
-	static constexpr int MAX_CONUT_3D = 750;
-	static constexpr int IMAGE_3D_SPEAD = 20;
-
-	static constexpr float IMG_3D_SIZE = 0.5;
-	static constexpr int IMG_3D_WIDTH = 1700;
-	static constexpr int IMG_3D_HEIGHT = 625;
-
-	static constexpr float IMG_TITLE_SIZE = 1.7;
-	static constexpr int IMG_TITLE_HEIGHT = 150;
+	static constexpr float IMG_TITLE_SIZE = 0.6;
+	static constexpr int IMG_TITLE_HEIGHT = 200;
 
 	static constexpr int WHITE_ALPHA = 255;
 	static constexpr int GRAY_ALPHA = 220;
@@ -102,11 +95,9 @@ public:
 private:
 
 	int cnt;
-	int cnt_3D;
 
 	// ‰æ‘œ
 	int imgTitle_;
-	int img3D_;
 	int imgBackTitle_;
 	int imgUDCursor_;
 	int imgConfirmEnd_;
@@ -115,6 +106,7 @@ private:
 	int imgYesSel_;
 	int imgNoSel_;
 	int imgP1_[2];
+	int imgFlag_;
 
 	int selectedIndex_;
 

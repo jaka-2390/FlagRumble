@@ -33,7 +33,7 @@ void ResourceManager::Init(void)
 	// UI画像系
 	// -----------------------------------------------------------------
 	// タイトル画像
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Title/GameTitle.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Title/Title.png");
 	resourcesMap_.emplace(SRC::TITLE, std::move(res));
 
 	// タイトル背景
@@ -83,10 +83,6 @@ void ResourceManager::Init(void)
 	// ゲームクリア
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Clear.png");
 	resourcesMap_.emplace(SRC::GAMECLEAR, std::move(res));
-
-	// こうして世界は生まれた
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "ClearWorld.png");
-	resourcesMap_.emplace(SRC::CLEARWOLEDBORN, std::move(res));
 
 	// 何かのキーを押して
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "PressKey.png");
