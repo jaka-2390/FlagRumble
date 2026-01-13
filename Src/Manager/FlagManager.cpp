@@ -4,10 +4,10 @@ void FlagManager::Init()
 {
     flags_.clear();
 
-    auto flag1 = std::make_unique<Flag>(VGet(-2000.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
-    auto flag2 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 4000.0f), Flag::ENEMY_TYPE::SABO, Flag::STATE::NEUTRAL);
-    auto flag3 = std::make_unique<Flag>(VGet(2300.0f, 254.0f, 2000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
-    auto flag4 = std::make_unique<Flag>(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
+    auto flag1 = std::make_unique<Flag>(FLAG1_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
+    auto flag2 = std::make_unique<Flag>(FLAG2_POS, Flag::ENEMY_TYPE::SABO, Flag::STATE::NEUTRAL);
+    auto flag3 = std::make_unique<Flag>(FLAG3_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
+    auto flag4 = std::make_unique<Flag>(FLAG4_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::NEUTRAL);
 
     auto flag5 = std::make_unique<PlayerFlag>(PLAYER_FLAG_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::PLAYER);
     auto flag6 = std::make_unique<EnemyFlag>(ENEMY_FLAG_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);

@@ -7,6 +7,30 @@ class FlagBase
 
 public:
 
+    static constexpr VECTOR FLAG_SCALE = { 2.0f, 2.0f, 2.0f };
+
+    static constexpr float GAUGE_MAX = 100.0f;
+    static constexpr float FLAG_RADIUS = 100.0f;
+    static constexpr float CHECK_RADIUS = 500.0f;
+
+    static constexpr float GAUGE_UP = 0.5f;
+    static constexpr float GAUGE_DOWN = 0.2f;
+
+    static constexpr int CIRCLE_DIVISION = 36;      //â~ÇÃï™äÑêî
+    static constexpr float FULL_CIRCLE = 2.0f * DX_PI_F;  //2ÉŒ
+
+    static constexpr float GAUGE_OFFSET_Y = 80.0f;
+    static constexpr int GAUGE_WIDTH = 100;
+    static constexpr int GAUGE_HEIGHT = 10;
+    static constexpr int HALF_DIVISOR = 2;				//ÅÄ2
+    static constexpr int GAUGE_SCREEN_OFFSET_Y = 20;
+    
+    static constexpr float EFFECT_SCALE = 300.0f;
+
+    //êF
+    int white = 0xffffff; //îí
+    int green = 0x00ff00; //óŒ
+
     enum class ENEMY_TYPE
     {
         NONE,

@@ -11,7 +11,7 @@ Sound::Sound(void)
     }
     pos_ = { 0.0f, 0.0f, 0.0f };
     radius_ = 0.0f;
-    maxVolume_ = 255;
+    maxVolume_ = VOL_MAX;
 }
 
 Sound::Sound(TYPE type, const std::string& path)
@@ -24,7 +24,7 @@ Sound::Sound(TYPE type, const std::string& path)
     }
     pos_ = { 0.0f, 0.0f, 0.0f };
     radius_ = 0.0f;
-    maxVolume_ = 255;
+    maxVolume_ = VOL_MAX;
 }
 
 Sound::~Sound(void)
@@ -168,5 +168,5 @@ void Sound::ChangeVolume(float per)
 void Sound::ChangeMaxVolume(float per)
 {
     per = std::clamp(per, 0.0f, 1.0f);
-    maxVolume_ = static_cast<int>(255 * per);
+    maxVolume_ = static_cast<int>(VOL_MAX * per);
 }

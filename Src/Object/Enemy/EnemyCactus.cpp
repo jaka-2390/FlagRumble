@@ -122,7 +122,7 @@ void EnemyCactus::ChasePlayer(void)
 
         // 旗に近づいたら奪う
         float distSq = VSize(VSub(transform_.pos, targetPos));
-        if (distSq < 100.0f) //エリアの範囲内
+        if (distSq < FLAG_AREA) //エリアの範囲内
         {
 			captureTimer_ += scnMng_.GetDeltaTime();
 
@@ -168,7 +168,7 @@ void EnemyCactus::ChasePlayer(void)
 			else
 			{
 				//ランダム方向
-				float angle = GetRand(360) * DX_PI_F / 180.0f;
+				float angle = GetRand(RANDOM_ANGLE) * DEG_TO_RAD;
 				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
 			}
 		}

@@ -7,6 +7,8 @@ class Sound
 
 public:
 
+    static constexpr int VOL_MAX = 255;
+
     enum class TYPE
     {
         NONE,

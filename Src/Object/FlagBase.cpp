@@ -27,17 +27,17 @@ void FlagBase::Init()
 {
 	//旗
 	flag_.pos = { pos_.x, pos_.y, pos_.z };
-	flag_.scl = { 2.0f, 2.0f, 2.0f };
+	flag_.scl = FLAG_SCALE;
 	flag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
 	flag_.Update();
 
 	pflag_.pos = { pos_.x, pos_.y, pos_.z };
-	pflag_.scl = { 2.0f, 2.0f, 2.0f };
+	pflag_.scl = FLAG_SCALE;
 	pflag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
 	pflag_.Update();
 	
 	nflag_.pos = { pos_.x, pos_.y, pos_.z };
-	nflag_.scl = { 2.0f, 2.0f, 2.0f };
+	nflag_.scl = FLAG_SCALE;
 	nflag_.quaRot = Quaternion::Euler(0.0f, AsoUtility::Deg2RadF(0.0f), 0.0f);
 	nflag_.Update();
 
@@ -45,9 +45,9 @@ void FlagBase::Init()
 	playerInRange_ = false;
 	enemyNear_ = false;
 	clearGauge_ = 0.0f;
-	clearGaugeMax_ = 100.0f;
-	flagRadius_ = 100.0f;
-	enemyCheckRadius_ = 500.0f;
+	clearGaugeMax_ = GAUGE_MAX;
+	flagRadius_ = FLAG_RADIUS;
+	enemyCheckRadius_ = CHECK_RADIUS;
 
 	//エフェクト
 	effectEnemyAreaResId_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::ENEMY_AREA).handleId_;
@@ -80,8 +80,6 @@ void FlagBase::Draw()
 	// 円を表示
 	if (IsOwnedByEnemy())
 	{
-		//DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 0, 0));
-
 		MV1SetScale(flag_.modelId, scl_);
 		MV1SetRotationXYZ(flag_.modelId, rot_);
 		MV1SetPosition(flag_.modelId, pos_);
@@ -89,8 +87,6 @@ void FlagBase::Draw()
 	}
 	else if (IsOwnedByPlayer())
 	{
-		//DrawCircleOnMap(pos_, flagRadius_, GetColor(0, 255, 0));
-
 		MV1SetScale(pflag_.modelId, scl_);
 		MV1SetRotationXYZ(pflag_.modelId, rot_);
 		MV1SetPosition(pflag_.modelId, pos_);
@@ -98,8 +94,6 @@ void FlagBase::Draw()
 	}
 	else
 	{
-		//DrawCircleOnMap(pos_, flagRadius_, GetColor(255, 255, 255));
-
 		MV1SetScale(nflag_.modelId, scl_);
 		MV1SetRotationXYZ(nflag_.modelId, rot_);
 		MV1SetPosition(nflag_.modelId, pos_);
@@ -150,6 +144,11 @@ void FlagBase::CheckCircle(const VECTOR& playerPos, const std::vector<std::share
 		{
 			if (!enemy) continue;
 			if (!enemy->IsAlive()) continue;
+
+			//Dogだけを見る
+			if (enemy->GetEnemyType() == EnemyBase::TYPE::DOG)
+				continue;
+
 			VECTOR ePos = enemy->GetTransform().pos;
 	
 			if (DistanceSqXZ(ePos, pos_) < enemyCheckRadius_ * enemyCheckRadius_)
@@ -163,7 +162,7 @@ void FlagBase::CheckCircle(const VECTOR& playerPos, const std::vector<std::share
 		//ゲージを貯める
 		if (!enemyNear_ && playerInRange_)
 		{
-			clearGauge_ += 0.5f;
+			clearGauge_ += GAUGE_UP;
 			if (clearGauge_ >= clearGaugeMax_)
 			{
 				clearGauge_ = clearGaugeMax_;
@@ -172,23 +171,23 @@ void FlagBase::CheckCircle(const VECTOR& playerPos, const std::vector<std::share
 		}
 		else
 		{
-			clearGauge_ -= 0.2f; // 離れると少し減るなども可能
+			clearGauge_ -= GAUGE_DOWN; // 離れると少し減るなども可能
 			if (clearGauge_ < 0.0f) clearGauge_ = 0.0f;
 		}
 }
 
 void FlagBase::DrawCircleOnMap(VECTOR center, float radius, int color)
 {
-	const int div = 36;
+	const int div = CIRCLE_DIVISION;
 
 	for (int i = 0; i < div; i++)
 	{
 		float t1 = (float)i / div;
 		float t2 = (float)(i + 1) / div;
-		float x1 = center.x + cosf(t1 * 2.0f * DX_PI_F) * radius;
-		float z1 = center.z + sinf(t1 * 2.0f * DX_PI_F) * radius;
-		float x2 = center.x + cosf(t2 * 2.0f * DX_PI_F) * radius;
-		float z2 = center.z + sinf(t2 * 2.0f * DX_PI_F) * radius;
+		float x1 = center.x + cosf(t1 * FULL_CIRCLE) * radius;
+		float z1 = center.z + sinf(t1 * FULL_CIRCLE) * radius;
+		float x2 = center.x + cosf(t2 * FULL_CIRCLE) * radius;
+		float z2 = center.z + sinf(t2 * FULL_CIRCLE) * radius;
 
 		DrawLine3D(VGet(x1, center.y, z1), VGet(x2, center.y, z2), color);
 	}
@@ -197,21 +196,21 @@ void FlagBase::DrawCircleOnMap(VECTOR center, float radius, int color)
 void FlagBase::DrawGauge3D(VECTOR center, float gaugeRate)
 {
 	// ゲージバーを円の上（少し高い位置）に表示
-	VECTOR gaugePos = VAdd(center, VGet(0.0f, 80.0f, 0.0f)); // 円より上
+	VECTOR gaugePos = VAdd(center, VGet(0.0f, GAUGE_OFFSET_Y, 0.0f)); // 円より上
 	VECTOR screenPos = ConvWorldPosToScreenPos(gaugePos);
 
-	int barWidth = 100;
-	int barHeight = 10;
+	int barWidth = GAUGE_WIDTH;
+	int barHeight = GAUGE_HEIGHT;
 
-	int x = (int)screenPos.x - barWidth / 2;
-	int y = (int)screenPos.y - 20; // 少し上にオフセット
+	int x = (int)screenPos.x - barWidth / HALF_DIVISOR;
+	int y = (int)screenPos.y - GAUGE_SCREEN_OFFSET_Y; // 少し上にオフセット
 
 	// 外枠
-	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, GetColor(255, 255, 255), FALSE);
+	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, white, FALSE);
 
 	// 中身
 	int fillWidth = (int)(barWidth * gaugeRate);
-	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(0, 255, 0), TRUE);
+	DrawBox(x, y, x + fillWidth, y + barHeight, green, TRUE);
 }
 
 float FlagBase::DistanceSqXZ(const VECTOR& a, const VECTOR& b) const
@@ -230,10 +229,10 @@ void FlagBase::EffectAreaRange(void)
 			StopEffekseer3DEffect(effectEnemyAreaPlayId_);
 		}
 
-		float scale = 300.0f;  // デフォルト値
+		float scale = EFFECT_SCALE;  // デフォルト値
 
 		effectEnemyAreaPlayId_ = PlayEffekseer3DEffect(effectEnemyAreaResId_);
-		SetScalePlayingEffekseer3DEffect(effectEnemyAreaPlayId_, scale, scale / 2, scale);
+		SetScalePlayingEffekseer3DEffect(effectEnemyAreaPlayId_, scale, scale / HALF_DIVISOR, scale);
 		SetPosPlayingEffekseer3DEffect(effectEnemyAreaPlayId_, pos_.x, pos_.y, pos_.z);
 	}
 	else if (IsOwnedByPlayer())
@@ -243,10 +242,10 @@ void FlagBase::EffectAreaRange(void)
 			StopEffekseer3DEffect(effectPlayerAreaPlayId_);
 		}
 
-		float scale = 300.0f;  // デフォルト値
+		float scale = EFFECT_SCALE;  // デフォルト値
 
 		effectPlayerAreaPlayId_ = PlayEffekseer3DEffect(effectPlayerAreaResId_);
-		SetScalePlayingEffekseer3DEffect(effectPlayerAreaPlayId_, scale, scale / 2, scale);
+		SetScalePlayingEffekseer3DEffect(effectPlayerAreaPlayId_, scale, scale / HALF_DIVISOR, scale);
 		SetPosPlayingEffekseer3DEffect(effectPlayerAreaPlayId_, pos_.x, pos_.y, pos_.z);
 	}
 	else
@@ -256,10 +255,10 @@ void FlagBase::EffectAreaRange(void)
 			StopEffekseer3DEffect(effectNeutralAreaPlayId_);
 		}
 
-		float scale = 300.0f;  // デフォルト値
+		float scale = EFFECT_SCALE;  // デフォルト値
 
 		effectNeutralAreaPlayId_ = PlayEffekseer3DEffect(effectNeutralAreaResId_);
-		SetScalePlayingEffekseer3DEffect(effectNeutralAreaPlayId_, scale, scale / 2, scale);
+		SetScalePlayingEffekseer3DEffect(effectNeutralAreaPlayId_, scale, scale / HALF_DIVISOR, scale);
 		SetPosPlayingEffekseer3DEffect(effectNeutralAreaPlayId_, pos_.x, pos_.y, pos_.z);
 	}
 }

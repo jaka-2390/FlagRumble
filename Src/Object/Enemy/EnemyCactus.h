@@ -11,7 +11,10 @@ public:
 	static constexpr  float SPEED = 6.0f;
 	static constexpr  int HP = 6;
 
+	static constexpr  float FLAG_AREA = 100.0f;
 	static constexpr  float FLAG_CHANGE = 3.0f;
+	static constexpr int   RANDOM_ANGLE = 360;
+	static constexpr float DEG_TO_RAD = DX_PI_F / 180.0f;
 
 	EnemyCactus();
 

@@ -11,6 +11,11 @@ class FlagManager
 
 public:
 
+    static constexpr VECTOR FLAG1_POS = { -2000.0f, 254.0f, 2000.0f };
+    static constexpr VECTOR FLAG2_POS = { -250.0f, 254.0f, 4000.0f };
+    static constexpr VECTOR FLAG3_POS = { 2300.0f, 254.0f, 2000.0f };
+    static constexpr VECTOR FLAG4_POS = { -250.0f, 254.0f, 1000.0f };
+
     static constexpr VECTOR PLAYER_FLAG_POS = { -2500.0f, 254.0f, 0.0f };
     static constexpr VECTOR ENEMY_FLAG_POS = { 2500.0f, 254.0f, 4700.0f };
 
