@@ -12,6 +12,7 @@ class OverScene : public SceneBase
 
 public:
 
+	static constexpr int TWO = 2;
 	static constexpr float VALUE_TWO = 2.0f;
 
 	// ゲームオーバー文字列

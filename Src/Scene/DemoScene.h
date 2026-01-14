@@ -34,12 +34,10 @@ class DemoScene :public SceneBase
 
 	public:
 
-		static constexpr int ENCOUNT = 60;			//エンカウンタ
-		static constexpr int ENEMY_MAX = 3;			//最大出現数
-		static constexpr int ENE_ENC = 30;			//最大許容量
-		static constexpr int BORN_DIR = 3;			//敵の出現方向
-		static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
-		static constexpr int STAGE_LANGE = 10000;	//ステージの幅
+		static constexpr int HALF_DIVISOR = 2;				//÷2
+		static constexpr int DOUBLE_MULTIPLIER = 2;			//×2
+		static constexpr VECTOR DOG_POS = { -250.0f, 254.0f, 1000.0f };	//敵の初期位置
+		static constexpr VECTOR CACTUS_POS = { -250.0f, 254.0f, 2000.0f };	//敵の初期位置
 		static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
 
 		//UI関係-----------------------------------------------------
@@ -53,14 +51,22 @@ class DemoScene :public SceneBase
 		static constexpr float PAUSE_IMG_UI_SIZE = 0.65;	//pauseImg_のサイズ
 
 		//ポーズメニュー関連
-		static constexpr int PAUSE_MENU_ITEM_COUNT = 4;						//ポーズメニューの数
+		static constexpr int PAUSE_BG_ALPHA = 200;			//ポーズメニューのアルファ値
+		static constexpr int PAUSE_WHITE_ALPHA = 150;
+		static constexpr float TITLE_FONT_SCALE = 5.0f;		//フォントのスケール
+		static constexpr float ENTER_FONT_SCALE = 2.5f;
+		static constexpr int PAUSE_MENU_CONTROLS = 1;		//操作説明
+		static constexpr int PAUSE_MENU_TITLE = 2;			//タイトルへ
+		static constexpr int PAUSE_MENU_ITEM_COUNT = 3;						//ポーズメニューの数
 		static constexpr int PAUSE_MENU_DOWN = 1;							//下に移動
-		static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動（+3 の代わり）
+		static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動
 
 		//フェード系
 		static constexpr int AUTO_FADE = 240;				//自動フェード
 		static constexpr int FLASH = 45;					//点滅
+		static constexpr float FLASH_RATE = 2.0;			//点滅レート
 		static constexpr int ONE_SECOND_FRAME = 60;			//1秒
+		static constexpr float FRAME_TIME = 1.0f / 60.0f;	//1フレーム = 1/60秒
 
 		//設定系
 		static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
@@ -83,15 +89,29 @@ class DemoScene :public SceneBase
 		//フラッグ
 		static constexpr float GAUGE_INCREMENT = 0.5f;		//flagゲージの上昇速度(フレーム単位)
 		static constexpr float FLAG_RADIUS = 100.0f;		//フラッグ範囲円の半径
+		static constexpr VECTOR FLAG_POS = { -250.0f, 254.0f, 1000.0f };		//フラッグの位置
+
+		//コントローラー
+		static constexpr float DEAD_ZONE = 0.2f;
 
 		//サボテンのインターバル
 		static constexpr float CACTUS_SPAWN_INTERVAL = 20.0f;
 
-		//メッセージの表示時間
-		static constexpr float MESSAGE_DISPLAY_SEC = 1.5f;
+		//メッセージ
+		static constexpr float MESSAGE_DISPLAY_SEC = 1.5f;	//メッセージの表示時間
+		static constexpr int MESSAGE_POS_X = 50;			//メッセージの位置X
+		static constexpr int MESSAGE_POS_Y = 600;			//メッセージの位置Y
+		static constexpr int MESSAGE_OFFSET = 40;			//メッセージの位置調整
+		static constexpr float MESSAGE_FONT_SCALE = 2.0f;
 
 		//スキップ
 		static constexpr float SKIP_TIME = 2.0f;
+		static constexpr int SKIP_UI_OFFSET = 50;			//SkipUIの位置調整用
+		static constexpr int GAUGE_INNER_RADIUS = 20;		//Skipゲージのサイズ
+		static constexpr int GAUGE_OUTER_RADIUS = 35;
+		static constexpr int SKIP_TEX_OFSET_X = 67;			//SkipTexの位置調整
+		static constexpr int SKIP_TEX_OFSET_Y = 25;
+		static constexpr int CIRCLE_SEGMENTS = 64;			//円弧分割数
 
 		//クリアゲージ
 		static constexpr int GAUGE_X = 20;                //左上X位置
@@ -104,6 +124,7 @@ class DemoScene :public SceneBase
 		//色
 		int white = 0xffffff; //白
 		int black = 0x000000; //黒
+		int gray = 0x808080; //灰
 		int red = 0xff0000;	  //赤
 		int green = 0x00ff00; //緑
 		int blue = 0x0000ff;  //青
@@ -136,7 +157,7 @@ private:
 
 		void DrawSkip(int cx, int cy, float rate, int rOuter, int rInner, int color);
 
-		void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
+		void EnemyCreate(VECTOR flagPos, int count, EnemyBase::TYPE type);
 
 		void SpawnCactus(void);
 

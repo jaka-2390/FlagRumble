@@ -57,7 +57,7 @@ void DemoScene::Init(void)
 
 	flagManager_ = std::make_shared<FlagManager>();
 	flagManager_->Clear();
-	flagManager_->AddFlag(VGet(-250.0f, 254.0f, 1000.0f), Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
+	flagManager_->AddFlag(FLAG_POS, Flag::ENEMY_TYPE::DOG, Flag::STATE::ENEMY);
 
 	//画像
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
@@ -107,7 +107,7 @@ void DemoScene::Update(void)
 	if (ins.IsNew(KEY_INPUT_RETURN) ||
 		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
-		skipSecond_ += 1.0f / 60.0f;	//1フレーム = 1/60秒
+		skipSecond_ += FRAME_TIME;	//1フレーム = 1/60秒
 		skipActive_ = true;
 
 		if (skipSecond_ >= SKIP_TIME)
@@ -181,11 +181,11 @@ void DemoScene::Draw(void)
 	if (skipActive_)
 	{
 		float gaugeRate = skipSecond_ / SKIP_TIME;
-		DrawSkip(Application::SCREEN_SIZE_X - 50, Application::SCREEN_SIZE_Y - 50, 1.0f, 20, 35, GetColor(100, 100, 100));
+		DrawSkip(Application::SCREEN_SIZE_X - SKIP_UI_OFFSET, Application::SCREEN_SIZE_Y - SKIP_UI_OFFSET, 1.0f, GAUGE_INNER_RADIUS, GAUGE_OUTER_RADIUS, gray);
 
-		DrawSkip(Application::SCREEN_SIZE_X - 50, Application::SCREEN_SIZE_Y - 50, gaugeRate, 20, 35, GetColor(255, 0, 0));
+		DrawSkip(Application::SCREEN_SIZE_X - SKIP_UI_OFFSET, Application::SCREEN_SIZE_Y - SKIP_UI_OFFSET, gaugeRate, GAUGE_INNER_RADIUS, GAUGE_OUTER_RADIUS, red);
 
-		DrawString(Application::SCREEN_SIZE_X - 67, Application::SCREEN_SIZE_Y - 25, "Skip", white);
+		DrawString(Application::SCREEN_SIZE_X - SKIP_TEX_OFSET_X, Application::SCREEN_SIZE_Y - SKIP_TEX_OFSET_Y, "Skip", white);
 	}
 
 	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
@@ -232,7 +232,7 @@ void DemoScene::UpdateMove()
 			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
 		// スティックが一定以上動いていたら移動入力と判定
-		if (fabs(padState.AKeyLX) > 0.2f || fabs(padState.AKeyLY) > 0.2f)
+		if (fabs(padState.AKeyLX) > DEAD_ZONE || fabs(padState.AKeyLY) > DEAD_ZONE)
 		{
 			moved = true;
 		}
@@ -266,7 +266,7 @@ void DemoScene::UpdateAttack()
 	//Dogがいなかったら生成
 	if (!isDog_)
 	{
-		EnemyCreateAt(VGet(-250.0f, 254.0f, 1000.0f), 1, EnemyBase::TYPE::DOG); // 各フラッグの周囲に1体
+		EnemyCreate(DOG_POS, 1, EnemyBase::TYPE::DOG); // 各フラッグの周囲に1体
 		isDog_ = true;
 		return;
 	}
@@ -350,37 +350,33 @@ void DemoScene::UpdateFinish()
 
 void DemoScene::DrawPause()
 {
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_BG_ALPHA);
 	DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), black, TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	if (pauseState_ == PauseState::Menu)
 	{
-		DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
-		SetFontSize(DEFAULT_FONT_SIZE * 5.0);
+		DrawRotaGraph((Application::SCREEN_SIZE_X / HALF_DIVISOR), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
+		SetFontSize(DEFAULT_FONT_SIZE * TITLE_FONT_SCALE);
 
-		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
+		DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", white);
 		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_4, UI_HEIGHT_PAUSE_1, "チュートリアルに戻る", yellow);
 
-		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
-		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
+		DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_CONTROLS)
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
 
-		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", white);
-		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 2)
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", yellow);
-
-		DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", white);
-		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 3)
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", yellow);
+		DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", white);
+		if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_TITLE)
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", yellow);
 
 		SetFontSize(DEFAULT_FONT_SIZE);
 	}
 	else if (pauseState_ == PauseState::ShowControls || pauseState_ == PauseState::ShowItems)
 	{
 		//白い背景
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
 		DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
@@ -389,9 +385,9 @@ void DemoScene::DrawPause()
 		DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
 
 		//文字を黄色に点滅
-		SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+		SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
 		DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-		if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+		if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
 		SetFontSize(DEFAULT_FONT_SIZE);
 	}
 	return;
@@ -401,11 +397,11 @@ void DemoScene::DrawMessage()
 {
 	bool isPad = (GetJoypadNum() > 0);
 
-	int x = 50;
-	int y = 600;
+	int x = MESSAGE_POS_X;
+	int y = MESSAGE_POS_Y;
 
 #pragma region UI
-	SetFontSize(DEFAULT_FONT_SIZE * 2.0);
+	SetFontSize(DEFAULT_FONT_SIZE * MESSAGE_FONT_SCALE);
 	switch (state_) {
 
 	case STATE::MOVE:
@@ -418,27 +414,27 @@ void DemoScene::DrawMessage()
 	case STATE::ATTACK:
 		DrawString(x, y, "黄色い敵は陣地を守っています", white);
 		if (isPad)
-			DrawString(x, y + 40, "Y ボタンで攻撃して倒してみよう！", white);
+			DrawString(x, y + MESSAGE_OFFSET, "Y ボタンで攻撃して倒してみよう！", white);
 		else
-			DrawString(x, y + 40, "E キーで攻撃して倒してみよう！", white);
+			DrawString(x, y + MESSAGE_OFFSET, "E キーで攻撃して倒してみよう！", white);
 		break;
 
 	case STATE::FLAG:
 		DrawString(x, y, "旗に近づいて陣地を奪還してみよう！", white);
-		DrawString(x, y + 40, "ゲージが溜まり旗が青になると奪還成功です", white);
+		DrawString(x, y + MESSAGE_OFFSET, "ゲージが溜まり旗が青になると奪還成功です", white);
 		break;
 		
 	case STATE::SABO:
 		DrawString(x, y, "緑の敵は、あなたの陣地を奪いに来る敵です", white);
-		DrawString(x, y + 40, "奪われないように倒しましょう！", white);
+		DrawString(x, y + MESSAGE_OFFSET, "奪われないように倒しましょう！", white);
 		break;
 
 	case STATE::FINISH:
 		DrawString(x, y, "チュートリアル完了！", white);
 		if (isPad)
-			DrawString(x, y + 40, "A ボタンでゲーム開始", white);
+			DrawString(x, y + MESSAGE_OFFSET, "A ボタンでゲーム開始", white);
 		else
-			DrawString(x, y + 40, "Enter でゲーム開始", white);
+			DrawString(x, y + MESSAGE_OFFSET, "Enter でゲーム開始", white);
 		break;
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
@@ -447,8 +443,8 @@ void DemoScene::DrawMessage()
 
 void DemoScene::DrawSkip(int cx, int cy, float rate, int rOuter, int rInner, int color)
 {
-	const int segments = 64; // 円を分割する数
-	const float angleMax = rate * DX_TWO_PI_F; //0から2πの角度計算
+	const int segments = CIRCLE_SEGMENTS;		//円を分割する数
+	const float angleMax = rate * DX_TWO_PI_F;	//0から2πの角度計算
 
 	for (int i = 0; i < segments; i++)
 	{
@@ -473,13 +469,13 @@ void DemoScene::DrawSkip(int cx, int cy, float rate, int rOuter, int rInner, int
 	}
 }
 
-void DemoScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
+void DemoScene::EnemyCreate(VECTOR flagPos, int count, EnemyBase::TYPE type)
 {
 	for (int i = 0; i < count; ++i)
 	{
 		VECTOR randPos = flagPos;
-		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.x += GetRand(SPAWN_RADIUS * DOUBLE_MULTIPLIER) - SPAWN_RADIUS;
+		randPos.z += GetRand(SPAWN_RADIUS * DOUBLE_MULTIPLIER) - SPAWN_RADIUS;
 
 		std::shared_ptr<EnemyBase> enemy;
 
@@ -519,7 +515,7 @@ void DemoScene::SpawnCactus(void)
 		}
 	}
 
-	EnemyCreateAt(VGet(-250.0f, 254.0f, 2000.0f), 1, EnemyBase::TYPE::SABO);
+	EnemyCreate(CACTUS_POS, 1, EnemyBase::TYPE::SABO);
 	
 }
 
@@ -527,7 +523,7 @@ void DemoScene::MessageTime(void)
 {
 	if (messageActive_)
 	{
-		messageTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒
+		messageTimer_ += FRAME_TIME; // 1フレーム = 1/60秒
 		if (messageTimer_ >= MESSAGE_DISPLAY_SEC)
 		{
 			messageActive_ = false; // メッセージ終了
@@ -568,8 +564,7 @@ bool DemoScene::PauseMenu(void)
 				mainCamera->SetPaused(false);
 				break;
 			case 1: pauseState_ = PauseState::ShowControls; break;
-			case 2: pauseState_ = PauseState::ShowItems; break;
-			case 3: SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE); break;
+			case 2: SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE); break;
 			}
 		}
 	}

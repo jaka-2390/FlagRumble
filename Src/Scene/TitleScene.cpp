@@ -137,7 +137,7 @@ void TitleScene::Update(void)
 		selectedIndex_ = (selectedIndex_ + 1) % MENU_SELECT;
 	}
 	else if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP)) {
-		selectedIndex_ = (selectedIndex_ + 2) % MENU_SELECT;
+		selectedIndex_ = (selectedIndex_ + SELECT_UP) % MENU_SELECT;
 	}
 
 	if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
@@ -146,14 +146,14 @@ void TitleScene::Update(void)
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
 		}
-		else if (selectedIndex_ == 1) {
+		else if (selectedIndex_ == MENU_DEMO) {
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::DEMO);
 			SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
 		}
-		else if (selectedIndex_ == 2) {
+		else if (selectedIndex_ == MENU_FINISH) {
 			isConfirmingExit_ = true;
 			confirmIndex_ = 1;
-			confirmAnimFrame_ = 0;  // ← アニメーション開始
+			confirmAnimFrame_ = 0;  //アニメーション開始
 			SoundManager::GetInstance().Play(SoundManager::SRC::WARNING_SE, Sound::TIMES::FORCE_ONCE);
 		}
 	}
@@ -210,24 +210,24 @@ void TitleScene::Update(void)
 
 void TitleScene::Draw(void)
 {
-	int centerX = (Application::SCREEN_SIZE_X / 2);
+	int centerX = (Application::SCREEN_SIZE_X / HALF_DIVISOR);
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, black, true);
 
 	// タイトルロゴ表示
 	int titleW, titleH;
 	GetGraphSize(imgTitle_, &titleW, &titleH);
-	DrawRotaGraph((Application::SCREEN_SIZE_X / 2), IMG_TITLE_HEIGHT, IMG_TITLE_SIZE, 0, imgTitle_, true);
+	DrawRotaGraph((Application::SCREEN_SIZE_X / HALF_DIVISOR), IMG_TITLE_HEIGHT, IMG_TITLE_SIZE, 0, imgTitle_, true);
 
 #pragma region		ボタン設定
 	const int yGame = BASE_Y;
 	const int yRule = BASE_Y + BUTTON_OFFSET;
-	const int yExit = BASE_Y + BUTTON_OFFSET * 2;
+	const int yExit = BASE_Y + BUTTON_OFFSET * DOUBLE_MULTIPLIER;
 
 	int phase = blinkFrameCount_ % ONE_SECOND_FRAME;
-	int alpha = (phase < ONE_SECOND_FRAME / 2)
-		? (WHITE_ALPHA * phase) / (ONE_SECOND_FRAME / 2)
-		: WHITE_ALPHA - (WHITE_ALPHA * (phase - ONE_SECOND_FRAME / 2)) / (ONE_SECOND_FRAME / 2);
+	int alpha = (phase < ONE_SECOND_FRAME / HALF_DIVISOR)
+		? (WHITE_ALPHA * phase) / (ONE_SECOND_FRAME / HALF_DIVISOR)
+		: WHITE_ALPHA - (WHITE_ALPHA * (phase - ONE_SECOND_FRAME / HALF_DIVISOR)) / (ONE_SECOND_FRAME / HALF_DIVISOR);
 
 	int yPositions[MENU_SELECT] = { yGame, yRule, yExit };
 #pragma endregion
@@ -245,34 +245,34 @@ void TitleScene::Draw(void)
 
 	// カーソル描画
 	DrawRotaGraph(CURSOR_1_WIDTH, CURSOR_HEIGHT +
-		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % 2], true);
+		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % CURSOR_FRAME_COUNT], true);
 
 	//テキスト
 	if (selectedIndex_ == 0)
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 60);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, TEXT_SELECT_SIZE);
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, 55);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, TEXT_NORMAL_SIZE);
 	}
 
-	if (selectedIndex_ == 1)
+	if (selectedIndex_ == MENU_DEMO)
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 60);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, TEXT_SELECT_SIZE);
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, 55);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, TEXT_NORMAL_SIZE);
 	}
 
-	if (selectedIndex_ == 2)
+	if (selectedIndex_ == MENU_FINISH)
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 60);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, TEXT_SELECT_SIZE);
 	}
 	else
 	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, 55);
+		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, TEXT_NORMAL_SIZE);
 	}
 
 	if (GetASyncLoadNum() != 0)
@@ -298,19 +298,19 @@ void TitleScene::Draw(void)
 		// ウィンドウ背景画像がある場合はここに描画（省略可）
 
 		// 「本当に終了しますか？」画像描画
-		SetFontSize(DEFAULT_FONT_SIZE * 7.8125);
+		SetFontSize(DEFAULT_FONT_SIZE * FONT_FINISH_SIZE);
 		DrawString(END_STRING_WIDTH, END_STRING_HEIGHT, "本当に終了しますか？", white);
 
 		// 選択中で画像を切り替え
 		if (confirmIndex_ == 0)
 		{
-			SetFontSize(DEFAULT_FONT_SIZE * 8.125);
+			SetFontSize(DEFAULT_FONT_SIZE * FONT_SELECT_SIZE);
 			DrawString(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", yellow);
-			DrawString(Application::SCREEN_SIZE_X / 2 + 130, Application::SCREEN_SIZE_Y / 2 + 100, "いいえ", white);
+			DrawString(Application::SCREEN_SIZE_X / HALF_DIVISOR + NO_WIDTH_OFSET, Application::SCREEN_SIZE_Y / HALF_DIVISOR + NO_HEIGHT_OFSET, "いいえ", white);
 		}
 		else
 		{
-			SetFontSize(DEFAULT_FONT_SIZE * 8.125);
+			SetFontSize(DEFAULT_FONT_SIZE * FONT_SELECT_SIZE);
 			DrawString(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", white);
 			DrawString(NO_STRING_WIDTH, NO_STRING_HEIGHT, "いいえ", yellow);
 		}

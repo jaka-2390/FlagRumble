@@ -21,6 +21,7 @@ public:
 	static constexpr VECTOR CAPSULE_TOP = { 0.0f, 110.0f, 0.0f };	//カプセルの頂点
 	static constexpr VECTOR CAPSULE_BOTTOM = { 0.0f,  30.0f, 0.0f };//カプセルの足元
 	static constexpr float PLAYER_ROT_Y = 180.0f;					//Y軸回転(度数)
+	static constexpr float ROT_SPEED = 0.2f;						//回転の追従速度
 	static constexpr float COLLISION_RADIUS = 100.0f;				//衝突判定の半径
 	static constexpr float CAPSULE_RADIUS = 20.0f;					//カプセルの半径
 	static constexpr float ROT_FORWARD_DEG = 0.0f;					//プレイヤー角度(前)
@@ -49,11 +50,6 @@ public:
 	//回転完了までの時間
 	static constexpr float TIME_ROT = 1.0f;
 
-	//木のレベル
-	static constexpr int LV_OLD = 75;		//木の成長段階
-	static constexpr int LV_ADULT = 50;		//木の成長段階
-	static constexpr int LV_KID = 25;		//木の成長段階
-
 	//影関係
 	static constexpr float PLAYER_SHADOW_SIZE = 100.0f;
 	static constexpr float PLAYER_SHADOW_HEIGHT = 300.0f;
@@ -72,13 +68,6 @@ public:
 	static constexpr int HP = 10;
 	static constexpr int D_COUNT = 600;
 	static constexpr int WATER_MAX = 10;
-
-	//水のサイズ
-	static constexpr float WATER_SCALE_BIG = 0.2f;
-	static constexpr float WATER_SCALE_MID = 0.15f;
-	static constexpr int WATER_SMALL = 1;
-	static constexpr int WATER_MID = 2;
-	static constexpr int WATER_BIG = 3;
 
 	//ステータスアップ
 	static constexpr int POWER_UP_TIME = 1200;			//パワーアップ時間
@@ -118,10 +107,20 @@ public:
 	//しきい値
 	static constexpr double SIKII = 0.1;
 
+	//Shadow
+	static constexpr int SHADOW_VERTEX_COUNT = 3;
+	static constexpr float ALPHA_MAX_VALUE = 255.0f;
+	static constexpr float FULL_OPACITY = 1.0f;
+	static constexpr float ALPHA_ROUNDING = 0.5f;
+
 	//重力
 	static constexpr float GRAVITY_POW = 10.0f;
 	static constexpr float COLLISION_LINE_UP = 2.0f;
 	static constexpr float COLLISION_PUSH_UP = 2.0f;
+	static constexpr float CONTACT_DOT_THRESHOLD = 0.9f;
+
+	static constexpr float FALL_DAMAGE_Y = -300.0f;
+	static constexpr int FALL_DAMAGE = 3;
 
 	//カプセル
 	static constexpr int CAPSULE_CNT = 10;

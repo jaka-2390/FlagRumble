@@ -16,11 +16,6 @@
 #include "../Object/EnemyBase.h"
 #include "../Object/Enemy/EnemyCactus.h"
 #include "../Object/Enemy/EnemyDog.h"
-#include "../Object/Enemy/EnemyMimic.h"
-#include "../Object/Enemy/EnemyMushroom.h"
-#include "../Object/Enemy/EnemyOnion.h"
-#include "../Object/Enemy/EnemyThorn.h"
-#include "../Object/Enemy/EnemyVirus.h"
 #include "../Object/Enemy/EnemyBoss.h"
 #include "../Object/Planet.h"
 #include "../Object/Flag/Flag.h"
@@ -132,58 +127,7 @@ void GameScene::Update(void)
 	// 敵全滅情報をFlagに伝える
 	flagManager_->Update(player_->GetTransform().pos, enemys_);
 
-	//それぞれの旗に敵を生成
-	/*int flagCount = flagManager_->GetFlagMax();
-	for (int i = 0; i < flagCount; ++i)
-	{
-		if (ENEMY_MAX >= enemys_.size())
-		{
-			FlagBase* flag = flagManager_->GetFlag(i);
-			if (!flag) continue;
-
-			// FlagのEnemyTypeをEnemyBase::TYPEに変換
-			EnemyBase::TYPE type;
-			switch (flag->GetEnemyType())
-			{
-			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
-			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
-			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
-			default:                      type = EnemyBase::TYPE::DOG; break;
-			}
-
-			// 敵生成
-			VECTOR flagPos = flag->GetPosition();
-			EnemyCreateAt(flagPos, 1, type); // 各フラッグの周囲に1体
-		}
-
-		FlagBase* flag = flagManager_->GetFlag(i);
-		if (!flag) continue;
-
-		// ① 通常の旗ならスキップ（敵を出さない）
-		auto core = dynamic_cast<EnemyFlag*>(flag);
-		if (!core) continue;
-
-		// ② EnemyFlag（敵の本陣）の場合のみ
-		if (flag->IsEnemySpawned())   // ← EnemyCoreFlag だけ true になる
-		{
-			// FlagのEnemyTypeをEnemyBase::TYPEに変換
-			EnemyBase::TYPE type;
-			switch (flag->GetEnemyType())
-			{
-			case Flag::ENEMY_TYPE::DOG:   type = EnemyBase::TYPE::DOG; break;
-			case Flag::ENEMY_TYPE::SABO: type = EnemyBase::TYPE::SABO; break;
-			case Flag::ENEMY_TYPE::BOSS:  type = EnemyBase::TYPE::BOSS; break;
-			default:                      type = EnemyBase::TYPE::DOG; break;
-			}
-
-			flag->SetEnemySpawned(false);
-
-			// 5秒ごとに Cactus を1体ずつ生成
-			EnemyCreateAt(flag->GetPosition(), 1, type);
-		}
-	}*/
-
-	SpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+	SpawnTimer_ += FRAME_TIME; // 1フレーム = 1/60秒として加算
 
 	if (SpawnTimer_ >= SPAWN_INTERVAL)
 	{
@@ -221,8 +165,8 @@ void GameScene::Update(void)
 				default:                      type = EnemyBase::TYPE::DOG; break;
 				}
 
-				// 5秒ごとに Cactus を1体ずつ生成
-				EnemyCreateAt(targetFlag->GetPosition(), 1, type);
+				//数秒ごとにCactusを1体ずつ生成
+				EnemyCreateRand(targetFlag->GetPosition(), 1, type);
 			}
 		}
 	}
@@ -280,60 +224,56 @@ void GameScene::Draw(void)
 
 	if (isPaused_)
 	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_BG_ALPHA);
 		DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), black, TRUE);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 		if (pauseState_ == PauseState::Menu)
 		{
-			DrawRotaGraph((Application::SCREEN_SIZE_X / 2), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
-			SetFontSize(DEFAULT_FONT_SIZE * 5.0);
+			DrawRotaGraph((Application::SCREEN_SIZE_X / HALF_DIVISOR), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
+			SetFontSize(DEFAULT_FONT_SIZE * TITLE_FONT_SCALE);
 
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white);
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow);
+				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow);
 
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 1)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_CONTROLS)
+				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
 
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 2)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_3, "アイテム概要", yellow);
-
-			DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", white);
-			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 3)
-				DrawString((Application::SCREEN_SIZE_X / 2) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_4, "タイトルへ", yellow);
+			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", white);
+			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_TITLE)
+				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", yellow);
 
 			SetFontSize(DEFAULT_FONT_SIZE);
 		}
 		else if (pauseState_ == PauseState::ShowControls)
 		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 			DrawGraph(0, 0, pauseExplainImgs_[0], true);
-			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
 			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
 			SetFontSize(DEFAULT_FONT_SIZE);
 		}
 		else if (pauseState_ == PauseState::ShowItems)
 		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 			DrawGraph(0, 0, pauseExplainImgs_[1], true);
-			SetFontSize(DEFAULT_FONT_SIZE * 2.5);
+			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
 			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * 2.0 <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
 			SetFontSize(DEFAULT_FONT_SIZE);
 		}
 		return;
 	}
 #pragma region UI
-	SetFontSize(DEFAULT_FONT_SIZE * 2.0);
-	DrawString(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:通常攻撃", white);
+	SetFontSize(DEFAULT_FONT_SIZE * ATTACK_FONT_SCALE);
+	DrawString(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:攻撃", white);
 	SetFontSize(DEFAULT_FONT_SIZE);
 #pragma endregion
 }
@@ -382,7 +322,7 @@ void GameScene::EnemyCreate(int count)
 {
 	for (int i = 0; i < count; ++i)
 	{
-		VECTOR randPos = VGet(2500.0f, 254.0f, 4700.0f);
+		VECTOR randPos = CUCTUS_POS;
 
 		//EnemyDogを生成
 		auto enemy = std::make_shared<EnemyCactus>();
@@ -399,13 +339,13 @@ void GameScene::EnemyCreate(int count)
 	}
 }
 
-void GameScene::EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type)
+void GameScene::EnemyCreateRand(VECTOR flagPos, int count, EnemyBase::TYPE type)
 {
 	for (int i = 0; i < count; ++i)
 	{
 		VECTOR randPos = flagPos;
-		randPos.x += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-		randPos.z += GetRand(SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+		randPos.x += GetRand(SPAWN_RADIUS * DOUBLE_MULTIPLIER) - SPAWN_RADIUS;
+		randPos.z += GetRand(SPAWN_RADIUS * DOUBLE_MULTIPLIER) - SPAWN_RADIUS;
 
 		std::shared_ptr<EnemyBase> enemy;
 
@@ -462,7 +402,7 @@ void GameScene::SpawnBoss(void)
 
 void GameScene::SpawnCactus(void)
 {
-	cactusSpawnTimer_ += 1.0f / 60.0f; // 1フレーム = 1/60秒として加算
+	cactusSpawnTimer_ += FRAME_TIME; //1フレーム = 1/60秒として加算
 
 	if (cactusSpawnTimer_ >= CACTUS_SPAWN_INTERVAL)
 	{
@@ -489,7 +429,7 @@ void GameScene::SpawnCactus(void)
 			if (targetFlag)
 			{
 				VECTOR flagPos = targetFlag->GetPosition();
-				EnemyCreateAt(flagPos, 1, EnemyBase::TYPE::SABO);
+				EnemyCreateRand(flagPos, 1, EnemyBase::TYPE::SABO);
 			}
 		}
 	}
@@ -527,8 +467,7 @@ bool GameScene::PauseMenu(void)
 				mainCamera->SetPaused(false);
 				break;
 			case 1: pauseState_ = PauseState::ShowControls; break;
-			case 2: pauseState_ = PauseState::ShowItems; break;
-			case 3: SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE); break;
+			case 2: SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE); break;
 			}
 		}
 	}

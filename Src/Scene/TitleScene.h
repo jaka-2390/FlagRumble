@@ -14,6 +14,7 @@ public:
 
 	static constexpr int ONE_SECOND_FRAME = 60;			//1秒
 
+	static constexpr int SELECT_UP = 2;
 	static constexpr int MENU_SELECT = 3;
 
 	static constexpr float PLAYER_POS_X = -900.0f;
@@ -55,6 +56,7 @@ public:
 	static constexpr int INDEX = 110;
 	static constexpr float IMG_CURSOR_SIZE = 4.5;
 	static constexpr float CURSOR_MOVE_SPEED = 0.03;
+	static constexpr int CURSOR_FRAME_COUNT = 2;
 
 	static constexpr int TEXT_WIDTH = 780;
 
@@ -68,8 +70,25 @@ public:
 	static constexpr int YES_STRING_WIDTH = 560;
 	static constexpr int YES_STRING_HEIGHT = 640;
 
+	static constexpr int NO_WIDTH_OFSET = 130;
+	static constexpr int NO_HEIGHT_OFSET = 100;
+
 	static constexpr int NO_STRING_WIDTH = 1090;
 	static constexpr int NO_STRING_HEIGHT = 640;
+
+	//選択
+	static constexpr int MENU_DEMO = 1;		//チュートリアルへ
+	static constexpr int MENU_FINISH = 2;	//ゲーム終了
+
+	//テキスト
+	static constexpr int TEXT_NORMAL_SIZE = 55;	//通常のテキストサイズ
+	static constexpr int TEXT_SELECT_SIZE = 60;	//選択中のテキストサイズ
+
+	static constexpr double FONT_FINISH_SIZE = 7.8125;	//終了確認のフォントサイズ
+	static constexpr double FONT_SELECT_SIZE = 8.125;	//YES,NOのフォントサイズ
+
+	static constexpr int HALF_DIVISOR = 2;		//÷2
+	static constexpr int DOUBLE_MULTIPLIER = 2;	//×2
 
 	//色
 	int white = 0xffffff; //白

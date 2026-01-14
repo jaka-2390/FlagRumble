@@ -58,7 +58,7 @@ void SceneManager::Init(void)
 void SceneManager::Init3D(void)
 {
 	// 背景色設定
-	SetBackgroundColor(0, 139, 139);
+	SetBackgroundColor(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B);
 
 	// Zバッファを有効にする
 	SetUseZBuffer3D(true);
@@ -73,15 +73,15 @@ void SceneManager::Init3D(void)
 	SetUseLighting(true);
 	
 	// ライトの設定
-	ChangeLightTypeDir({0.3f,-3.0f,0.3f});
+	ChangeLightTypeDir({ LIGHT_DIR_X ,LIGHT_DIR_Y ,LIGHT_DIR_Z });
 
 	//環境光
-	SetGlobalAmbientLight(GetColorF(0.3f, 0.3f, 0.3f, 1.0f));
+	SetGlobalAmbientLight(GetColorF(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1.0f));
 
-	// フォグ設定
+	//フォグ設定
 	SetFogEnable(true);
-	SetFogColor(5, 5, 5);
-	SetFogStartEnd(10000.0f, 20000.0f);
+	SetFogColor(FOG_COLOR, FOG_COLOR, FOG_COLOR);
+	SetFogStartEnd(FOG_START, FOG_END);
 }
 
 void SceneManager::Update(void)
@@ -94,7 +94,7 @@ void SceneManager::Update(void)
 	// デルタタイム
 	auto nowTime = std::chrono::system_clock::now();
 	deltaTime_ = static_cast<float>(
-		std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - preTime_).count() / 1000000000.0);
+		std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - preTime_).count() / NANOSECONDS_PER_SECOND);
 	preTime_ = nowTime;
 
 	// 重力方向の計算
@@ -189,14 +189,14 @@ SceneManager::SceneManager(void)
 	isSceneChanging_ = false;
 
 	// デルタタイム
-	deltaTime_ = 1.0f / 60.0f;
+	deltaTime_ = FRAME_TIME;
 
 	camera_ = nullptr;
 }
 
 void SceneManager::ResetDeltaTime(void)
 {
-	deltaTime_ = 0.016f;
+	deltaTime_ = RESET_TIME;
 	preTime_ = std::chrono::system_clock::now();
 }
 
@@ -219,11 +219,11 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	{
 	case SCENE_ID::TITLE:
 		scene_ = std::make_unique<TitleScene>();
-		SetFontSize(15);
+		SetFontSize(TITLE_FONT_SIZE);
 		break;
 	case SCENE_ID::DEMO:
 		scene_ = std::make_unique<DemoScene>();
-		SetFontSize(55);
+		SetFontSize(DEMO_FONT_SIZE);
 		break;
 	case SCENE_ID::GAME:
 		scene_ = std::make_unique<GameScene>();
@@ -273,7 +273,7 @@ void SceneManager::Fade(void)
             {
                 loadingTimer_++;
 
-                if (loadingTimer_ > 60) // 約1秒間ローディングを見せる
+                if (loadingTimer_ > LOADING_FRAMES) // 約1秒間ローディングを見せる
                 {
                     DoChangeScene(waitSceneId_);
                     fader_->SetFade(Fader::STATE::FADE_IN);

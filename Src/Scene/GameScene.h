@@ -24,13 +24,17 @@ class GameScene : public SceneBase
 
 public:
 
-	static constexpr int ENCOUNT = 60;			//エンカウンタ
-	static constexpr int ENEMY_MAX = 3;			//最大出現数
-	static constexpr int ENE_ENC = 30;			//最大許容量
-	static constexpr int BORN_DIR = 3;			//敵の出現方向
-	static constexpr int STAGE_WIDTH = 20000;	//ステージの全体
-	static constexpr int STAGE_LANGE = 10000;	//ステージの幅
-	static constexpr float SPAWN_RADIUS = 100.0f;//スポーン場所
+	static constexpr int ENCOUNT = 60;				//エンカウンタ
+	static constexpr int ENEMY_MAX = 3;				//最大出現数
+	static constexpr int ENE_ENC = 30;				//最大許容量
+	static constexpr int BORN_DIR = 3;				//敵の出現方向
+	static constexpr int STAGE_WIDTH = 20000;		//ステージの全体
+	static constexpr int STAGE_LANGE = 10000;		//ステージの幅
+	static constexpr int HALF_DIVISOR = 2;			//÷2
+	static constexpr int DOUBLE_MULTIPLIER = 2;		//×2
+	static constexpr float SPAWN_RADIUS = 100.0f;	//スポーン場所
+
+	static constexpr VECTOR CUCTUS_POS = { 2500.0f, 254.0f, 4700.0f };
 	static constexpr VECTOR BOSS_POS = { 80.0f, 254.0f, 2300.0f };
 
 	//UI関係-----------------------------------------------------
@@ -48,17 +52,27 @@ public:
 	static constexpr float PAUSE_IMG_UI_SIZE = 0.65;	//pauseImg_のサイズ
 
 	//ポーズメニュー関連
-	static constexpr int PAUSE_MENU_ITEM_COUNT = 4;						//ポーズメニューの数
+	static constexpr double TITLE_FONT_SCALE = 5.0;						//フォントのスケール
+	static constexpr double ENTER_FONT_SCALE = 2.5;						//Enterのスケール
+	static constexpr double ATTACK_FONT_SCALE = 2.0;					//攻撃のスケール
+	static constexpr int PAUSE_MENU_CONTROLS = 1;						//操作説明
+	static constexpr int PAUSE_MENU_TITLE = 2;							//タイトルへ
+	static constexpr int PAUSE_MENU_ITEM_COUNT = 3;						//ポーズメニューの数
 	static constexpr int PAUSE_MENU_DOWN = 1;							//下に移動
-	static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動（+3 の代わり）
+	static constexpr int PAUSE_MENU_UP = PAUSE_MENU_ITEM_COUNT - 1;		//上に移動
 
 	//フェード系
 	static constexpr int AUTO_FADE = 240;				//自動フェード
 	static constexpr int FLASH = 45;					//点滅
+	static constexpr double FLASH_RATE = 2.0;			//点滅レート
 	static constexpr int ONE_SECOND_FRAME = 60;			//1秒
 
 	//設定系
 	static constexpr int UI_GEAR = 100;					//imgOpeGear_のX,Yの場所
+
+	//ポーズメニュー
+	static constexpr int PAUSE_BG_ALPHA = 200;			//ポーズメニューのアルファ値
+	static constexpr int PAUSE_WHITE_ALPHA = 150;
 
 	static constexpr int UI_PAUSE_IMG_HEIGHT = 150;		//pauseImg_の高さ
 
@@ -78,6 +92,8 @@ public:
 
 	static constexpr int BACK_PAUSE_WIDTH = 1600;		//ポーズに戻るときのENTERのX
 	static constexpr int BACK_PAUSE_HEIGHT = 1020;		//ポーズに戻るときのENTERのY
+
+	static constexpr float FRAME_TIME = 1.0f / 60.0f;	//1フレーム = 1/60秒
 
 	//フラッグ
 	static constexpr float GAUGE_INCREMENT = 0.5f;		//flagゲージの上昇速度(フレーム単位)
@@ -121,7 +137,7 @@ private:
 
 	void EnemyCreate(int count);
 
-	void EnemyCreateAt(VECTOR flagPos, int count, EnemyBase::TYPE type);
+	void EnemyCreateRand(VECTOR flagPos, int count, EnemyBase::TYPE type);
 
 	void SpawnBoss(void);
 

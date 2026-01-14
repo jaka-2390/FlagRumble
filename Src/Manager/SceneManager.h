@@ -14,10 +14,40 @@ class SceneManager
 
 public:
 
+	//背景色
+	static constexpr int BG_COLOR_R = 0;
+	static constexpr int BG_COLOR_G = 139;
+	static constexpr int BG_COLOR_B = 139;
+
+	//ライト方向
+	static constexpr float LIGHT_DIR_X = 0.3f;
+	static constexpr float LIGHT_DIR_Y = -3.0f;
+	static constexpr float LIGHT_DIR_Z = 0.3f;
+
+	//環境光
+	static constexpr float AMBIENT_LIGHT = 0.3f;
+
+	//フォグ
+	static constexpr int FOG_COLOR = 5;
+	static constexpr float FOG_START = 10000.0f;
+	static constexpr float FOG_END = 20000.0f;
+
+	//ナノ秒
+	static constexpr double NANOSECONDS_PER_SECOND = 1000000000.0;
+
+	//フレーム
+	static constexpr float FRAME_TIME = 1.0f / 60.0f;	//1フレーム = 1/60秒
+	static constexpr float RESET_TIME = 0.016f;			//60FPS の 1 フレーム時間
+	static constexpr int LOADING_FRAMES = 60;			//約1秒（60FPS）
+
+	//フォントサイズ
+	static constexpr int TITLE_FONT_SIZE = 15;	//タイトルのフォントサイズ
+	static constexpr int DEMO_FONT_SIZE = 55;	//チュートリアルのフォントサイズ
+
 	//60FPS固定の定数
 	static constexpr float DEFAULT_FPS = 60.0f;
 
-	// シーン管理用
+	//シーン管理用
 	enum class SCENE_ID
 	{
 		NONE,

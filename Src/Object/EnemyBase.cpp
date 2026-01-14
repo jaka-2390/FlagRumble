@@ -118,12 +118,12 @@ void EnemyBase::UpdateAttack(void)
 	animationController_->Play((int)ANIM_TYPE::ATTACK, false);
 
 	const auto& anim = animationController_->GetPlayAnim();
-	if (anim.step > 15.0f && isAttack_ == true)
+	if (anim.step > ATTACK_FRAME && isAttack_ == true)
 	{
 		isAttack_ = false;
 		CheckHitAttackHit();
 	}
-	else if(anim.step > 30.0f && enemyType_ == TYPE::BOSS && isAttack_P)
+	else if(anim.step > BOSS_ATTACK_FRAME && enemyType_ == TYPE::BOSS && isAttack_P)
 	{
 		isAttack_P = false;
 		CheckHitAttackHit();
@@ -158,37 +158,6 @@ void EnemyBase::UpdateDeath(void)
 
 		//マップ中心との距離を計算
 		float distance = VSize(VSub(dropPos, AsoUtility::VECTOR_ZERO));
-
-		//ドロップアイテムを取得
-		//Item::TYPE dropType = GetDropItemType();
-
-		////エネミーがボスのとき
-		//if (enemyType_ == TYPE::BOSS)
-		//{
-		//	//ボスのアイテムはスケール固定
-		//	float scale = DROP_SCALE_LARGE;
-
-		//	scene_->CreateItem(dropPos, scale, dropType);
-		//}
-		//else
-		//{
-		//	//通常の敵は1つだけアイテムドロップ
-		//	//距離でサイズを変える
-		//	float scale = DROP_SCALE_SMALL;
-		//	if (dropType == Item::TYPE::WATER)
-		//	{
-		//		if (distance >= DROP_DISTANCE_LARGE)
-		//		{	//中心から一定距離以上離れたら
-		//			scale = DROP_SCALE_LARGE;
-		//		}
-		//		else if (distance >= DROP_DISTANCE_MEDIUM)
-		//		{	//中心から一定距離以上離れたら
-		//			scale = DROP_SCALE_MEDIUM;
-		//		}
-		//	}
-		//	//アイテムを1つ出す（サイズ調整）
-		//	scene_->CreateItem(dropPos, scale, dropType);
-		//}
 	}
 }
 #pragma endregion
@@ -268,7 +237,7 @@ void EnemyBase::ChasePlayer(void)
 			else
 			{
 				//ランダム方向
-				float angle = GetRand(360) * DX_PI_F / 180.0f;
+				float angle = GetRand(FULL_CIRCLE_DEGREE) * DEGREE_TO_RADIAN;
 				wanderDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
 			}
 		}
@@ -306,12 +275,6 @@ void EnemyBase::Draw(void)
 		gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f); //範囲制限
 		DrawHpGauge3D(transform_.pos, gaugeRate);
 	}
-
-	//デッバグ
-	//DrawDebug();
-
-	//視野範囲の描画
-	//DrawDebugSearchRange();
 }
 
 void EnemyBase::Release(void)
@@ -475,21 +438,21 @@ void EnemyBase::DrawDamage()
 void EnemyBase::DrawHpGauge3D(VECTOR center, float gaugeRate)
 {
 	//HPバーを敵の上(少し高い位置)に表示
-	VECTOR gaugePos = VAdd(center, VGet(0.0f, 80.0f, 0.0f));
+	VECTOR gaugePos = VAdd(center, VGet(0.0f, GAUGE_HEIGHT_OFFSET, 0.0f));
 	VECTOR screenPos = ConvWorldPosToScreenPos(gaugePos);
 
-	int barWidth = 80;
-	int barHeight = 8;
+	int barWidth = GAUGE_WIDTH;
+	int barHeight = GAUGE_HEIGHT;
 
-	int x = (int)screenPos.x - barWidth / 2;
-	int y = (int)screenPos.y - 200; //少し上にオフセット
+	int x = (int)screenPos.x - barWidth / HALF_DIVISOR;
+	int y = (int)screenPos.y - GAUGE_SCREEN_OFFSET; //少し上にオフセット
 
 	//外枠
-	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, GetColor(255, 255, 255), FALSE);
+	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, white, FALSE);
 
 	//中身
 	int fillWidth = (int)(barWidth * gaugeRate);
-	DrawBox(x, y, x + fillWidth, y + barHeight, GetColor(255, 0, 0), TRUE);
+	DrawBox(x, y, x + fillWidth, y + barHeight, red, TRUE);
 }
 
 
@@ -568,11 +531,6 @@ void EnemyBase::CheckHitAttackHit(void)
 	}
 }
 
-//Item::TYPE EnemyBase::GetDropItemType(void) const
-//{
-//	return Item::TYPE::WATER;
-//}
-
 void EnemyBase::SetGameScene(GameScene* scene)
 {
 	scene_ = scene;
@@ -628,79 +586,4 @@ void EnemyBase::ChangeStateDeath(void)
 void EnemyBase::SetPlayer(std::shared_ptr<Player> player)
 {
 	player_ = player;
-}
-
-void EnemyBase::DrawDebug(void)
-{
-
-#ifdef _DEBUG
-
-	VECTOR v;
-	VECTOR s;
-	VECTOR a;
-
-	//キャラ基本情報
-	//-------------------------------------------------------
-	//キャラ座標
-	v = transform_.pos;
-	DrawFormatString(20, 120, white, "キャラ座標 ： (%0.2f, %0.2f, %0.2f)", v.x, v.y, v.z);
-
-	s = collisionPos_;
-	DrawSphere3D(s, collisionRadius_, 8, black, black, false);
-	DrawFormatString(20, 180, white, "スフィア座標 ： (%0.2f, %0.2f, %0.2f)", s.x, s.y, s.z);
-	DrawFormatString(20, 210, white, "エネミーの移動速度 ： %0.2f", speed_);
-
-	a = attackCollisionPos_;
-	DrawSphere3D(a, attackCollisionRadius_, 8, yellow, yellow, false);
-
-#endif //DEBUG
-
-}
-
-void EnemyBase::DrawDebugSearchRange(void)
-{
-
-#ifdef _DEBUG
-
-	VECTOR centerPos = transform_.pos;
-	float radius = VIEW_RANGE;
-	int segments = 60;
-
-	// プレイヤーの座標
-	VECTOR playerPos = player_->GetTransform().pos; // プレイヤーオブジェクトの参照を持っている想定
-
-	// プレイヤーと敵の距離（XZ平面）
-	float dx = playerPos.x - centerPos.x;
-	float dz = playerPos.z - centerPos.z;
-	float distance = sqrtf(dx * dx + dz * dz);
-
-	// 範囲内か判定
-	bool inRange = (distance <= radius);
-
-	// 色を決定（範囲内なら赤、範囲外は元の色）
-	unsigned int color = inRange ? 0xff0000 : 0xffdead;
-
-	float angleStep = DX_PI * 2.0f / segments;
-
-	for (int i = 0; i < segments; ++i)
-	{
-		float angle1 = angleStep * i;
-		float angle2 = angleStep * (i + 1);
-
-		VECTOR p1 = {
-			centerPos.x + radius * sinf(angle1),
-			centerPos.y,
-			centerPos.z + radius * cosf(angle1)
-		};
-		VECTOR p2 = {
-			centerPos.x + radius * sinf(angle2),
-			centerPos.y,
-			centerPos.z + radius * cosf(angle2)
-		};
-		DrawTriangle3D(centerPos, p1, p2, color, false);
-	}
-	DrawSphere3D(centerPos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
-
-#endif //DEBUG
-
 }

@@ -33,6 +33,13 @@ public:
 	static constexpr float VALUE_ONE = 1.0f;
 	static constexpr float VALUE_TWO = 2.0f;
 	static constexpr int  VALUE_SIXTY = 60;
+	static constexpr int HALF_DIVISOR = 2;			//÷2
+
+	//HPバー
+	static constexpr float GAUGE_HEIGHT_OFFSET = 80.0f;	//敵の頭上
+	static constexpr int GAUGE_SCREEN_OFFSET = 200;		//画面上方向補正
+	static constexpr int GAUGE_WIDTH = 80;				//HPバーの横幅
+	static constexpr int GAUGE_HEIGHT = 8;				//HPバーの縦幅
 
 	//向き
 	static constexpr float DEGREE = 180.0f;
@@ -64,7 +71,13 @@ public:
 	static constexpr float MIN_MOVE_DISTANCE = 0.01f;
 
 	//アニメーション関係
+	static constexpr float ATTACK_FRAME = 15.0f;
+	static constexpr float BOSS_ATTACK_FRAME = 30.0f;
 	static constexpr float ANIM_SPEED = 20.0f;
+
+	//ランダムの向き
+	static constexpr int FULL_CIRCLE_DEGREE = 360;
+	static constexpr float DEGREE_TO_RADIAN = DX_PI_F / 180.0f;
 
 	//アニメーション番号
 	static constexpr int   ANIM_IDLE_INDEX = 0;

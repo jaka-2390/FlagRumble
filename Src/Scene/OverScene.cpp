@@ -182,7 +182,7 @@ void OverScene::Draw(void)
 
 	if (isMenuActive_)
 	{
-		if (selectedIndex_ % 2 == 1)
+		if (selectedIndex_ % TWO == 1)
 		{
 			SetFontSize(MENU_FONT_SIZE);
 			DrawString(MENU_POS_X, MENU_PLAY_Y, "‚à‚¤ˆê“xƒvƒŒƒC", white);

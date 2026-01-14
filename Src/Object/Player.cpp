@@ -142,7 +142,7 @@ void Player::Update(void)
 	auto moveRot = Quaternion::LookRotation(moveDir_);
 
 	transform_.quaRot = Quaternion::Slerp(
-		transform_.quaRot, moveRot, 0.2f
+		transform_.quaRot, moveRot, ROT_SPEED
 	);
 
 	//モデル制御更新
@@ -425,7 +425,7 @@ void Player::DrawShadow(void)
 			Vertex[0].dif.a = 0;
 			Vertex[1].dif.a = 0;
 			Vertex[2].dif.a = 0;
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < SHADOW_VERTEX_COUNT; i++)
 			{
 				float diff = fabs(HitRes->Position[i].y - transform_.pos.y);
 
@@ -435,9 +435,9 @@ void Player::DrawShadow(void)
 						(1.0f - diff / PLAYER_SHADOW_HEIGHT);
 
 					//0～255にクランプしてからBYTEへキャスト
-					alpha = std::clamp(alpha, 0.0f, 255.0f);
+					alpha = std::clamp(alpha, 0.0f, ALPHA_MAX_VALUE);
 
-					Vertex[i].dif.a = static_cast<unsigned char>(alpha + 0.5f);
+					Vertex[i].dif.a = static_cast<unsigned char>(alpha + ALPHA_ROUNDING);
 				}
 				else
 				{
@@ -639,11 +639,11 @@ void Player::CollisionGravity(void)
 	//重力の強さ
 	float gravityPow = grvMng_.GetPower();
 
-	float checkPow = 10.0f;
+	float checkPow = GRAVITY_POW;
 
 	gravHitPosUp_ = VAdd(movedPos_, VScale(dirUpGravity, gravityPow));
 
-	gravHitPosUp_ = VAdd(gravHitPosUp_, VScale(dirUpGravity, checkPow * 2.0f));
+	gravHitPosUp_ = VAdd(gravHitPosUp_, VScale(dirUpGravity, checkPow * COLLISION_LINE_UP));
 
 	gravHitPosDown_ = VAdd(movedPos_, VScale(dirGravity, checkPow));
 
@@ -654,12 +654,12 @@ void Player::CollisionGravity(void)
 			c.lock()->modelId_, -1, gravHitPosUp_, gravHitPosDown_);
 
 		//if(hit.HitFlag > 0)
-		if (hit.HitFlag > 0 && VDot(dirGravity, jumpPow_) > 0.9f)
+		if (hit.HitFlag > 0 && VDot(dirGravity, jumpPow_) > CONTACT_DOT_THRESHOLD)
 		{
 			//衝突地点から、少し上に移動
 			//地面と衝突している
 			//movedPos_に押し戻し座標を設定
-			movedPos_ = VAdd(hit.HitPosition, VScale(dirUpGravity, 2.0f));
+			movedPos_ = VAdd(hit.HitPosition, VScale(dirUpGravity, COLLISION_PUSH_UP));
 
 			//jumpPow_の値をゼロにする
 			jumpPow_ = AsoUtility::VECTOR_ZERO;
@@ -836,10 +836,10 @@ void Player::CalcGravityPow(void)
 
 void Player::ProcessFall(void)
 {
-	if (transform_.pos.y <= -300.0f)
+	if (transform_.pos.y <= FALL_DAMAGE_Y)
 	{
 		transform_.pos = PLAYER_POS;
-		Damage(3);
+		Damage(FALL_DAMAGE);
 	}
 }
 
@@ -1134,26 +1134,6 @@ bool Player::IsMax(void)
 void Player::SetIsMax(void)
 {
 	isMax_ = false;
-}
-
-void Player::wHit(float scale)
-{
-	//SE
-	SoundManager::GetInstance().Play(SoundManager::SRC::GETWATER_SE, Sound::TIMES::FORCE_ONCE);
-
-	//増加量
-	int add = WATER_SMALL;
-
-	//スケールに応じて増加量を変える
-	if (scale >= WATER_SCALE_BIG) {
-		add = WATER_BIG;
-	}
-	else if (scale >= WATER_SCALE_MID) {
-		add = WATER_MID;
-	}
-	//それ未満は1
-	water_ += add;
-	if (water_ > WATER_MAX)water_ = WATER_MAX;
 }
 
 void Player::tHit()
