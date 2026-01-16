@@ -32,6 +32,7 @@ public:
 	//アニメーション関係
 	static constexpr  float IDLE_SPEED = 60.0f;
 	static constexpr  float ANIM_SPEED = 15.0f;
+	static constexpr float ATTACK_FRAME = 6.5f;
 
 	//アニメーション番号
 	static constexpr int   ANIM_IDLE_INDEX = 1;
@@ -340,6 +341,7 @@ private:
 	bool isAttack_;		//縦斬り
 	bool isAttack2_;	//横斬り
 	bool exAttack_;		//回転斬り
+	bool hasHit_;		//1回判定
 	int exTimer_;		//クールタイム 10秒（ミリ秒）
 	int lastExTime_;	//exが解放されたらすぐに使えるようにする
 

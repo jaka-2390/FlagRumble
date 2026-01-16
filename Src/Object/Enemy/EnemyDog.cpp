@@ -28,6 +28,8 @@ void EnemyDog::InitAnimation(void)
 
 void EnemyDog::SetParam(void)
 {
+	enemyType_ = EnemyBase::TYPE::DOG;
+
 	// 使用メモリ容量と読み込み時間の削減のため
 	// モデルデータをいくつもメモリ上に存在させない
 	transform_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::DOG));

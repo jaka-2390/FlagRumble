@@ -146,7 +146,7 @@ void FlagBase::CheckCircle(const VECTOR& playerPos, const std::vector<std::share
 			if (!enemy->IsAlive()) continue;
 
 			//Dog‚¾‚¯‚ðŒ©‚é
-			if (enemy->GetEnemyType() == EnemyBase::TYPE::DOG)
+			if (enemy->GetEnemyType() != EnemyBase::TYPE::DOG)
 				continue;
 
 			VECTOR ePos = enemy->GetTransform().pos;

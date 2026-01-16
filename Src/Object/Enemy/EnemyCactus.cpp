@@ -34,6 +34,8 @@ void EnemyCactus::InitAnimation(void)
 
 void EnemyCactus::SetParam(void)
 {
+	enemyType_ = EnemyBase::TYPE::SABO;
+
 	// 使用メモリ容量と読み込み時間の削減のため
 	// モデルデータをいくつもメモリ上に存在させない
 	transform_.SetModel(ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::SABO));

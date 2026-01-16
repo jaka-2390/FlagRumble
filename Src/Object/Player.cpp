@@ -736,9 +736,13 @@ void Player::CollisionAttack(void)
 			//‹…‘Ì“¯Žm‚Ì“–‚½‚è”»’è
 			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
 			{
+				VECTOR dir = VSub(enemyPos, attackPos);
+				dir = VNorm(dir);	//³‹K‰»
+				VECTOR hitPos = VAdd(attackPos, VScale(dir, attackRadius));
+
 				EffectSword();
 
-				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, attackPos.x, attackPos.y + ATTACK2_HEIGHT, attackPos.z);
+				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, hitPos.x, hitPos.y, hitPos.z);
 
 				enemy->Damage(normalAttack_);
 				//•¡”ƒqƒbƒg
@@ -851,44 +855,51 @@ void Player::ProcessAttack(void)
 	bool isHit_E = CheckHitKey(KEY_INPUT_R);
 
 	//ƒAƒ^ƒbƒN
-	if (isAttack_ || IsEndLanding())
+	if (!isAttack_ && !isAttack2_ && !exAttack_ && isHit)
 	{
-		if (!isAttack_ && !isAttack2_ && !exAttack_ && isHit)
+		animationController_->Play((int)ANIM_TYPE::NORMALATTACK, false);
+		isAttack_ = true;
+		hasHit_ = false;
+	}
+
+	if (isAttack_)
+	{
+		const auto anim = animationController_->GetPlayAnim();
+
+		if (!hasHit_ && anim.step >= ATTACK_FRAME)
 		{
-			animationController_->Play((int)ANIM_TYPE::NORMALATTACK, false);
-			isAttack_ = true;
-			
 			//Õ“Ë(UŒ‚)
 			CollisionAttack();
 
 			//UŒ‚‰¹‡@
 			SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE1, Sound::TIMES::FORCE_ONCE);
 
-		}
-		else if (!isAttack2_ && !isAttack_ && !exAttack_ && isHit_N)
-		{
-			animationController_->Play((int)ANIM_TYPE::SLASHATTACK, false);
-			isAttack2_ = true;
-
-			//Õ“Ë(UŒ‚)
-			CollisionAttack2();
-
-			//UŒ‚‰¹‡A
-			SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE2, Sound::TIMES::FORCE_ONCE);
-		}
-		else if (!exAttack_ && !isAttack_ && !isAttack2_ && isHit_E)
-		{
-			animationController_->Play((int)ANIM_TYPE::EXATTACK, false);
-			exAttack_ = true;
-			lastExTime_ = GetNowCount(); //© ƒN[ƒ‹ƒ^ƒCƒ€ŠJŽn
-
-			//Õ“Ë(UŒ‚)
-			CollisionAttackEx();
-
-			//UŒ‚‰¹‡B
-			SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE3, Sound::TIMES::FORCE_ONCE);
+			hasHit_ = true;
 		}
 	}
+	/*else if (!isAttack2_ && !isAttack_ && !exAttack_ && isHit_N)
+	{
+		animationController_->Play((int)ANIM_TYPE::SLASHATTACK, false);
+		isAttack2_ = true;
+
+		//Õ“Ë(UŒ‚)
+		CollisionAttack2();
+
+		//UŒ‚‰¹‡A
+		SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE2, Sound::TIMES::FORCE_ONCE);
+	}
+	else if (!exAttack_ && !isAttack_ && !isAttack2_ && isHit_E)
+	{
+		animationController_->Play((int)ANIM_TYPE::EXATTACK, false);
+		exAttack_ = true;
+		lastExTime_ = GetNowCount(); //© ƒN[ƒ‹ƒ^ƒCƒ€ŠJŽn
+
+		//Õ“Ë(UŒ‚)
+		CollisionAttackEx();
+
+		//UŒ‚‰¹‡B
+		SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE3, Sound::TIMES::FORCE_ONCE);
+	}*/
 
 	//ƒAƒjƒ[ƒVƒ‡ƒ“‚ªI‚í‚Á‚½‚çƒtƒ‰ƒO‚ðƒŠƒZƒbƒg
 	if (animationController_->IsEnd())
