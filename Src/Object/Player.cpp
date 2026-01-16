@@ -46,6 +46,8 @@ Player::Player(void)
 	exTimer_ = EX_TIME;
 	lastExTime_ = -exTimer_;
 	powerUpCnt_ = POWER_UP_TIME;
+	isHitStop_ = false;
+	hitStopFrame_ = 0;
 
 	//ステ関連
 	hp_ = HP;
@@ -150,6 +152,18 @@ void Player::Update(void)
 
 	//アニメーション再生
 	animationController_->Update();
+
+	if (isHitStop_)
+	{
+		hitStopFrame_--;
+
+		if (hitStopFrame_ <= 0)
+		{
+			isHitStop_ = false;
+			animationController_->SetStop(false);
+		}
+		return;
+	}
 
 	//ダウン処理
 	UpdateDown(DOWN_DELTATIME);
@@ -740,6 +754,8 @@ void Player::CollisionAttack(void)
 				dir = VNorm(dir);	//正規化
 				VECTOR hitPos = VAdd(attackPos, VScale(dir, attackRadius));
 
+				StartHitStop();
+
 				EffectSword();
 
 				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, hitPos.x, hitPos.y, hitPos.z);
@@ -845,6 +861,15 @@ void Player::ProcessFall(void)
 		transform_.pos = PLAYER_POS;
 		Damage(FALL_DAMAGE);
 	}
+}
+
+void Player::StartHitStop(void)
+{
+	isHitStop_ = true;
+	hitStopFrame_ = HIT_STOP;
+
+	//アニメーション停止
+	animationController_->SetStop(true);
 }
 
 void Player::ProcessAttack(void)

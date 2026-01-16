@@ -198,7 +198,7 @@ void OverScene::Draw(void)
 
 	// 画像描画
 	SetFontSize(STORY_FONT_SIZE);
-	DrawString(Application::SCREEN_SIZE_X / static_cast<int>(VALUE_TWO) - STORY_X_OFFSET, STORY_Y, "ユグドラシルは死んでしまった…", white, true);
+	DrawString(Application::SCREEN_SIZE_X / static_cast<int>(VALUE_TWO) - STORY_X_OFFSET, STORY_Y, "プレイヤーは死んでしまった…", white, true);
 	SetFontSize(DEFAULT_FONT_SIZE);
 
 	//黒帯描画（maskLeftX_ は初期値 msgX + imgW から 徐々に msgX へ移動する想定）

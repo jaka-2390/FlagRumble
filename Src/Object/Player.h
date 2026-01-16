@@ -89,6 +89,7 @@ public:
 	static constexpr float ATTACK2_HEIGHT = 100.0f;		//スラッシュ位置高さ
 	static constexpr float EX_RADIUS = 140.0f;			//回転斬り判定半径
 	static constexpr float EX_HEIGHT = 100.0f;			//回転斬り位置高さ
+	static constexpr float HIT_STOP = 4.0f;				//攻撃時のヒットストップ
 
 	//ステータス関連
 	static constexpr int NAME_X = 55;										//名前の位置X
@@ -217,7 +218,6 @@ public:
 	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemyCollision(void) const;
 
 	//水の受け渡し
-	void wHit(float scale);		//水を取得
 	void tHit(void);			//木を与える
 
 	//水の量を取得
@@ -278,6 +278,7 @@ private:
 	void ProcessMove(void);			//移動
 	void ProcessAttack(void);		//攻撃モーション
 	void ProcessFall(void);			//落下処理
+	void StartHitStop(void);		//ヒットストップ
 
 	//回転
 	void SetGoalRotate(double rotRad);
@@ -344,6 +345,8 @@ private:
 	bool hasHit_;		//1回判定
 	int exTimer_;		//クールタイム 10秒（ミリ秒）
 	int lastExTime_;	//exが解放されたらすぐに使えるようにする
+	bool isHitStop_;	//ヒットストップ
+	int hitStopFrame_;	//ヒットストップのフレーム
 
 	//アイコンUI
 	int imgPowerIcon_;			//パワー

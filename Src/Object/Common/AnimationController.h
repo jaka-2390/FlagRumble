@@ -43,6 +43,9 @@ public :
 	//play中のアニメーションを返す
 	const Animation& GetPlayAnim(void) const { return playAnim_; }
 
+	//ヒットストップ用
+	void SetStop(bool stop) { isStop_ = stop; }
+
 	// 再生終了
 	bool IsEnd(void) const;
 
