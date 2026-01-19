@@ -39,9 +39,6 @@ public:
 		SELECT_YES,
 		SELECT_NO,
 		OPE_GEAR,
-		POWER_UP_ICON,
-		SPEED_UP_ICON,
-		ROTA_ATTACK_ICON,
 		//3Dƒ‚ƒfƒ‹
 		SPEECH_BALLOON,
 		PLAYER,
@@ -87,9 +84,6 @@ public:
 		NONE_AREA,
 		PLAYER_AREA,
 		ENEMY_AREA,
-		EFF_POWER,
-		EFF_SPEED,
-		EFF_HEAL,
 		SWORD
 	};
 

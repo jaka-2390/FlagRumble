@@ -68,14 +68,10 @@ public:
 	static constexpr float DOWN_DELTATIME = 1.0f;
 	static constexpr int HP = 10;
 	static constexpr int D_COUNT = 600;
-	static constexpr int WATER_MAX = 10;
 
 	//ステータスアップ
-	static constexpr int POWER_UP_TIME = 1200;			//パワーアップ時間
-	static constexpr int SPEED_UP_TIME = 1200;			//スピードアップ時間
 	static constexpr int EX_TIME = 10000;				//無敵時間
-	static constexpr float STATUS_UP = 2.0f;			//ステータス変更用の値
-	static constexpr float STATUS_EFFECT_SCALE = 20.0f;	//ステータスアップエフェクトのスケール
+	static constexpr float EFFECT_SCALE = 20.0f;		//エフェクトのスケール
 	static constexpr int HALF_DIVISOR = 2;				//÷2
 
 	//攻撃
@@ -140,23 +136,6 @@ public:
 	int purpl = 0x800080; //紫
 	int gray = 0xaaaaaa;  //灰
 
-	//ステータス関連
-	static constexpr double ICON_SIZE = 1.3;
-	static constexpr int ICON_CY_HEIGHT = 115;
-
-	static constexpr int GRAY_ALPHA = 180;
-
-	static constexpr int ICON_CY = 965;
-	static constexpr int TIMER_CY = 967;
-
-	static constexpr float RADIUS = 32.0f;
-	static constexpr int SEGMENTS = 60;
-
-	static constexpr int POWER_CX = 150;
-	static constexpr int SPEED_CX = 225;
-	static constexpr int ROT_ATK_CX = 450;
-
-
 	//状態
 	enum class STATE
 	{
@@ -214,23 +193,7 @@ public:
 	//衝突用の球体半径の取得
 	float GetCollisionRadius(void);
 
-	//エネミーの衝突用座標
-	const std::vector<std::shared_ptr<EnemyBase>>& GetEnemyCollision(void) const;
-
-	//水の受け渡し
-	void tHit(void);			//木を与える
-
-	//水の量を取得
-	int GetWater(void) const;
-
-	//水獲得量特別増加
-	bool IsMax(void);
-	void SetIsMax(void);
-
 	void Damage(int damage);	//ダメージ
-	void PowerUp(void);			//パワーアップ
-	void SpeedUp(void);			//スピードアップ
-	void Heal(void);			//回復
 	void Muteki(void);			//無敵
 
 private:
@@ -288,10 +251,6 @@ private:
 	bool IsEndLanding(void);		//アタック終了
 	bool IsExAttackReady() const;	//回転斬りリセット
 
-	//ステータス変化管理
-	void PowerUpTimer(void);		//パワーアップの制限時間
-	void SpeedUpTimer(void);		//スピードアップの制限時間
-
 	//復活処理
 	void StartRevival();
 	void Revival();
@@ -299,9 +258,6 @@ private:
 
 	//エフェクト
 	void EffectFootSmoke(void);		//足煙エフェクト
-	void EffectPower(void);			//パワーアップエフェクト
-	void EffectSpeed(void);			//スピードアップエフェクト
-	void EffectHeal(void);			//回復エフェクト
 	void EffectSword(void);			//攻撃エフェクト
 
 	//移動関連
@@ -321,7 +277,6 @@ private:
 
 	//ステータス値
 	int hp_;		//プレイヤーの体力
-	int water_;		//水の所持量
 
 	//攻撃力
 	int normalAttack_;	//2ダメージ
@@ -329,14 +284,7 @@ private:
 	int exrAttack_;		//2ダメージ
 
 	//アイテム効果
-	bool powerUpFlag_;	//パワーが上がったている間treu
-	bool speedUpFlag_;	//スピードが上がったている間treu
-	int powerUpCnt_;	//2パワーアップの時間(20秒)
-	int speedUpCnt_;	//スピードアップの時間(20秒)
 	bool invincible_;	//無敵状態
-
-	//水の所持上限
-	bool isMax_;
 
 	//攻撃フラグ
 	bool isAttack_;		//縦斬り
@@ -348,11 +296,6 @@ private:
 	bool isHitStop_;	//ヒットストップ
 	int hitStopFrame_;	//ヒットストップのフレーム
 
-	//アイコンUI
-	int imgPowerIcon_;			//パワー
-	int imgSpeedIcon_;			//スピード
-	int imgRotateAttackIcon_;	//回転切り
-
 	//丸影
 	int imgShadow_;
 
@@ -361,19 +304,6 @@ private:
 	int effectSmokeResId_;
 	int effectSmokePleyId_;
 
-	//パワーアップエフェクト
-	int effectPowerResId_;
-	int effectPowerPleyId_;
-
-	//スピードアップエフェクト
-	int effectSpeedResId_;
-	int effectSpeedPleyId_;
-
-	//回復エフェクト
-	float stepHeal_;
-	int effectHealResId_;
-	int effectHealPleyId_;
-	
 	//攻撃エフェクト
 	float stepSword_;
 	int effectSwordResId_;

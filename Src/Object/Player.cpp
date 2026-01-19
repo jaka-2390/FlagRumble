@@ -31,40 +31,22 @@ Player::Player(void)
 	//丸影
 	imgShadow_ = -1;
 
-	//スピードアップ用のフラグ
-	speedUpFlag_ = false;
-	speedUpCnt_ = SPEED_UP_TIME;
-
 	//攻撃の初期化
-	normalAttack_ = NORMAL_ATTACK;
 	slashAttack_ = SLASH_ATTACK;
 	exrAttack_ = EX_ATTACK;
-	powerUpFlag_ = false;
-	isAttack_ = false;
 	isAttack2_ = false;
 	exAttack_ = false;
 	exTimer_ = EX_TIME;
 	lastExTime_ = -exTimer_;
-	powerUpCnt_ = POWER_UP_TIME;
-	isHitStop_ = false;
-	hitStopFrame_ = 0;
 
 	//ステ関連
 	hp_ = HP;
-	water_ = 0;
 
 	//無敵状態
 	invincible_ = false;
 
-	//アイコン
-	imgPowerIcon_ = -1;
-	imgSpeedIcon_ = -1;
-	imgRotateAttackIcon_ = -1;
-
 	//移動が可能かどうか
 	canMove_ = true;
-	//所持上限かどうか
-	isMax_ = false;
 
 	//状態管理
 	stateChanges_.emplace(
@@ -91,27 +73,10 @@ void Player::Init(void)
 	imgShadow_ = resMng_.Load(
 		ResourceManager::SRC::PLAYER_SHADOW).handleId_;
 
-	//アイコン画像
-	imgPowerIcon_ = resMng_.Load(ResourceManager::SRC::POWER_UP_ICON).handleId_;
-	imgSpeedIcon_ = resMng_.Load(ResourceManager::SRC::SPEED_UP_ICON).handleId_;
-	imgRotateAttackIcon_ = resMng_.Load(ResourceManager::SRC::ROTA_ATTACK_ICON).handleId_;
-
 	//足煙エフェクト
 	effectSmokeResId_ = ResourceManager::GetInstance().Load(
 		ResourceManager::SRC::FOOT_SMOKE).handleId_;
 
-	//パワーアップエフェクト
-	effectPowerResId_ = ResourceManager::GetInstance().Load(
-		ResourceManager::SRC::EFF_POWER).handleId_;
-
-	//スピードアップエフェクト
-	effectSpeedResId_ = ResourceManager::GetInstance().Load(
-		ResourceManager::SRC::EFF_SPEED).handleId_;
-
-	//回復エフェクト
-	effectHealResId_ = ResourceManager::GetInstance().Load(
-		ResourceManager::SRC::EFF_HEAL).handleId_;
-	
 	//攻撃エフェクト
 	effectSwordResId_ = ResourceManager::GetInstance().Load(
 		ResourceManager::SRC::SWORD).handleId_;
@@ -197,6 +162,7 @@ void Player::Draw(void)
 	//DrawDebug();						//デバッグ用描画
 
 #pragma region ステータス
+
 	DrawFormatString(NAME_X, NAME_Y, black, "PLAYER");
 	//枠線
 	DrawBox(FRAME_START_X, FRAME_START_Y, FRAME_END_X, FRAME_END_Y, gray, true);
@@ -204,56 +170,6 @@ void Player::Draw(void)
 	DrawBox(BAR_START_X, BAR_START_HY, BAR_END_X, BAR_END_HY, black, true);
 	if (hp_ != 0)DrawBox(BAR_START_X, BAR_START_HY, hp_ * BAR_POINT + BAR_START_X, BAR_END_HY, green, true);
 	
-
-	if (powerUpFlag_)
-	{
-		//アイコン描画
-		DrawRotaGraph(POWER_CX, ICON_CY, ICON_SIZE, 0, imgPowerIcon_, true);
-
-		//タイマー描画（黒い円グラフ）
-		float ratio = static_cast<float>(powerUpCnt_) / POWER_UP_TIME;
-		int filledSegments = static_cast<int>(SEGMENTS * ratio);
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, GRAY_ALPHA);
-		for (int i = filledSegments; i < SEGMENTS; ++i)
-		{
-			float angle1 = -(static_cast<float>(DX_PI_F) / HALF_DIVISOR) - static_cast<float>(DX_TWO_PI) * i / SEGMENTS;
-			float angle2 = -(static_cast<float>(DX_PI_F) / HALF_DIVISOR) - static_cast<float>(DX_TWO_PI) * (i + 1) / SEGMENTS;
-
-			float x1 = POWER_CX + RADIUS * cosf(angle1);
-			float y1 = TIMER_CY + RADIUS * sinf(angle1);  //timerCy使用
-			float x2 = POWER_CX + RADIUS * cosf(angle2);
-			float y2 = TIMER_CY + RADIUS * sinf(angle2);  //timerCy使用
-
-			DrawTriangle(POWER_CX, TIMER_CY, (int)x1, (int)y1, (int)x2, (int)y2, GetColor(0, 0, 0), true);
-		}
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
-
-	if (speedUpFlag_)
-	{
-		//アイコン描画
-		DrawRotaGraph(SPEED_CX, ICON_CY, ICON_SIZE, 0, imgSpeedIcon_, true);
-
-		//タイマー描画（黒い円グラフ）
-		float ratio = static_cast<float>(speedUpCnt_) / SPEED_UP_TIME;
-		int filledSegments = static_cast<int>(SEGMENTS * ratio);
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, GRAY_ALPHA);
-		for (int i = filledSegments; i < SEGMENTS; ++i)
-		{
-			float angle1 = -(static_cast<float>(DX_PI_F) / HALF_DIVISOR) - static_cast<float>(DX_TWO_PI) * i / SEGMENTS;
-			float angle2 = -(static_cast<float>(DX_PI_F) / HALF_DIVISOR) - static_cast<float>(DX_TWO_PI) * (i + 1) / SEGMENTS;
-
-			float x1 = SPEED_CX + RADIUS * cosf(angle1);
-			float y1 = TIMER_CY + RADIUS * sinf(angle1);  //timerCy使用
-			float x2 = SPEED_CX + RADIUS * cosf(angle2);
-			float y2 = TIMER_CY + RADIUS * sinf(angle2);  //timerCy使用
-
-			DrawTriangle(SPEED_CX, TIMER_CY, (int)x1, (int)y1, (int)x2, (int)y2, GetColor(0, 0, 0), true);
-		}
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
 #pragma endregion
 }
 
@@ -297,11 +213,6 @@ float Player::GetCollisionRadius(void)
 	return collisionRadius_;
 }
 
-const std::vector<std::shared_ptr<EnemyBase>>& Player::GetEnemyCollision(void) const
-{
-	return *enemy_;
-}
-
 void Player::InitAnimation(void)
 {
 	std::string path = Application::PATH_MODEL + "Player/";
@@ -338,17 +249,11 @@ void Player::UpdatePlay(void)
 {
 	if (!canMove_)return;
 
-	//スピードアップの制限時間
-	SpeedUpTimer();
-
 	//移動処理
 	ProcessMove();
 
 	//移動方向に応じた回転
 	Rotate();
-
-	//パワーアップの制限時間
-	PowerUpTimer();
 
 	//攻撃処理
 	ProcessAttack();
@@ -374,11 +279,6 @@ void Player::UpdatePlay(void)
 
 	//歩きエフェクト
 	EffectFootSmoke();
-
-	//エフェクトの位置
-	SetPosPlayingEffekseer3DEffect(effectPowerPleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
-	SetPosPlayingEffekseer3DEffect(effectSpeedPleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
-	SetPosPlayingEffekseer3DEffect(effectHealPleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
 }
 
 void Player::DrawShadow(void)
@@ -570,12 +470,6 @@ void Player::ProcessMove(void)
 			{
 				//アニメーション
 				animationController_->Play((int)ANIM_TYPE::RUN);
-			}
-
-			//アイテム獲得時のスピード
-			if (speedUpFlag_)
-			{
-				speed_ = speed_ * STATUS_UP;
 			}
 
 			moveDir_ = dir;
@@ -988,76 +882,6 @@ void Player::Damage(int damage)
 	}
 }
 
-void Player::PowerUpTimer(void)
-{
-	//攻撃アップ
-	if (powerUpFlag_)
-	{
-		powerUpCnt_--;
-
-		if (powerUpCnt_ <= 0)
-		{
-			powerUpFlag_ = false;
-
-			normalAttack_ = NORMAL_ATTACK;
-			slashAttack_ = SLASH_ATTACK;
-			exrAttack_ = EX_ATTACK;
-			powerUpCnt_ = POWER_UP_TIME;
-		}
-	}
-}
-
-void Player::PowerUp(void)
-{
-	powerUpFlag_ = true;
-
-	EffectPower();
-
-	//パワーアップ
-	SoundManager::GetInstance().Play(SoundManager::SRC::POWERUP_SE, Sound::TIMES::ONCE);
-
-	if (powerUpCnt_ >= 0 && powerUpFlag_)
-	{
-		normalAttack_ = normalAttack_ * static_cast<int>(STATUS_UP);
-		slashAttack_ = slashAttack_ * static_cast<int>(STATUS_UP);
-		exrAttack_ = exrAttack_ * static_cast<int>(STATUS_UP);
-	}
-}
-
-void Player::SpeedUpTimer(void)
-{
-	//攻撃アップ
-	if (speedUpFlag_)
-	{
-		speedUpCnt_--;
-
-		if (speedUpCnt_ <= 0)
-		{
-			speedUpFlag_ = false;
-			speedUpCnt_ = SPEED_UP_TIME;
-		}
-	}
-}
-
-void Player::SpeedUp(void)
-{
-	speedUpFlag_ = true;
-
-	EffectSpeed();
-
-	//スピードアップ
-	SoundManager::GetInstance().Play(SoundManager::SRC::SPEEDUP_SE, Sound::TIMES::ONCE);
-}
-
-void Player::Heal(void)
-{
-	hp_ = HP;
-
-	//回復
-	SoundManager::GetInstance().Play(SoundManager::SRC::HEAL_SE, Sound::TIMES::ONCE);
-	EffectHeal();
-}
-
 void Player::Muteki(void)
 {
 	invincible_ = true;
@@ -1108,79 +932,13 @@ void Player::EffectFootSmoke(void)
 	}
 }
 
-void Player::EffectPower(void)
-{
-	float scale = STATUS_EFFECT_SCALE;
-
-	//エフェクト再生
-	effectPowerPleyId_ = PlayEffekseer3DEffect(effectPowerResId_);
-
-	//エフェクトの大きさ
-	SetScalePlayingEffekseer3DEffect(effectPowerPleyId_, scale, scale, scale);
-
-	//エフェクトの位置
-	SetPosPlayingEffekseer3DEffect(effectPowerPleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
-}
-
-void Player::EffectSpeed(void)
-{
-	float scale = STATUS_EFFECT_SCALE;
-
-	//エフェクト再生
-	effectSpeedPleyId_ = PlayEffekseer3DEffect(effectSpeedResId_);
-
-	//エフェクトの大きさ
-	SetScalePlayingEffekseer3DEffect(effectSpeedPleyId_, scale, scale, scale);
-
-	//エフェクトの位置
-	SetPosPlayingEffekseer3DEffect(effectSpeedPleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
-}
-
-void Player::EffectHeal(void)
-{
-	float scale = STATUS_EFFECT_SCALE;
-
-	//エフェクト再生
-	effectHealPleyId_ = PlayEffekseer3DEffect(effectHealResId_);
-
-	//エフェクトの大きさ
-	SetScalePlayingEffekseer3DEffect(effectHealPleyId_, scale, scale, scale);
-}
-
 void Player::EffectSword(void)
 {
-	float scale = STATUS_EFFECT_SCALE;
+	float scale = EFFECT_SCALE;
 
 	//エフェクト再生
 	effectSwordPleyId_ = PlayEffekseer3DEffect(effectSwordResId_);
 
 	//エフェクトの大きさ
 	SetScalePlayingEffekseer3DEffect(effectSwordPleyId_, scale, scale, scale);
-}
-
-int Player::GetWater(void) const
-{
-	return water_;
-}
-
-bool Player::IsMax(void)
-{
-	return isMax_;
-}
-void Player::SetIsMax(void)
-{
-	isMax_ = false;
-}
-
-void Player::tHit()
-{
-	if (water_ == WATER_MAX)
-	{
-		isMax_ = true;
-		water_ = 0;
-	}
-	else
-	{
-		water_--;
-	}
 }

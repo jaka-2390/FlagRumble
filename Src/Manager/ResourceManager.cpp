@@ -68,18 +68,6 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "OpeGear.png");
 	resourcesMap_.emplace(SRC::OPE_GEAR, std::move(res));
 
-	// パワーアップ状態アイコン
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Icon/PowerIcon.png");
-	resourcesMap_.emplace(SRC::POWER_UP_ICON, std::move(res));
-
-	// スピードアップ状態アイコン
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Icon/SpeedIcon.png");
-	resourcesMap_.emplace(SRC::SPEED_UP_ICON, std::move(res));
-
-	// 回転切り使用可能状態アイコン
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Icon/RotaAttackIcon.png");
-	resourcesMap_.emplace(SRC::ROTA_ATTACK_ICON, std::move(res));
-
 	// ゲームクリア
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Clear.png");
 	resourcesMap_.emplace(SRC::GAMECLEAR, std::move(res));
@@ -211,27 +199,17 @@ void ResourceManager::Init(void)
 	//エフェクト
 	//-------------------------
 
-	//木の視野
+	//中立エリア
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "NoneArea.efkefc");
 	resourcesMap_.emplace(SRC::NONE_AREA, std::move(res));
 	
+	//プレイヤーエリア
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PlayerArea.efkefc");
 	resourcesMap_.emplace(SRC::PLAYER_AREA, std::move(res));
 	
+	//敵エリア
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "EnemyArea.efkefc");
 	resourcesMap_.emplace(SRC::ENEMY_AREA, std::move(res));
-	
-	//パワーアップ
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "PowerUp.efkefc");
-	resourcesMap_.emplace(SRC::EFF_POWER, std::move(res));	
-
-	//スピードアップ
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "SpeedUp.efkefc");
-	resourcesMap_.emplace(SRC::EFF_SPEED, std::move(res));
-	
-	//回復
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "HealEffect.efkefc");
-	resourcesMap_.emplace(SRC::EFF_HEAL, std::move(res));
 	
 	//攻撃
 	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "Sword.efkefc");
