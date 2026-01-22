@@ -78,7 +78,6 @@ private:
 	// ‰æ‘œ
 	int imgGameOver_;
 	int imgCursor_[2];
-	int imgDieTree_;
 	int imgLightCircle_;	// Œõ
 
 	// ƒƒjƒ…[

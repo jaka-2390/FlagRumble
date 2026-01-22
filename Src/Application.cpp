@@ -8,7 +8,7 @@
 #include "Manager/FontManager.h"
 #include "Application.h"
 
-// staticメンバ変数の実体
+//staticメンバ変数の実体
 Application* Application::instance_ = nullptr;
 bool Application::isRunning_ = true;
 
@@ -39,14 +39,14 @@ Application::Application(void)
 
 void Application::Init(void)
 {
-	// ウィンドウタイトル
+	//ウィンドウタイトル
 	SetWindowText("AGS2025");
 
-	// 画面サイズ設定
+	//画面サイズ設定
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 0);
 	ChangeWindowMode(true);
 
-	// DxLib初期化
+	//DxLib初期化
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	if (DxLib_Init() == -1)
 	{
@@ -56,10 +56,10 @@ void Application::Init(void)
 
 	FontManager::Init();
 
-	// Effekseer初期化
+	//Effekseer初期化
 	InitEffekseer();
 
-	// 入力管理など初期化
+	//入力管理など初期化
 	SetUseDirectInputFlag(true);
 	InputManager::CreateInstance();
 	ResourceManager::CreateInstance();
@@ -83,7 +83,7 @@ void Application::Run(void)
 	auto& inputManager = InputManager::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
 
-	isRunning_ = true; // フラグ初期化
+	isRunning_ = true; //フラグ初期化
 
 	while (isRunning_ && ProcessMessage() == 0 /*&& CheckHitKey(KEY_INPUT_ESCAPE) == 0*/)
 	{
@@ -104,10 +104,10 @@ void Application::Destroy(void)
 	SceneManager::GetInstance().Destroy();
 	FontManager::Release();
 
-	// Effekseer終了
+	//Effekseer終了
 	Effkseer_End();
 
-	// DxLib終了
+	//DxLib終了
 	if (DxLib_End() == -1)
 	{
 		isReleaseFail_ = true;

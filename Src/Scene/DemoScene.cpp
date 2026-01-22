@@ -65,7 +65,6 @@ void DemoScene::Init(void)
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
 
 	pauseExplainImgs_[0] = resMng_.Load(ResourceManager::SRC::PAUSEOPE).handleId_;	//操作説明
-	pauseExplainImgs_[1] = resMng_.Load(ResourceManager::SRC::PAUSEITEM).handleId_;	//アイテム概要
 
 	//カウンタ
 	uiFadeStart_ = false;

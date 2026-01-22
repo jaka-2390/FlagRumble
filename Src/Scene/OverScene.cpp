@@ -60,7 +60,6 @@ void OverScene::Init(void)
 
 	// ‰æ‘œ“Ç‚İ‚İ
 	imgGameOver_ = resMng_.Load(ResourceManager::SRC::GAMEOVER).handleId_;
-	imgDieTree_ = resMng_.Load(ResourceManager::SRC::DIETREE).handleId_;
 	imgCursor_[0] = LoadGraph("Data/Image/Over/1player1.png");
 	imgCursor_[1] = LoadGraph("Data/Image/Over/1player2.png");
 	imgLightCircle_ = resMng_.Load(ResourceManager::SRC::LIGHT).handleId_;  // ì¬‚µ‚½Œõ‰æ‘œ‚ğ“Ç‚İ‚Ş

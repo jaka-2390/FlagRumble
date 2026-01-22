@@ -30,11 +30,11 @@ void Fader::Init(void)
 	isEnd_ = true;
 
 	LoadDivGraph(
-		"Data/image/Load.png",	 // スプライトシート
-		4,						 // 分割数
-		4, 1,						// 横4コマ、縦1コマ
-		600, 129,					// 各コマのサイズ
-		imgLoad_					// グラフィックIDを格納
+		"Data/image/Load.png",		//スプライトシート
+		4,							//分割数
+		4, 1,						//横4コマ、縦1コマ
+		600, 129,					//各コマのサイズ
+		imgLoad_					//グラフィックIDを格納
 	);
 
 	loadingTimer_ = 0;
@@ -58,11 +58,11 @@ void Fader::Update(void)
 		alpha_ += SPEED_ALPHA;
 		if (alpha_ > 255)
 		{
-			// フェード終了
+			//フェード終了
 			alpha_ = 255;
 			if (isPreEnd_)
 			{
-				// 1フレーム後(Draw後)に終了とする
+				//1フレーム後(Draw後)に終了とする
 				isEnd_ = true;
 			}
 			isPreEnd_ = true;
@@ -74,11 +74,11 @@ void Fader::Update(void)
 		alpha_ -= SPEED_ALPHA;
 		if (alpha_ < 0)
 		{
-			// フェード終了
+			//フェード終了
 			alpha_ = 0;
 			if (isPreEnd_)
 			{
-				// 1フレーム後(Draw後)に終了とする
+				//1フレーム後(Draw後)に終了とする
 				isEnd_ = true;
 			}
 			isPreEnd_ = true;
@@ -108,13 +108,13 @@ void Fader::Draw(void)
 		break;
 	}
 
-	// 暗転中に「Now Loading...」など表示
+	//暗転中に「Now Loading...」など表示
 	if (state_ == Fader::STATE::FADE_OUT || state_ == Fader::STATE::FADE_IN) {
-		//DrawString(400, 400, "Now Loading...", GetColor(255, 255, 255)); // 中央表示など
+		//DrawString(400, 400, "Now Loading...", GetColor(255, 255, 255)); //中央表示など
 		//DrawGraph(1200, 900, imgLoad_[4], true);
 
 
-		int index = (loadingTimer_ / 20) % 4; // 約1秒で一周
+		int index = (loadingTimer_ / 20) % 4; //約1秒で一周
 
 		DrawGraph(1200, 900, imgLoad_[index], TRUE);
 	}

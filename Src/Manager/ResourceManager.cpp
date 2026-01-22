@@ -48,10 +48,6 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "BackGame.png");
 	resourcesMap_.emplace(SRC::GOGAME, std::move(res));
 
-	// アイテム概要
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Item.png");
-	resourcesMap_.emplace(SRC::ITEMTEACH, std::move(res));
-
 	// 操作説明
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Operation.png");
 	resourcesMap_.emplace(SRC::OPERATION, std::move(res));
@@ -60,16 +56,12 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "PauseOpe.png");
 	resourcesMap_.emplace(SRC::PAUSEOPE, std::move(res));
 
-	// ポーズのアイテム
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "PauseItem.png");
-	resourcesMap_.emplace(SRC::PAUSEITEM, std::move(res));
-
 	// 設定表示
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "OpeGear.png");
 	resourcesMap_.emplace(SRC::OPE_GEAR, std::move(res));
 
 	// ゲームクリア
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Clear.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Clear1.png");
 	resourcesMap_.emplace(SRC::GAMECLEAR, std::move(res));
 
 	// 何かのキーを押して
@@ -83,10 +75,6 @@ void ResourceManager::Init(void)
 	// ゲームオーバー
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Over/Over.png");
 	resourcesMap_.emplace(SRC::GAMEOVER, std::move(res));
-
-	// ユグドラシルは死んでしまった…
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Over/DieTree.png");
-	resourcesMap_.emplace(SRC::DIETREE, std::move(res));
 
 	// はい選択中
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "SelectYes.png");

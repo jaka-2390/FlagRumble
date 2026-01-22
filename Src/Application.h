@@ -6,11 +6,11 @@ class Application
 
 public:
 
-	// スクリーンサイズ
+	//スクリーンサイズ
 	static constexpr int SCREEN_SIZE_X = 1920;
 	static constexpr int SCREEN_SIZE_Y = 1080;
 
-	// データパス関連
+	//データパス関連
 	//-------------------------------------------
 	static const std::string PATH_IMAGE;
 	static const std::string PATH_MODEL;
@@ -18,47 +18,47 @@ public:
 	static const std::string PATH_SOUND;
 	//-------------------------------------------
 
-	// 明示的にインステンスを生成する
+	//明示的にインステンスを生成する
 	static void CreateInstance(void);
 
-	// 静的インスタンスの取得
+	//静的インスタンスの取得
 	static Application& GetInstance(void);
 
-	// 初期化
+	//初期化
 	void Init(void);
 
-	// ゲームループの開始
+	//ゲームループの開始
 	void Run(void);
 
-	// リソースの破棄
+	//リソースの破棄
 	void Destroy(void);
 
-	// 初期化成功／失敗の判定
+	//初期化成功／失敗の判定
 	bool IsInitFail(void) const;
 
-	// 解放成功／失敗の判定
+	//解放成功／失敗の判定
 	bool IsReleaseFail(void) const;
 
-	// アプリケーションの実行状態（ゲーム終了フラグ）
-	static bool isRunning_;  // ← 追加！
+	//アプリケーションの実行状態（ゲーム終了フラグ）
+	static bool isRunning_;  //← 追加！
 
 private:
 
-	// 静的インスタンス
+	//静的インスタンス
 	static Application* instance_;
 
-	// 初期化失敗
+	//初期化失敗
 	bool isInitFail_;
 
-	// 解放失敗
+	//解放失敗
 	bool isReleaseFail_;
 
-	// デフォルトコンストラクタをprivateにして、
-	// 外部から生成できない様にする
+	//デフォルトコンストラクタをprivateにして、
+	//外部から生成できない様にする
 	Application(void);
 	Application(const Application& manager) = default;
 	~Application(void) = default;
 
-	// Effekseerの初期化
+	//Effekseerの初期化
 	void InitEffekseer(void);
 };

@@ -68,28 +68,28 @@ Quaternion Quaternion::Mult(const Quaternion& q1, const Quaternion& q2)
     Quaternion ret = Quaternion();
     double d1, d2, d3, d4;
 
-    // w‚ÌŒvZ 
+    //w‚ÌŒvZ 
     d1 = q1.w * q2.w;
     d2 = -q1.x * q2.x;
     d3 = -q1.y * q2.y;
     d4 = -q1.z * q2.z;
     ret.w = d1 + d2 + d3 + d4;
 
-    // x‚ÌŒvZ 
+    //x‚ÌŒvZ 
     d1 = q1.w * q2.x;
     d2 = q2.w * q1.x;
     d3 = q1.y * q2.z;
     d4 = -q1.z * q2.y;
     ret.x = d1 + d2 + d3 + d4;
 
-    // y‚ÌŒvZ
+    //y‚ÌŒvZ
     d1 = q1.w * q2.y;
     d2 = q2.w * q1.y;
     d3 = q1.z * q2.x;
     d4 = -q1.x * q2.z;
     ret.y = d1 + d2 + d3 + d4;
 
-    // z‚ÌŒvZ
+    //z‚ÌŒvZ
     d1 = q1.w * q2.z;
     d2 = q2.w * q1.z;
     d3 = q1.x * q2.y;
@@ -111,7 +111,7 @@ Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
     double norm;
     double c, s;
 
-    // Unity‚É‡‚í‚¹‚é
+    //Unity‚É‡‚í‚¹‚é
     //ret.w = ret.x = ret.y = ret.z = 0.0;
     ret.w = 1.0;
     ret.x = ret.y = ret.z = 0.0;
@@ -140,8 +140,8 @@ Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
 
 VECTOR Quaternion::PosAxis(const Quaternion& q, VECTOR pos)
 {
-    // ˆÊ’uî•ñ‚É‰ñ“]î•ñ‚ğ”½‰f‚³‚¹‚é
-    // pos' = qEposEq(-1)
+    //ˆÊ’uî•ñ‚É‰ñ“]î•ñ‚ğ”½‰f‚³‚¹‚é
+    //pos' = qEposEq(-1)
     Quaternion tmp = Quaternion();
     tmp = tmp.Mult(q);
     tmp = tmp.Mult(Quaternion(0.0f, pos.x, pos.y, pos.z));
@@ -458,7 +458,7 @@ double Quaternion::Angle(const Quaternion& q1, const Quaternion& q2)
 
 Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
 {
-    // if either input is zero, return the other.
+    //if either input is zero, return the other.
     if (a.LengthSquared() == 0.0f)
     {
         if (b.LengthSquared() == 0.0f)
@@ -492,7 +492,7 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
     float blendB;
     if (cosHalfAngle < 0.99f)
     {
-        // do proper slerp for big angles
+        //do proper slerp for big angles
         float halfAngle = acosf(cosHalfAngle);
         float sinHalfAngle = sinf(halfAngle);
         float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
@@ -501,7 +501,7 @@ Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, float t)
     }
     else
     {
-        // do lerp if angle is really small.
+        //do lerp if angle is really small.
         blendA = 1.0f - t;
         blendB = t;
     }
@@ -562,8 +562,8 @@ void Quaternion::ToAngleAxis(float* angle, VECTOR* axis)
 	}
 	else
 	{
-		// This occurs when the angle is zero. 
-		// Not a problem: just set an arbitrary normalized axis.
+		//This occurs when the angle is zero. 
+		//Not a problem: just set an arbitrary normalized axis.
 		*axis = { 1.0f, 0.0f, 0.0f };
 	}
 }
