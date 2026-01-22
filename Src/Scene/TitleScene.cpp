@@ -297,22 +297,19 @@ void TitleScene::Draw(void)
 
 		// ウィンドウ背景画像がある場合はここに描画（省略可）
 
-		// 「本当に終了しますか？」画像描画
-		SetFontSize(DEFAULT_FONT_SIZE * FONT_FINISH_SIZE);
-		DrawString(END_STRING_WIDTH, END_STRING_HEIGHT, "本当に終了しますか？", white);
+		//「本当に終了しますか？」画像描画
+		FontManager::DrawStringEx(END_STRING_WIDTH, END_STRING_HEIGHT, "本当に終了しますか？", white, FONT_FINISH_SIZE);
 
 		// 選択中で画像を切り替え
 		if (confirmIndex_ == 0)
 		{
-			SetFontSize(DEFAULT_FONT_SIZE * FONT_SELECT_SIZE);
-			DrawString(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", yellow);
-			DrawString(Application::SCREEN_SIZE_X / HALF_DIVISOR + NO_WIDTH_OFSET, Application::SCREEN_SIZE_Y / HALF_DIVISOR + NO_HEIGHT_OFSET, "いいえ", white);
+			FontManager::DrawStringEx(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", yellow, FONT_SELECT_SIZE);
+			FontManager::DrawStringEx(Application::SCREEN_SIZE_X / HALF_DIVISOR + NO_WIDTH_OFSET, Application::SCREEN_SIZE_Y / HALF_DIVISOR + NO_HEIGHT_OFSET, "いいえ", white, FONT_SELECT_SIZE);
 		}
 		else
 		{
-			SetFontSize(DEFAULT_FONT_SIZE * FONT_SELECT_SIZE);
-			DrawString(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", white);
-			DrawString(NO_STRING_WIDTH, NO_STRING_HEIGHT, "いいえ", yellow);
+			FontManager::DrawStringEx(YES_STRING_WIDTH, YES_STRING_HEIGHT, "はい", white, FONT_SELECT_SIZE);
+			FontManager::DrawStringEx(NO_STRING_WIDTH, NO_STRING_HEIGHT, "いいえ", yellow, FONT_SELECT_SIZE);
 		}
 	}
 }

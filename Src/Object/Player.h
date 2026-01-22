@@ -10,6 +10,7 @@
 class AnimationController;
 class Collider;
 class Capsule;
+class PlayerAttack;
 
 class Player : public ActorBase
 {
@@ -32,14 +33,13 @@ public:
 	//アニメーション関係
 	static constexpr  float IDLE_SPEED = 60.0f;
 	static constexpr  float ANIM_SPEED = 15.0f;
-	static constexpr float ATTACK_FRAME = 6.5f;
 
 	//アニメーション番号
 	static constexpr int   ANIM_IDLE_INDEX = 1;
 	static constexpr int   ANIM_RUN_INDEX = 2;
 	static constexpr int   ANIM_FAST_RUN_INDEX = 3;
 	static constexpr int   ANIM_SLASHATTACK_INDEX = 4;
-	static constexpr int   ANIM_NORMALATTACK_INDEX = 5;
+	//static constexpr int   ANIM_NORMALATTACK_INDEX = 5;
 	static constexpr int   ANIM_DAMAGE_INDEX = 6;
 	static constexpr int   ANIM_DOWN_INDEX = 7;
 	static constexpr int   ANIM_EXATTACK_INDEX = 8;
@@ -71,21 +71,7 @@ public:
 
 	//ステータスアップ
 	static constexpr int EX_TIME = 10000;				//無敵時間
-	static constexpr float EFFECT_SCALE = 20.0f;		//エフェクトのスケール
 	static constexpr int HALF_DIVISOR = 2;				//÷2
-
-	//攻撃
-	static constexpr int NORMAL_ATTACK = 2;				//通常攻撃
-	static constexpr int SLASH_ATTACK = 1;				//スラッシュ
-	static constexpr int EX_ATTACK = 2;					//回転斬り
-	static constexpr float ATTACK_RADIUS = 100.0f;		//通常攻撃判定の球半径
-	static constexpr float ATTACK_FORWARD = 100.0f;		//通常攻撃位置の前方オフセット
-	static constexpr float ATTACK2_RADIUS = 140.0f;		//スラッシュ判定半径
-	static constexpr float ATTACK2_FORWARD = 80.0f;		//スラッシュ位置前方オフセット
-	static constexpr float ATTACK2_HEIGHT = 100.0f;		//スラッシュ位置高さ
-	static constexpr float EX_RADIUS = 140.0f;			//回転斬り判定半径
-	static constexpr float EX_HEIGHT = 100.0f;			//回転斬り位置高さ
-	static constexpr float HIT_STOP = 4.0f;				//攻撃時のヒットストップ
 
 	//ステータス関連
 	static constexpr int NAME_X = 55;										//名前の位置X
@@ -193,6 +179,15 @@ public:
 	//衝突用の球体半径の取得
 	float GetCollisionRadius(void);
 
+	//アニメーションを取得
+	AnimationController* GetAnimation() const;
+	
+	//クォータニオンを取得
+	const Quaternion& GetRotation() const;
+
+	//エネミーを取得
+	const std::vector<std::shared_ptr<EnemyBase>>* GetEnemies() const;
+
 	void Damage(int damage);	//ダメージ
 	void Muteki(void);			//無敵
 
@@ -206,6 +201,9 @@ private:
 	STATE state_;
 	std::map<STATE, std::function<void(void)>> stateChanges_;	//状態管理(状態遷移時初期処理)
 	std::function<void(void)> stateUpdate_;						//状態管理(更新)
+
+	//攻撃
+	std::unique_ptr<PlayerAttack> attack_;
 
 	//状態遷移
 	void ChangeState(STATE state);
@@ -227,11 +225,6 @@ private:
 	void CollisionGravity(void);
 	void CollisionCapsule(void);
 
-	//攻撃判定
-	void CollisionAttack(void);
-	void CollisionAttack2(void);
-	void CollisionAttackEx(void);
-
 	//プレイヤーが持つ判定
 	VECTOR collisionPos_;			//プレイヤーの当たり判定移動後座標
 	float collisionRadius_;			//衝突判定用の球体半径
@@ -239,9 +232,7 @@ private:
 
 	//プレイヤーの動き
 	void ProcessMove(void);			//移動
-	void ProcessAttack(void);		//攻撃モーション
 	void ProcessFall(void);			//落下処理
-	void StartHitStop(void);		//ヒットストップ
 
 	//回転
 	void SetGoalRotate(double rotRad);
@@ -249,7 +240,6 @@ private:
 
 	//モーション終了
 	bool IsEndLanding(void);		//アタック終了
-	bool IsExAttackReady() const;	//回転斬りリセット
 
 	//復活処理
 	void StartRevival();
@@ -258,7 +248,6 @@ private:
 
 	//エフェクト
 	void EffectFootSmoke(void);		//足煙エフェクト
-	void EffectSword(void);			//攻撃エフェクト
 
 	//移動関連
 	VECTOR moveDir_;				//移動方向
@@ -278,23 +267,12 @@ private:
 	//ステータス値
 	int hp_;		//プレイヤーの体力
 
-	//攻撃力
-	int normalAttack_;	//2ダメージ
-	int slashAttack_;	//1ダメージ
-	int exrAttack_;		//2ダメージ
-
 	//アイテム効果
 	bool invincible_;	//無敵状態
 
 	//攻撃フラグ
-	bool isAttack_;		//縦斬り
-	bool isAttack2_;	//横斬り
-	bool exAttack_;		//回転斬り
-	bool hasHit_;		//1回判定
 	int exTimer_;		//クールタイム 10秒（ミリ秒）
 	int lastExTime_;	//exが解放されたらすぐに使えるようにする
-	bool isHitStop_;	//ヒットストップ
-	int hitStopFrame_;	//ヒットストップのフレーム
 
 	//丸影
 	int imgShadow_;
@@ -303,11 +281,6 @@ private:
 	float stepFootSmoke_;
 	int effectSmokeResId_;
 	int effectSmokePleyId_;
-
-	//攻撃エフェクト
-	float stepSword_;
-	int effectSwordResId_;
-	int effectSwordPleyId_;
 
 	//ポインタ
 	const std::vector<std::shared_ptr<EnemyBase>>* enemy_;

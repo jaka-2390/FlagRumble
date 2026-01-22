@@ -102,6 +102,7 @@ void Application::Destroy(void)
 	ResourceManager::GetInstance().Destroy();
 	SoundManager::GetInstance().Destroy();
 	SceneManager::GetInstance().Destroy();
+	FontManager::Release();
 
 	// EffekseerèIóπ
 	Effkseer_End();

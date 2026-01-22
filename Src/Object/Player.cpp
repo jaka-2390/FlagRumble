@@ -11,6 +11,7 @@
 #include "Common/AnimationController.h"
 #include "Common/Capsule.h"
 #include "Common/Collider.h"
+#include "PlayerAttack.h"
 #include "Player.h"
 
 Player::Player(void)
@@ -30,14 +31,6 @@ Player::Player(void)
 
 	//丸影
 	imgShadow_ = -1;
-
-	//攻撃の初期化
-	slashAttack_ = SLASH_ATTACK;
-	exrAttack_ = EX_ATTACK;
-	isAttack2_ = false;
-	exAttack_ = false;
-	exTimer_ = EX_TIME;
-	lastExTime_ = -exTimer_;
 
 	//ステ関連
 	hp_ = HP;
@@ -77,10 +70,6 @@ void Player::Init(void)
 	effectSmokeResId_ = ResourceManager::GetInstance().Load(
 		ResourceManager::SRC::FOOT_SMOKE).handleId_;
 
-	//攻撃エフェクト
-	effectSwordResId_ = ResourceManager::GetInstance().Load(
-		ResourceManager::SRC::SWORD).handleId_;
-
 	//アニメーションの設定
 	InitAnimation();
 
@@ -95,6 +84,9 @@ void Player::Init(void)
 
 	//衝突判定用の球体中心の調整座標
 	collisionLocalPos_ = { 0.0f, capsule_->GetCenter().y - COLL_OFFSET, 0.0f };
+
+	attack_ = std::make_unique<PlayerAttack>(this);
+	attack_->Init();
 
 	//初期状態
 	ChangeState(STATE::PLAY);
@@ -118,18 +110,6 @@ void Player::Update(void)
 	//アニメーション再生
 	animationController_->Update();
 
-	if (isHitStop_)
-	{
-		hitStopFrame_--;
-
-		if (hitStopFrame_ <= 0)
-		{
-			isHitStop_ = false;
-			animationController_->SetStop(false);
-		}
-		return;
-	}
-
 	//ダウン処理
 	UpdateDown(DOWN_DELTATIME);
 }
@@ -144,9 +124,6 @@ void Player::UpdateDown(float deltaTime)
 	}
 
 	if (pstate_ == PlayerState::DOWN) {
-		isAttack_ = false;
-		isAttack2_ = false;
-		exAttack_ = false;
 		revivalTimer_ += deltaTime;
 		if (revivalTimer_ >= D_COUNT) {
 			Revival();
@@ -223,7 +200,7 @@ void Player::InitAnimation(void)
 	animationController_->Add((int)ANIM_TYPE::RUN, path + "Player.mv1", ANIM_SPEED, ANIM_RUN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "Player.mv1", ANIM_SPEED, ANIM_FAST_RUN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::SLASHATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_SLASHATTACK_INDEX);
-	animationController_->Add((int)ANIM_TYPE::NORMALATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_NORMALATTACK_INDEX);
+	//animationController_->Add((int)ANIM_TYPE::NORMALATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_NORMALATTACK_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DAMAGE, path + "Player.mv1", ANIM_SPEED, ANIM_DAMAGE_INDEX);
 	animationController_->Add((int)ANIM_TYPE::DOWN, path + "Player.mv1", ANIM_SPEED, ANIM_DOWN_INDEX);
 	animationController_->Add((int)ANIM_TYPE::EXATTACK, path + "Player.mv1", ANIM_SPEED, ANIM_EXATTACK_INDEX);
@@ -249,14 +226,17 @@ void Player::UpdatePlay(void)
 {
 	if (!canMove_)return;
 
+	//攻撃処理
+	//ProcessAttack();
+	attack_->Update();
+
+	if (attack_->IsAttacking()) return;
+
 	//移動処理
 	ProcessMove();
 
 	//移動方向に応じた回転
 	Rotate();
-
-	//攻撃処理
-	ProcessAttack();
 
 	//重力による移動量
 	CalcGravityPow();
@@ -415,7 +395,7 @@ void Player::ProcessMove(void)
 
 	double rotRad = 0;
 
-	if (!isAttack_ && !isAttack2_ && !exAttack_ && IsEndLanding())
+	if (IsEndLanding())
 	{
 		if (GetJoypadNum() == 0)
 		{
@@ -620,112 +600,6 @@ void Player::CollisionCapsule(void)
 	}
 }
 
-void Player::CollisionAttack(void)
-{
-	if (isAttack_ || enemy_)
-	{
-		//エネミーとの衝突判定
-
-		//攻撃の球の半径
-		float attackRadius = ATTACK_RADIUS;
-		//攻撃の方向(プレイヤーの前方)
-		VECTOR forward = transform_.quaRot.GetForward();
-		//攻撃の開始位置と終了位置
-		VECTOR attackPos = VAdd(transform_.pos, VScale(forward, ATTACK_FORWARD));
-
-		for (const auto& enemy : *enemy_)
-		{
-			if (!enemy || !enemy->IsAlive()) continue;
-
-			//敵の当たり判定とサイズ
-			VECTOR enemyPos = enemy->GetCollisionPos();
-			float enemyRadius = enemy->GetCollisionRadius();
-
-			//球体同士の当たり判定
-			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
-			{
-				VECTOR dir = VSub(enemyPos, attackPos);
-				dir = VNorm(dir);	//正規化
-				VECTOR hitPos = VAdd(attackPos, VScale(dir, attackRadius));
-
-				StartHitStop();
-
-				EffectSword();
-
-				SetPosPlayingEffekseer3DEffect(effectSwordPleyId_, hitPos.x, hitPos.y, hitPos.z);
-
-				enemy->Damage(normalAttack_);
-				//複数ヒット
-				continue;
-			}
-		}
-	}
-}
-
-void Player::CollisionAttack2(void)
-{
-	if (isAttack2_ || enemy_)
-	{
-		//エネミーとの衝突判定
-
-		//攻撃の球の半径
-		float attackRadius = ATTACK2_RADIUS;
-		//攻撃の方向(プレイヤーの前方)
-		VECTOR forward = transform_.quaRot.GetForward();
-		//攻撃の開始位置と終了位置
-		VECTOR attackPos = VAdd(transform_.pos, VScale(forward, ATTACK2_FORWARD));
-		attackPos.y += ATTACK2_HEIGHT;  //攻撃の高さ調整
-
-		for (const auto& enemy : *enemy_)
-		{
-			if (!enemy || !enemy->IsAlive()) continue;
-
-			//敵の当たり判定とサイズ
-			VECTOR enemyPos = enemy->GetCollisionPos();
-			float enemyRadius = enemy->GetCollisionRadius();
-
-			//球体同士の当たり判定
-			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
-			{
-				enemy->Damage(slashAttack_);
-				//複数ヒット
-				continue;
-			}
-		}
-	}
-}
-
-void Player::CollisionAttackEx(void)
-{
-	if (exAttack_ || enemy_)
-	{
-		//エネミーとの衝突判定
-
-		//攻撃の球の半径
-		float attackRadius = EX_RADIUS;
-		//攻撃の開始位置と終了位置
-		VECTOR attackPos = transform_.pos;
-		attackPos.y += EX_HEIGHT;  //攻撃の高さ調整
-
-		for (const auto& enemy : *enemy_)
-		{
-			if (!enemy || !enemy->IsAlive()) continue;
-
-			//敵の当たり判定とサイズ
-			VECTOR enemyPos = enemy->GetCollisionPos();
-			float enemyRadius = enemy->GetCollisionRadius();
-
-			//球体同士の当たり判定
-			if (AsoUtility::IsHitSpheres(attackPos, attackRadius, enemyPos, enemyRadius))
-			{
-				enemy->Damage(exrAttack_);
-				//複数ヒットさせたいなら
-				continue;
-			}
-		}
-	}
-}
-
 void Player::CalcGravityPow(void)
 {
 	//重力方向
@@ -757,87 +631,6 @@ void Player::ProcessFall(void)
 	}
 }
 
-void Player::StartHitStop(void)
-{
-	isHitStop_ = true;
-	hitStopFrame_ = HIT_STOP;
-
-	//アニメーション停止
-	animationController_->SetStop(true);
-}
-
-void Player::ProcessAttack(void)
-{
-	bool isHit = CheckHitKey(KEY_INPUT_E) ||
-		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP);
-	bool isHit_N = CheckHitKey(KEY_INPUT_Q);
-	bool isHit_E = CheckHitKey(KEY_INPUT_R);
-
-	//アタック
-	if (!isAttack_ && !isAttack2_ && !exAttack_ && isHit)
-	{
-		animationController_->Play((int)ANIM_TYPE::NORMALATTACK, false);
-		isAttack_ = true;
-		hasHit_ = false;
-	}
-
-	if (isAttack_)
-	{
-		const auto anim = animationController_->GetPlayAnim();
-
-		if (!hasHit_ && anim.step >= ATTACK_FRAME)
-		{
-			//衝突(攻撃)
-			CollisionAttack();
-
-			//攻撃音①
-			SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE1, Sound::TIMES::FORCE_ONCE);
-
-			hasHit_ = true;
-		}
-	}
-	/*else if (!isAttack2_ && !isAttack_ && !exAttack_ && isHit_N)
-	{
-		animationController_->Play((int)ANIM_TYPE::SLASHATTACK, false);
-		isAttack2_ = true;
-
-		//衝突(攻撃)
-		CollisionAttack2();
-
-		//攻撃音②
-		SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE2, Sound::TIMES::FORCE_ONCE);
-	}
-	else if (!exAttack_ && !isAttack_ && !isAttack2_ && isHit_E)
-	{
-		animationController_->Play((int)ANIM_TYPE::EXATTACK, false);
-		exAttack_ = true;
-		lastExTime_ = GetNowCount(); //← クールタイム開始
-
-		//衝突(攻撃)
-		CollisionAttackEx();
-
-		//攻撃音③
-		SoundManager::GetInstance().Play(SoundManager::SRC::ATK_SE3, Sound::TIMES::FORCE_ONCE);
-	}*/
-
-	//アニメーションが終わったらフラグをリセット
-	if (animationController_->IsEnd())
-	{
-		if (isAttack_)
-		{
-			isAttack_ = false;
-		}
-		if (isAttack2_)
-		{
-			isAttack2_ = false;
-		}
-		if (exAttack_)
-		{
-			exAttack_ = false;
-		}
-	}
-}
-
 bool Player::IsEndLanding(void)
 {
 	bool ret = true;
@@ -856,10 +649,19 @@ bool Player::IsEndLanding(void)
 	return false;
 }
 
-bool Player::IsExAttackReady() const
+AnimationController* Player::GetAnimation() const
 {
-	int now = GetNowCount(); //DxLib の現在時刻（ミリ秒）
-	return (now - lastExTime_) >= exTimer_;
+	return animationController_.get();
+}
+
+const Quaternion& Player::GetRotation() const
+{
+	return transform_.quaRot;
+}
+
+const std::vector<std::shared_ptr<EnemyBase>>* Player::GetEnemies() const
+{
+	return enemy_;
 }
 
 void Player::Damage(int damage)
@@ -930,15 +732,4 @@ void Player::EffectFootSmoke(void)
 		//エフェクトの位置
 		SetPosPlayingEffekseer3DEffect(effectSmokePleyId_, transform_.pos.x, transform_.pos.y, transform_.pos.z);
 	}
-}
-
-void Player::EffectSword(void)
-{
-	float scale = EFFECT_SCALE;
-
-	//エフェクト再生
-	effectSwordPleyId_ = PlayEffekseer3DEffect(effectSwordResId_);
-
-	//エフェクトの大きさ
-	SetScalePlayingEffekseer3DEffect(effectSwordPleyId_, scale, scale, scale);
 }

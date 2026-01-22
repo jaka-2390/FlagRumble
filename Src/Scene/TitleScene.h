@@ -84,8 +84,8 @@ public:
 	static constexpr int TEXT_NORMAL_SIZE = 55;	//通常のテキストサイズ
 	static constexpr int TEXT_SELECT_SIZE = 60;	//選択中のテキストサイズ
 
-	static constexpr double FONT_FINISH_SIZE = 7.8125;	//終了確認のフォントサイズ
-	static constexpr double FONT_SELECT_SIZE = 8.125;	//YES,NOのフォントサイズ
+	static constexpr int FONT_FINISH_SIZE = 123;	//終了確認のフォントサイズ
+	static constexpr int FONT_SELECT_SIZE = 130;	//YES,NOのフォントサイズ
 
 	static constexpr int HALF_DIVISOR = 2;		//÷2
 	static constexpr int DOUBLE_MULTIPLIER = 2;	//×2

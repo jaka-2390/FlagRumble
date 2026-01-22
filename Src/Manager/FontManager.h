@@ -10,11 +10,14 @@ public:
 
     static void DrawStringEx(int x, int y, const char* text, int color, int size);
 
-    static int GetAkazuki() { return kakuG_; }
+    static void Release(void);
+
+    static int GetKakuG() { return kakuG_; }
 
 private:
     
     static int kakuG_;
+    static int currentSize_;
 
 };
 

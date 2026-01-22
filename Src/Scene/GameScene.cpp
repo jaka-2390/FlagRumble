@@ -8,6 +8,7 @@
 #include "../Manager/GravityManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/FlagManager.h"
+#include "../Manager/FontManager.h"
 #include "../Object/Common/Capsule.h"
 #include "../Object/Common/Collider.h"
 #include "../Object/SkyDome.h"
@@ -231,21 +232,18 @@ void GameScene::Draw(void)
 		if (pauseState_ == PauseState::Menu)
 		{
 			DrawRotaGraph((Application::SCREEN_SIZE_X / HALF_DIVISOR), UI_PAUSE_IMG_HEIGHT, PAUSE_IMG_UI_SIZE, 0, pauseImg_, true);
-			SetFontSize(DEFAULT_FONT_SIZE * TITLE_FONT_SCALE);
-
-			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white);
+			
+			FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", white, TITLE_FONT_SIZE);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == 0)
-				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow);
+				FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_3, UI_HEIGHT_PAUSE_1, "ゲームに戻る", yellow, TITLE_FONT_SIZE);
 
-			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white);
+			FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", white, TITLE_FONT_SIZE);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_CONTROLS)
-				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow);
+				FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_1, UI_HEIGHT_PAUSE_2, "操作説明", yellow, TITLE_FONT_SIZE);
 
-			DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", white);
+			FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", white, TITLE_FONT_SIZE);
 			if (pauseSelectIndex_ % PAUSE_MENU_ITEM_COUNT == PAUSE_MENU_TITLE)
-				DrawString((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", yellow);
-
-			SetFontSize(DEFAULT_FONT_SIZE);
+				FontManager::DrawStringEx((Application::SCREEN_SIZE_X / HALF_DIVISOR) - UI_WIDTH_PAUSE_2, UI_HEIGHT_PAUSE_3, "タイトルへ", yellow, TITLE_FONT_SIZE);
 		}
 		else if (pauseState_ == PauseState::ShowControls)
 		{
@@ -253,28 +251,13 @@ void GameScene::Draw(void)
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 			DrawGraph(0, 0, pauseExplainImgs_[0], true);
-			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
-			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
-			SetFontSize(DEFAULT_FONT_SIZE);
-		}
-		else if (pauseState_ == PauseState::ShowItems)
-		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
-			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawGraph(0, 0, pauseExplainImgs_[1], true);
-			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
-			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
-			SetFontSize(DEFAULT_FONT_SIZE);
+			FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow, ENTER_FONT_SIZE);
+			if (cnt % FLASH * FLASH_RATE <= FLASH)FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white, ENTER_FONT_SIZE);
 		}
 		return;
 	}
 #pragma region UI
-	SetFontSize(DEFAULT_FONT_SIZE * ATTACK_FONT_SCALE);
-	DrawString(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:攻撃", white);
-	SetFontSize(DEFAULT_FONT_SIZE);
+	FontManager::DrawStringEx(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:攻撃", white, ATTACK_FONT_SIZE);
 #pragma endregion
 }
 

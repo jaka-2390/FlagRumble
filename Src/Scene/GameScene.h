@@ -52,9 +52,9 @@ public:
 	static constexpr float PAUSE_IMG_UI_SIZE = 0.65;	//pauseImg_のサイズ
 
 	//ポーズメニュー関連
-	static constexpr double TITLE_FONT_SCALE = 5.0;						//フォントのスケール
-	static constexpr double ENTER_FONT_SCALE = 2.5;						//Enterのスケール
-	static constexpr double ATTACK_FONT_SCALE = 2.0;					//攻撃のスケール
+	static constexpr int TITLE_FONT_SIZE = 80;						//フォントのスケール
+	static constexpr int ENTER_FONT_SIZE = 40;						//Enterのスケール
+	static constexpr int ATTACK_FONT_SIZE = 32;					//攻撃のスケール
 	static constexpr int PAUSE_MENU_CONTROLS = 1;						//操作説明
 	static constexpr int PAUSE_MENU_TITLE = 2;							//タイトルへ
 	static constexpr int PAUSE_MENU_ITEM_COUNT = 3;						//ポーズメニューの数
