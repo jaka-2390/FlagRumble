@@ -249,7 +249,7 @@ void GameScene::Draw(void)
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawGraph(0, 0, pauseExplainImgs_[0], true);
+			DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[0], true);
 			FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow, ENTER_FONT_SIZE);
 			if (cnt % FLASH * FLASH_RATE <= FLASH)FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white, ENTER_FONT_SIZE);
 		}

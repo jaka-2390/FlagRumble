@@ -381,7 +381,7 @@ void DemoScene::DrawPause()
 
 		//ëÄçÏê‡ñæÇ©Ç«Ç§Ç©
 		int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
-		DrawGraph(0, 0, pauseExplainImgs_[imgIndex], true);
+		DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[imgIndex], true);
 
 		//ï∂éöÇâ©êFÇ…ì_ñ≈
 		SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
