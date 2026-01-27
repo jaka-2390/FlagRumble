@@ -36,6 +36,7 @@ public:
 		SELECT_YES,
 		SELECT_NO,
 		OPE_GEAR,
+		OPE_GEAR_CON,
 		//3Dƒ‚ƒfƒ‹
 		SPEECH_BALLOON,
 		PLAYER,

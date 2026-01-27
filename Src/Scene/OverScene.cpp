@@ -43,9 +43,6 @@ OverScene::OverScene(void)
 	selectedIndex_ = 0;
 	isMenuActive_ = false;
 
-	maskLeftX_ = 0;
-	maskRightX_ = 0;
-
 	cheackCounter_ = 0;
 }
 
@@ -66,8 +63,6 @@ void OverScene::Init(void)
 
 	// 画像の横幅（例）
 	const int massageX = Application::SCREEN_SIZE_X / static_cast<int>(VALUE_TWO) - MASSAGE_X_OFFSET;
-	maskLeftX_ = massageX;                          // 黒帯は最初は画像全体を覆う
-	maskRightX_ = massageX + maskWidthMax_;
 
 	selectedIndex_ = 0;
 
@@ -111,7 +106,9 @@ void OverScene::Update(void)
 			selectedIndex_ = 1 - selectedIndex_;
 		}
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
 			if (selectedIndex_ == 0) {
 				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			}
@@ -126,14 +123,11 @@ void OverScene::Update(void)
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
 
-	// 黒帯の左端を右へスライド（文字が左から見える）
-	if (maskLeftX_ < maskRightX_)
+	// メッセージ表示用タイマー
+	messageTimer_ += FRAME_TIME; //1フレーム = 1/60秒として加算
+	if (messageTimer_ >= MESSAGE_SEC)
 	{
-		maskLeftX_ += revealSpeed_;
-		if (maskLeftX_ >= maskRightX_) {
-			maskLeftX_ = maskRightX_;
-			isMenuActive_ = true; // ← ここで初めて true にする
-		}
+		isMenuActive_ = true; // ← ここで初めて true にする
 	}
 
 	animationController_->Update();
@@ -199,10 +193,6 @@ void OverScene::Draw(void)
 	SetFontSize(STORY_FONT_SIZE);
 	DrawString(Application::SCREEN_SIZE_X / static_cast<int>(VALUE_TWO) - STORY_X_OFFSET, STORY_Y, "プレイヤーは死んでしまった…", white, true);
 	SetFontSize(DEFAULT_FONT_SIZE);
-
-	//黒帯描画（maskLeftX_ は初期値 msgX + imgW から 徐々に msgX へ移動する想定）
-	DrawBox(BLACK_BOX_X1 + (cnt * BLACK_BOX_SLIDE_SPEED),
-		BLACK_BOX_Y1, BLACK_BOX_X2, BLACK_BOX_Y2, black, true);
 }
 
 void OverScene::Release(void)

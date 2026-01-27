@@ -26,6 +26,7 @@ DemoScene::DemoScene(void)
 	skyDome_ = nullptr;
 	stage_ = nullptr;
 	imgOpeGear_ = -1;
+	imgOpeGearCon_ = -1;
 }
 
 DemoScene::~DemoScene(void)
@@ -61,6 +62,7 @@ void DemoScene::Init(void)
 
 	//画像
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
+	imgOpeGearCon_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR_CON).handleId_;
 
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
 
@@ -104,7 +106,8 @@ void DemoScene::Update(void)
 	//-------------------------
 
 	if (ins.IsNew(KEY_INPUT_RETURN) ||
-		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		skipSecond_ += FRAME_TIME;	//1フレーム = 1/60秒
 		skipActive_ = true;
@@ -187,7 +190,13 @@ void DemoScene::Draw(void)
 		DrawString(Application::SCREEN_SIZE_X - SKIP_TEX_OFSET_X, Application::SCREEN_SIZE_Y - SKIP_TEX_OFSET_Y, "Skip", white);
 	}
 
-	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
+	bool isPad = (GetJoypadNum() > 0);
+
+	if (isPad)
+		DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGearCon_, true);
+	else
+		DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
+
 
 	//入力チェック or 時間経過でフェード開始
 	if (!uiFadeStart_)
@@ -341,7 +350,8 @@ void DemoScene::UpdateSabo()
 void DemoScene::UpdateFinish()
 {
 	if (ins.IsNew(KEY_INPUT_RETURN) || 
-		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
@@ -383,11 +393,24 @@ void DemoScene::DrawPause()
 		int imgIndex = (pauseState_ == PauseState::ShowControls) ? 0 : 1;
 		DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[imgIndex], true);
 
-		//文字を黄色に点滅
-		SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
-		DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
-		if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
-		SetFontSize(DEFAULT_FONT_SIZE);
+		bool isPad = (GetJoypadNum() > 0);
+
+		if (isPad)
+		{
+			//文字を黄色に点滅
+			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
+			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Bボタンで戻る", yellow);
+			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Bボタンで戻る", white);
+			SetFontSize(DEFAULT_FONT_SIZE);
+		}
+		else
+		{
+			//文字を黄色に点滅
+			SetFontSize(DEFAULT_FONT_SIZE * ENTER_FONT_SCALE);
+			DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow);
+			if (cnt % FLASH * FLASH_RATE <= FLASH)DrawString(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white);
+			SetFontSize(DEFAULT_FONT_SIZE);
+		}
 	}
 	return;
 }
@@ -554,7 +577,9 @@ bool DemoScene::PauseMenu(void)
 		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_UP) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 		{
 			switch (pauseSelectIndex_)
 			{
@@ -569,7 +594,9 @@ bool DemoScene::PauseMenu(void)
 	}
 	else
 	{
-		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 			pauseState_ = PauseState::Menu;
 	}
 

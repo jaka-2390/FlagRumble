@@ -56,9 +56,13 @@ void ResourceManager::Init(void)
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "PauseOpe.png");
 	resourcesMap_.emplace(SRC::PAUSEOPE, std::move(res));
 
-	// 設定表示
+	// キーボード設定表示
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "OpeGear.png");
 	resourcesMap_.emplace(SRC::OPE_GEAR, std::move(res));
+	
+	// コントローラー設定表示
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "OpeGearCon.png");
+	resourcesMap_.emplace(SRC::OPE_GEAR_CON, std::move(res));
 
 	// ゲームクリア
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Clear1.png");

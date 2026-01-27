@@ -30,6 +30,7 @@ GameScene::GameScene(void)
 	skyDome_ = nullptr;
 	stage_ = nullptr;
 	imgOpeGear_ = -1;
+	imgOpeGearCon_ = -1;
 }
 
 GameScene::~GameScene(void)
@@ -69,6 +70,7 @@ void GameScene::Init(void)
 
 	//画像
 	imgOpeGear_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR).handleId_;
+	imgOpeGearCon_ = resMng_.Load(ResourceManager::SRC::OPE_GEAR_CON).handleId_;
 
 	pauseImg_ = LoadGraph("Data/Image/pause.png");
 
@@ -206,7 +208,12 @@ void GameScene::Draw(void)
 
 	//DrawMiniMap();
 
-	DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
+	bool isPad = (GetJoypadNum() > 0);
+
+	if (isPad)
+		DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGearCon_, true);
+	else
+		DrawRotaGraph(UI_GEAR, UI_GEAR, IMG_OPEGEAR_UI_SIZE, 0.0, imgOpeGear_, true);
 
 	//入力チェック or 時間経過でフェード開始
 	if (!uiFadeStart_)
@@ -249,15 +256,21 @@ void GameScene::Draw(void)
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, PAUSE_WHITE_ALPHA);
 			DrawBox(0, 0, (Application::SCREEN_SIZE_X), (Application::SCREEN_SIZE_Y), white, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[0], true);
-			FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow, ENTER_FONT_SIZE);
-			if (cnt % FLASH * FLASH_RATE <= FLASH)FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white, ENTER_FONT_SIZE);
+			if (isPad)
+			{
+				DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[0], true);
+				FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Bボタンで戻る", yellow, ENTER_FONT_SIZE);
+				if (cnt % FLASH * FLASH_RATE <= FLASH)FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Bボタンで戻る", white, ENTER_FONT_SIZE);
+			}
+			else
+			{
+				DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, 0.5, 0, pauseExplainImgs_[0], true);
+				FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", yellow, ENTER_FONT_SIZE);
+				if (cnt % FLASH * FLASH_RATE <= FLASH)FontManager::DrawStringEx(BACK_PAUSE_WIDTH, BACK_PAUSE_HEIGHT, "Enterキーで戻る", white, ENTER_FONT_SIZE);
+			}
 		}
 		return;
 	}
-#pragma region UI
-	FontManager::DrawStringEx(UI_ATTACK_X, UI_NORMAL_ATTACK_Y, "E:攻撃", white, ATTACK_FONT_SIZE);
-#pragma endregion
 }
 
 void GameScene::Release(void)
@@ -440,7 +453,9 @@ bool GameScene::PauseMenu(void)
 		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 			pauseSelectIndex_ = (pauseSelectIndex_ + PAUSE_MENU_UP) % PAUSE_MENU_ITEM_COUNT;
 
-		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 		{
 			switch (pauseSelectIndex_)
 			{
@@ -455,7 +470,9 @@ bool GameScene::PauseMenu(void)
 	}
 	else
 	{
-		if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 			pauseState_ = PauseState::Menu;
 	}
 

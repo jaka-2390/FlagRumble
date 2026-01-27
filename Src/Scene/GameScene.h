@@ -163,6 +163,7 @@ private:
 
 	//İ’èŠJ‚­
 	int imgOpeGear_;
+	int imgOpeGearCon_;
 
 	std::vector<std::shared_ptr<EnemyBase>> enemys_;
 	int enCounter;//“G‚ÌoŒ»•p“x

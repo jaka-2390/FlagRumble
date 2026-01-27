@@ -110,7 +110,9 @@ void ClearScene::Update(void)
 	}
 
 	// 入力受付（アニメーション後）
-	if (isAnimEnd_ && CheckHitKeyAll() > 0 || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
+	if (isAnimEnd_ && CheckHitKeyAll() > 0 || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 		// 音楽
 		SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
@@ -158,21 +160,11 @@ void ClearScene::Draw(void)
 		"陣地を奪還した", true);
 	SetFontSize(FONT_SIZE_DEFAULT);
 
-	// メッセージの上に背景で覆う（横方向）
-	int horizontalMaskW = messageX_ + imgW_ - maskLeftX_;
-	if (horizontalMaskW > 0) {
-		DrawRectGraph(
-			maskLeftX_, messageY_,                    // 表示先（画面上）
-			maskLeftX_, messageY_, horizontalMaskW, imgH_, // 背景画像の一部
-			imgBackGameClaer_, TRUE, FALSE
-		);
-	}
-
 	// 敵モデル
-	MV1DrawModel(enemy_.modelId);
+	//MV1DrawModel(enemy_.modelId);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, pressKeyAlpha_);
-	DrawGraph(0, pressKeyY_, imgPressKey_, true);
+	//DrawGraph(0, pressKeyY_, imgPressKey_, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 

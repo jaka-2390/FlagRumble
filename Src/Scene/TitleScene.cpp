@@ -111,7 +111,9 @@ void TitleScene::Update(void)
 				ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT)) {
 				confirmIndex_ = 1 - confirmIndex_; // 「はい」「いいえ」切替
 			}
-			if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
+			if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+				ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+				ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
 				SoundManager::GetInstance().Play(SoundManager::SRC::SET_SE, Sound::TIMES::ONCE);
 
 				if (confirmIndex_ == 0) {
@@ -140,7 +142,9 @@ void TitleScene::Update(void)
 		selectedIndex_ = (selectedIndex_ + SELECT_UP) % MENU_SELECT;
 	}
 
-	if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	if (ins.IsTrgDown(KEY_INPUT_RETURN) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		if (selectedIndex_ == 0) {
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);

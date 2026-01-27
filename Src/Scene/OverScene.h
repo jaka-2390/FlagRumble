@@ -43,11 +43,9 @@ public:
 	static constexpr int STORY_Y = 330;
 	static constexpr int BLACK_BOX_SLIDE_SPEED = 4;
 
-	// 黒帯
-	static constexpr int BLACK_BOX_X1 = 200;
-	static constexpr int BLACK_BOX_Y1 = 300;
-	static constexpr int BLACK_BOX_X2 = 1700;
-	static constexpr int BLACK_BOX_Y2 = 500;
+	// メッセージ
+	static constexpr int MESSAGE_SEC = 2;
+	static constexpr float FRAME_TIME = 1.0f / 60.0f;
 
 	static constexpr int FORCE_TITLE_TIME = 3600; // 60秒でタイトルに戻る
 
@@ -55,13 +53,6 @@ public:
 	int white = 0xffffff; //白
 	int black = 0x000000; //黒
 	int yellow = 0xffff00;//黄
-
-	//struct VECTOR4
-	//{
-	//	float x, y, z, w;
-	//	VECTOR4() : x(0), y(0), z(0), w(0) {}
-	//	VECTOR4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
-	//};
 
 	OverScene(void);	// コンストラクタ
 	~OverScene(void);	// デストラクタ
@@ -84,15 +75,13 @@ private:
 	int selectedIndex_;       // 選択中のメニューインデックス（0:リプレイ, 1:タイトルへ）
 	bool isMenuActive_;
 
-	// 死んでしまった…
-	int maskLeftX_;   // 黒帯の左端X座標
-	int maskRightX_;  // 黒帯の右端X座標（固定）
-
 	// カウンター
 	int cheackCounter_;
 
 	static constexpr int maskWidthMax_ = 1600;  // 画像横幅
 	static constexpr int revealSpeed_ = 4;
+
+	float messageTimer_ = 0.0f;		//メッセージ表示用タイマー
 
 	// キャラクター
 	Transform charactor_;

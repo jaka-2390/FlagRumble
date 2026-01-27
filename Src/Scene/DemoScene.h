@@ -179,7 +179,8 @@ private:
 		int uiFadeFrame_ = 0;
 
 		//設定開く
-		int imgOpeGear_;
+		int imgOpeGear_;		//キーボード
+		int imgOpeGearCon_;		//コントローラー
 
 		std::vector<std::shared_ptr<EnemyBase>> enemys_;
 		int enCounter;//敵の出現頻度
