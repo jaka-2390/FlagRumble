@@ -221,7 +221,7 @@ void TitleScene::Draw(void)
 	// タイトルロゴ表示
 	int titleW, titleH;
 	GetGraphSize(imgTitle_, &titleW, &titleH);
-	DrawRotaGraph((Application::SCREEN_SIZE_X / HALF_DIVISOR), IMG_TITLE_HEIGHT, IMG_TITLE_SIZE, 0, imgTitle_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / HALF_DIVISOR, Application::SCREEN_SIZE_Y / HALF_DIVISOR, IMG_TITLE_SIZE, 0, imgTitle_, true);
 
 #pragma region		ボタン設定
 	const int yGame = BASE_Y;
@@ -250,34 +250,6 @@ void TitleScene::Draw(void)
 	// カーソル描画
 	DrawRotaGraph(CURSOR_1_WIDTH, CURSOR_HEIGHT +
 		(selectedIndex_ * INDEX), IMG_CURSOR_SIZE, 0, imgP1_[static_cast<int>(cnt * CURSOR_MOVE_SPEED) % CURSOR_FRAME_COUNT], true);
-
-	//テキスト
-	if (selectedIndex_ == 0)
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, TEXT_SELECT_SIZE);
-	}
-	else
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_1, "ゲームプレイ", white, TEXT_NORMAL_SIZE);
-	}
-
-	if (selectedIndex_ == MENU_DEMO)
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, TEXT_SELECT_SIZE);
-	}
-	else
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_2, "ルール説明", white, TEXT_NORMAL_SIZE);
-	}
-
-	if (selectedIndex_ == MENU_FINISH)
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, TEXT_SELECT_SIZE);
-	}
-	else
-	{
-		FontManager::DrawStringEx(TEXT_WIDTH, TEXT_HEIGHT_3, "ゲーム終了", white, TEXT_NORMAL_SIZE);
-	}
 
 	if (GetASyncLoadNum() != 0)
 	{

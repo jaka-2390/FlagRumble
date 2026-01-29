@@ -41,7 +41,7 @@ void ClearScene::Init(void)
 	cheackCounter_ = 0;
 
 	// 音楽
-	SoundManager::GetInstance().Play(SoundManager::SRC::GAMECLEAR_BGM, Sound::TIMES::LOOP);
+	SoundManager::GetInstance().Play(SoundManager::SRC::GAMECLEAR_BGM, Sound::TIMES::ONCE);
 
 	// アニメーション用です
 	// ---------------------------------------------

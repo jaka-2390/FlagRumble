@@ -39,7 +39,7 @@ public:
 
 	static constexpr float INVERSION = 90.0f;
 
-	static constexpr float IMG_TITLE_SIZE = 0.6;
+	static constexpr float IMG_TITLE_SIZE = 1.0;
 	static constexpr int IMG_TITLE_HEIGHT = 200;
 
 	static constexpr int WHITE_ALPHA = 255;
@@ -51,7 +51,7 @@ public:
 	static constexpr int BUTTON_OFFSET = 120;
 
 	static constexpr int CURSOR_1_WIDTH = 720;
-	static constexpr int CURSOR_HEIGHT = 450;
+	static constexpr int CURSOR_HEIGHT = 490;
 
 	static constexpr int INDEX = 110;
 	static constexpr float IMG_CURSOR_SIZE = 4.5;

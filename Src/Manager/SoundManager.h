@@ -31,6 +31,7 @@ public:
 		E_DAMAGE_SE,	//敵がダメージSE
 		SET_SE,			//決定のSE
 		WARNING_SE,		//警告音SE
+		GETFLAG_SE,	//フラッグ取得SE
 	};
 
 	// 明示的にインステンスを生成する

@@ -25,7 +25,8 @@ public:
     static constexpr int HALF_DIVISOR = 2;				//ÅÄ2
     static constexpr int GAUGE_SCREEN_OFFSET_Y = 20;
     
-    static constexpr float EFFECT_SCALE = 300.0f;
+    static constexpr float EFFECT_SCALE = 10.0f;
+    static constexpr int EFFECT_OFFSET = 100;
 
     //êF
     int white = 0xffffff; //îí

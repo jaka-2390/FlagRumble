@@ -7,6 +7,7 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/GravityManager.h"
 #include "../Manager/SoundManager.h"
+#include "../Manager/FontManager.h"
 #include "../Manager/Camera.h"
 #include "Common/AnimationController.h"
 #include "Common/Capsule.h"
@@ -140,7 +141,7 @@ void Player::Draw(void)
 
 #pragma region ステータス
 
-	DrawFormatString(NAME_X, NAME_Y, black, "PLAYER");
+	FontManager::DrawStringEx(NAME_X, NAME_Y, "PLAYER", black, HP_NAME_STRING);
 	//枠線
 	DrawBox(FRAME_START_X, FRAME_START_Y, FRAME_END_X, FRAME_END_Y, gray, true);
 

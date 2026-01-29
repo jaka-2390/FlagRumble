@@ -130,6 +130,11 @@ void SoundManager::Init(void)
 	res = Sound(Sound::TYPE::SOUND_2D, Application::PATH_SOUND + "WarningSE.mp3");
 	res.ChangeMaxVolume(1.5);
 	soundMap_.emplace(SRC::WARNING_SE, res);
+
+	//ƒtƒ‰ƒbƒOŽæ“¾
+	res = Sound(Sound::TYPE::SOUND_2D, Application::PATH_SOUND + "GetFlagSE.mp3");
+	res.ChangeMaxVolume(0.8);
+	soundMap_.emplace(SRC::GETFLAG_SE, res);
 }
 
 void SoundManager::Release(void)

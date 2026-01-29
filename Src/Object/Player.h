@@ -67,6 +67,7 @@ public:
 	//ステ関連
 	static constexpr float DOWN_DELTATIME = 1.0f;
 	static constexpr int HP = 10;
+	static constexpr int HP_NAME_STRING = 19;
 	static constexpr int D_COUNT = 600;
 
 	//ステータスアップ

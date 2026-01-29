@@ -77,7 +77,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::BACK_GAMECLEAR, std::move(res));
 
 	// ゲームオーバー
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Over/Over.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Over/GameOver.png");
 	resourcesMap_.emplace(SRC::GAMEOVER, std::move(res));
 
 	// はい選択中
@@ -192,7 +192,7 @@ void ResourceManager::Init(void)
 	//-------------------------
 
 	//中立エリア
-	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "NoneArea.efkefc");
+	res = std::make_unique<RES>(RES_T::EFFEKSEER, PATH_EFF + "AreaTexture/GetArea.efkefc");
 	resourcesMap_.emplace(SRC::NONE_AREA, std::move(res));
 	
 	//プレイヤーエリア

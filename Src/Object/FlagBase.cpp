@@ -1,6 +1,7 @@
 #include<EffekseerForDXLib.h>
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SceneManager.h"
+#include "../Manager/SoundManager.h"
 #include "../Utility/AsoUtility.h"
 #include "FlagBase.h"
 
@@ -19,8 +20,8 @@ FlagBase::FlagBase(VECTOR pos, ENEMY_TYPE type, STATE state) :
 	effectPlayerAreaPlayId_ = 0;
 	effectPlayerAreaPlayId_ = 0;
 
-	effectNeutralAreaPlayId_ = 0;
-	effectNeutralAreaPlayId_ = 0;
+	effectNeutralAreaPlayId_ = -1;
+	effectNeutralAreaPlayId_ = -1;
 }
 
 void FlagBase::Init()
@@ -163,10 +164,24 @@ void FlagBase::CheckCircle(const VECTOR& playerPos, const std::vector<std::share
 		if (!enemyNear_ && playerInRange_)
 		{
 			clearGauge_ += GAUGE_UP;
+			//エフェクト
+			if (effectNeutralAreaPlayId_ >= 0)
+			{
+				StopEffekseer3DEffect(effectNeutralAreaPlayId_);
+			}
+
+			float scale = EFFECT_SCALE;  // デフォルト値
+
+			effectNeutralAreaPlayId_ = PlayEffekseer3DEffect(effectNeutralAreaResId_);
+			SetScalePlayingEffekseer3DEffect(effectNeutralAreaPlayId_, scale, scale, scale);
 			if (clearGauge_ >= clearGaugeMax_)
 			{
 				clearGauge_ = clearGaugeMax_;
 				state_ = STATE::PLAYER;
+				SetPosPlayingEffekseer3DEffect(effectNeutralAreaPlayId_, pos_.x, pos_.y + EFFECT_OFFSET, pos_.z);
+
+				//旗の取得音
+				SoundManager::GetInstance().Play(SoundManager::SRC::GETFLAG_SE, Sound::TIMES::ONCE);
 			}
 		}
 		else
