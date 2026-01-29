@@ -668,6 +668,7 @@ const std::vector<std::shared_ptr<EnemyBase>>* Player::GetEnemies() const
 void Player::Damage(int damage)
 {
 	if (pstate_ == PlayerState::DOWN || invincible_) return;  //ダウン中は無敵
+	if (SceneManager::GetInstance().GetSceneID() == SceneManager::SCENE_ID::GAME)//ゲーム中のみダメージ処理
 	hp_ -= damage;
 
 	//アニメーション
