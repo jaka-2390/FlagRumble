@@ -30,6 +30,7 @@ public:
 
     //êF
     int white = 0xffffff; //îí
+    int red = 0xff0000; //ê‘
     int green = 0x00ff00; //óŒ
 
     enum class ENEMY_TYPE
@@ -110,7 +111,8 @@ protected:
     void CheckCircle(const VECTOR& playerPos, const std::vector<std::shared_ptr<EnemyBase>>& enemies);
 
     void DrawCircleOnMap(VECTOR center, float radius, int color);
-    void DrawGauge3D(VECTOR center, float gaugeRate);
+    void PlayerDrawGauge(VECTOR center, float gaugeRate);
+    void EnemyDrawGauge(VECTOR center, float gaugeRate);
 
     //â~Ç∆ÇÃãóó£
     float DistanceSqXZ(const VECTOR& a, const VECTOR& b) const;

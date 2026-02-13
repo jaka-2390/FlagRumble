@@ -63,7 +63,7 @@ void PlayerAttack::ProcessInput(void)
 	if (CheckHitKey(KEY_INPUT_E) || 
 		ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP))
 	{
-		owner_->GetAnimation()->Play((int)ATTACK_TYPE::NORMALATTACK, false);
+		owner_->GetAnimation()->Play((int)ATTACK_TYPE::NORMALATTACK, false, 2.0f, 14.0f);
 
 		isAttack_ = true;
 		hasHit_ = false;

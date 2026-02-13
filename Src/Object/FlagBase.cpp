@@ -103,7 +103,11 @@ void FlagBase::Draw()
 
 	if (!enemyNear_ && playerInRange_ && !IsOwnedByPlayer())
 	{
-		DrawGauge3D(pos_, clearGauge_ / clearGaugeMax_);
+		PlayerDrawGauge(pos_, clearGauge_ / clearGaugeMax_);
+	}
+	else if(enemyNear_ && !playerInRange_ && !IsOwnedByEnemy())
+	{
+		EnemyDrawGauge(pos_, clearGauge_ / clearGaugeMax_);
 	}
 }
 
@@ -208,7 +212,7 @@ void FlagBase::DrawCircleOnMap(VECTOR center, float radius, int color)
 	}
 }
 
-void FlagBase::DrawGauge3D(VECTOR center, float gaugeRate)
+void FlagBase::PlayerDrawGauge(VECTOR center, float gaugeRate)
 {
 	// ゲージバーを円の上（少し高い位置）に表示
 	VECTOR gaugePos = VAdd(center, VGet(0.0f, GAUGE_OFFSET_Y, 0.0f)); // 円より上
@@ -226,6 +230,26 @@ void FlagBase::DrawGauge3D(VECTOR center, float gaugeRate)
 	// 中身
 	int fillWidth = (int)(barWidth * gaugeRate);
 	DrawBox(x, y, x + fillWidth, y + barHeight, green, TRUE);
+}
+
+void FlagBase::EnemyDrawGauge(VECTOR center, float gaugeRate)
+{
+	// ゲージバーを円の上（少し高い位置）に表示
+	VECTOR gaugePos = VAdd(center, VGet(0.0f, GAUGE_OFFSET_Y, 0.0f)); // 円より上
+	VECTOR screenPos = ConvWorldPosToScreenPos(gaugePos);
+
+	int barWidth = GAUGE_WIDTH;
+	int barHeight = GAUGE_HEIGHT;
+
+	int x = (int)screenPos.x - barWidth / HALF_DIVISOR;
+	int y = (int)screenPos.y - GAUGE_SCREEN_OFFSET_Y; // 少し上にオフセット
+
+	// 外枠
+	DrawBox(x - 1, y - 1, x + barWidth + 1, y + barHeight + 1, white, FALSE);
+
+	// 中身
+	int fillWidth = (int)(barWidth * gaugeRate);
+	DrawBox(x, y, x + fillWidth, y + barHeight, red, TRUE);
 }
 
 float FlagBase::DistanceSqXZ(const VECTOR& a, const VECTOR& b) const
